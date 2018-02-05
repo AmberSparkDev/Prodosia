@@ -1,10 +1,10 @@
 /** This file is released under the Apache License 2.0. See the LICENSE file for details. **/
 package com.github.kskelm.baringo.model.search;
 
-import java.util.logging.Logger;
-
 import com.github.kskelm.baringo.BaringoClient;
 import com.github.kskelm.baringo.util.Utils;
+
+import java.util.logging.Logger;
 
 /**
  * 

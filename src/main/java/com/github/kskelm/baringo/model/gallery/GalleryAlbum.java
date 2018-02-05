@@ -1,12 +1,12 @@
 /** This file is released under the Apache License 2.0. See the LICENSE file for details. **/
 package com.github.kskelm.baringo.model.gallery;
 
-import java.util.HashMap;
-import java.util.List;
-
 import com.github.kskelm.baringo.model.Image;
 import com.github.kskelm.baringo.util.Utils;
 import com.google.gson.annotations.SerializedName;
+
+import java.util.HashMap;
+import java.util.List;
 
 /**
  * Model object for albums found in a gallery.

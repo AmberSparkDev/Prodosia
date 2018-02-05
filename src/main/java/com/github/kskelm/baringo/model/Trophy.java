@@ -1,10 +1,10 @@
 /** This file is released under the Apache License 2.0. See the LICENSE file for details. **/
 package com.github.kskelm.baringo.model;
 
-import java.util.Date;
-
 import com.github.kskelm.baringo.util.Utils;
 import com.google.gson.annotations.SerializedName;
+
+import java.util.Date;
 
 /**
  * Represents a trophy that can be earned by users, such as the number

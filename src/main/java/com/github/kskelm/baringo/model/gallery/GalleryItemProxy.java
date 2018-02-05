@@ -1,16 +1,14 @@
 /** This file is released under the Apache License 2.0. See the LICENSE file for details. **/
 package com.github.kskelm.baringo.model.gallery;
 
-import java.lang.reflect.Field;
-import java.util.Date;
-import java.util.List;
-
 import com.github.kskelm.baringo.model.Comment;
 import com.github.kskelm.baringo.model.Image;
 import com.github.kskelm.baringo.model.gallery.GalleryAlbum.Layout;
 import com.github.kskelm.baringo.model.gallery.GalleryAlbum.Privacy;
-import com.github.kskelm.baringo.util.Utils;
 import com.google.gson.annotations.SerializedName;
+
+import java.util.Date;
+import java.util.List;
 
 /**
  * <b>INTERNAL ONLY - don't use this for anything.</b>

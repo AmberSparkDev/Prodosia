@@ -1,19 +1,7 @@
 /** This file is released under the Apache License 2.0. See the LICENSE file for details. **/
 package com.github.kskelm.baringo;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
-import com.github.kskelm.baringo.model.ImgurResponseWrapper;
-import com.github.kskelm.baringo.model.Comment;
-import com.github.kskelm.baringo.model.Image;
-import com.github.kskelm.baringo.model.ReportReason;
-import com.github.kskelm.baringo.model.TagGallery;
-import com.github.kskelm.baringo.model.TagVote;
-import com.github.kskelm.baringo.model.TagVoteList;
-import com.github.kskelm.baringo.model.Vote;
-import com.github.kskelm.baringo.model.Votes;
+import com.github.kskelm.baringo.model.*;
 import com.github.kskelm.baringo.model.gallery.GalleryAlbum;
 import com.github.kskelm.baringo.model.gallery.GalleryImage;
 import com.github.kskelm.baringo.model.gallery.GalleryItem;
@@ -22,9 +10,12 @@ import com.github.kskelm.baringo.model.search.CompoundSearchQuery;
 import com.github.kskelm.baringo.model.search.SearchQuery;
 import com.github.kskelm.baringo.util.BaringoApiException;
 import com.google.gson.GsonBuilder;
-
 import retrofit.Call;
 import retrofit.Response;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 
 /**

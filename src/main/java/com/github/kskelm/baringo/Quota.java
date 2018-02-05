@@ -1,9 +1,9 @@
 /** This file is released under the Apache License 2.0. See the LICENSE file for details. **/
 package com.github.kskelm.baringo;
 
-import java.util.Date;
-
 import com.github.kskelm.baringo.util.Utils;
+
+import java.util.Date;
 
 /**
  * 

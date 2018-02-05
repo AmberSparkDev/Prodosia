@@ -1,25 +1,20 @@
 /** This file is released under the Apache License 2.0. See the LICENSE file for details. **/
 package com.github.kskelm.baringo;
 
+import com.github.kskelm.baringo.model.Comment;
+import com.github.kskelm.baringo.model.ImgurResponseWrapper;
+import com.github.kskelm.baringo.model.ReportReason;
+import com.github.kskelm.baringo.model.Vote;
+import com.github.kskelm.baringo.util.BaringoApiException;
+import com.google.gson.*;
+import retrofit.Call;
+import retrofit.Response;
+
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
-import com.github.kskelm.baringo.model.ImgurResponseWrapper;
-import com.github.kskelm.baringo.model.Comment;
-import com.github.kskelm.baringo.model.ReportReason;
-import com.github.kskelm.baringo.model.Vote;
-import com.github.kskelm.baringo.util.BaringoApiException;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonDeserializationContext;
-import com.google.gson.JsonDeserializer;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParseException;
-
-import retrofit.Call;
-import retrofit.Response;
 
 
 /**

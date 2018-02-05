@@ -1,18 +1,17 @@
 /** This file is released under the Apache License 2.0. See the LICENSE file for details. **/
 package com.github.kskelm.baringo;
 
-import java.io.IOException;
-import java.util.List;
-
 import com.github.kskelm.baringo.model.ImgurResponseWrapper;
 import com.github.kskelm.baringo.model.Topic;
 import com.github.kskelm.baringo.model.gallery.GalleryItem;
 import com.github.kskelm.baringo.model.gallery.GalleryItemProxy;
 import com.github.kskelm.baringo.util.BaringoApiException;
 import com.google.gson.GsonBuilder;
-
 import retrofit.Call;
 import retrofit.Response;
+
+import java.io.IOException;
+import java.util.List;
 
 
 /**

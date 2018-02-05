@@ -1,15 +1,10 @@
 /** This file is released under the Apache License 2.0. See the LICENSE file for details. **/
 package com.github.kskelm.baringo;
 
-import java.io.IOException;
-import java.util.Date;
-import java.util.logging.Logger;
-
 import com.github.kskelm.baringo.model.Account;
 import com.github.kskelm.baringo.model.ImgurResponseWrapper;
 import com.github.kskelm.baringo.util.BaringoApiException;
 import com.github.kskelm.baringo.util.RetrofittedImgur;
-
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.TypeAdapter;
@@ -21,10 +16,13 @@ import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.logging.HttpLoggingInterceptor;
 import com.squareup.okhttp.logging.HttpLoggingInterceptor.Level;
-
 import retrofit.GsonConverterFactory;
-import retrofit.Retrofit;
 import retrofit.Response;
+import retrofit.Retrofit;
+
+import java.io.IOException;
+import java.util.Date;
+import java.util.logging.Logger;
 
 
 /**

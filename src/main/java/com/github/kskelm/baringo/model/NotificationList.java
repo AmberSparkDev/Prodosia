@@ -1,9 +1,9 @@
 /** This file is released under the Apache License 2.0. See the LICENSE file for details. **/
 package com.github.kskelm.baringo.model;
 
-import java.util.List;
-
 import com.github.kskelm.baringo.util.Utils;
+
+import java.util.List;
 
 /**
  * This is meant to be internal, not seen by human eyes. It is a list of notifications, by message/reply type.

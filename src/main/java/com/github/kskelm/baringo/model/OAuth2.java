@@ -2,10 +2,10 @@
 package com.github.kskelm.baringo.model;
 
 
-import java.util.Date;
-
 import com.github.kskelm.baringo.util.Utils;
 import com.google.gson.annotations.SerializedName;
+
+import java.util.Date;
 
 /**
  * Authentication information.  If authenticating via

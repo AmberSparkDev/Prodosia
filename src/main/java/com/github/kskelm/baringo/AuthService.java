@@ -1,16 +1,15 @@
 /** This file is released under the Apache License 2.0. See the LICENSE file for details. **/
 package com.github.kskelm.baringo;
 
-import java.io.IOException;
-
-import com.squareup.okhttp.Request;
-import retrofit.Call;
-import retrofit.Response;
-
 import com.github.kskelm.baringo.model.Account;
 import com.github.kskelm.baringo.model.OAuth2;
 import com.github.kskelm.baringo.util.BaringoApiException;
 import com.github.kskelm.baringo.util.BaringoAuthException;
+import com.squareup.okhttp.Request;
+import retrofit.Call;
+import retrofit.Response;
+
+import java.io.IOException;
 
 
 /**

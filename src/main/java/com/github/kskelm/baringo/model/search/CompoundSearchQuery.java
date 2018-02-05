@@ -1,10 +1,10 @@
 /** This file is released under the Apache License 2.0. See the LICENSE file for details. **/
 package com.github.kskelm.baringo.model.search;
 
+import com.github.kskelm.baringo.util.BaringoApiException;
+
 import java.util.ArrayList;
 import java.util.List;
-
-import com.github.kskelm.baringo.util.BaringoApiException;
 
 /**
  * For putting together complex, compound search queries.

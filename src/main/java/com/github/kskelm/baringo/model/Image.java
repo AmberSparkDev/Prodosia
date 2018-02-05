@@ -1,11 +1,11 @@
 /** This file is released under the Apache License 2.0. See the LICENSE file for details. **/
 package com.github.kskelm.baringo.model;
 
-import java.util.Date;
-import java.util.HashMap;
-
 import com.github.kskelm.baringo.util.Utils;
 import com.google.gson.annotations.SerializedName;
+
+import java.util.Date;
+import java.util.HashMap;
 
 /**
  * Model object for (non-gallery) images.  @see GalleryImage objects are

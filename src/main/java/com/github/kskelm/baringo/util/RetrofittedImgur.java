@@ -1,44 +1,18 @@
 /** This file is released under the Apache License 2.0. See the LICENSE file for details. **/
 package com.github.kskelm.baringo.util;
 
-import java.util.List;
-import java.util.Map;
-
 import com.github.kskelm.baringo.CommentService.CommentListWrapper;
-import com.github.kskelm.baringo.model.Account;
-import com.github.kskelm.baringo.model.AccountSettings;
-import com.github.kskelm.baringo.model.Album;
-import com.github.kskelm.baringo.model.ImgurResponseWrapper;
-import com.github.kskelm.baringo.model.ChangedAccountSettings;
-import com.github.kskelm.baringo.model.Comment;
-import com.github.kskelm.baringo.model.Conversation;
-import com.github.kskelm.baringo.model.Image;
-import com.github.kskelm.baringo.model.Notification;
-import com.github.kskelm.baringo.model.NotificationList;
-import com.github.kskelm.baringo.model.OAuth2;
-import com.github.kskelm.baringo.model.TagGallery;
-import com.github.kskelm.baringo.model.TagVoteList;
-import com.github.kskelm.baringo.model.Topic;
-import com.github.kskelm.baringo.model.Votes;
+import com.github.kskelm.baringo.model.*;
 import com.github.kskelm.baringo.model.gallery.CustomGallery;
 import com.github.kskelm.baringo.model.gallery.GalleryImage;
 import com.github.kskelm.baringo.model.gallery.GalleryItemProxy;
 import com.github.kskelm.baringo.model.gallery.GalleryProfile;
 import com.squareup.okhttp.RequestBody;
-
 import retrofit.Call;
-import retrofit.http.Body;
-import retrofit.http.DELETE;
-import retrofit.http.Field;
-import retrofit.http.FormUrlEncoded;
-import retrofit.http.GET;
-import retrofit.http.HEAD;
-import retrofit.http.Multipart;
-import retrofit.http.POST;
-import retrofit.http.PUT;
-import retrofit.http.Part;
-import retrofit.http.Path;
-import retrofit.http.Query;
+import retrofit.http.*;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * 
