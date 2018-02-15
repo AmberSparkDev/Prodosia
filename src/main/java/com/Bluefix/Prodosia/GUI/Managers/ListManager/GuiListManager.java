@@ -6,16 +6,10 @@
  * Vestibulum commodo. Ut rhoncus gravida arcu.
  */
 
-package com.Bluefix.Prodosia.GUI.Managers;
+package com.Bluefix.Prodosia.GUI.Managers.ListManager;
 
-import com.Bluefix.Prodosia.DataHandler.TrackerHandler;
-import com.Bluefix.Prodosia.DataType.Tracker;
-import com.Bluefix.Prodosia.GUI.Navigation.VistaNavigator;
-import com.Bluefix.Prodosia.GUI.Tracker.EditTrackerWindow;
-import javafx.scene.control.Button;
 import javafx.scene.control.Labeled;
 import javafx.scene.layout.Pane;
-import javafx.scene.layout.Region;
 
 import java.util.regex.Pattern;
 
@@ -55,16 +49,16 @@ public abstract class GuiListManager<T extends Labeled>
         // retrieve the items.
         items = listItems();
 
+        if (items == null || items.length <= 0)
+            return;
+
         for (T item : items)
         {
             root.getChildren().add(item);
         }
 
         // set the default item height
-        if (items.length > 0)
-        {
-            itemHeight = items[0].getPrefHeight();
-        }
+        itemHeight = items[0].getPrefHeight();
     }
 
     /**
@@ -98,6 +92,7 @@ public abstract class GuiListManager<T extends Labeled>
             if (match)
             {
                 t.setDisable(false);
+                t.setVisible(true);
                 t.setMaxHeight(itemHeight);
                 t.setPrefHeight(itemHeight);
                 t.setMinHeight(itemHeight);
@@ -105,6 +100,7 @@ public abstract class GuiListManager<T extends Labeled>
             else
             {
                 t.setDisable(true);
+                t.setVisible(false);
                 t.setMaxHeight(0.0);
                 t.setPrefHeight(0.0);
                 t.setMinHeight(0.0);

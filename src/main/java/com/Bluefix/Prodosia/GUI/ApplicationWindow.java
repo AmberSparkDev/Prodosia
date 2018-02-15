@@ -2,11 +2,12 @@ package com.Bluefix.Prodosia.GUI;
 
 import com.Bluefix.Prodosia.DataType.Data;
 import com.Bluefix.Prodosia.DataType.Rating;
-import com.Bluefix.Prodosia.GUI.Helpers.*;
-import com.Bluefix.Prodosia.GUI.Managers.GuiListManager;
-import com.Bluefix.Prodosia.GUI.Managers.TaglistListManager;
-import com.Bluefix.Prodosia.GUI.Managers.TrackerListManager;
-import com.Bluefix.Prodosia.GUI.Managers.UserListManager;
+import com.Bluefix.Prodosia.GUI.Managers.CheckboxListManager.GuiCheckboxListManager;
+import com.Bluefix.Prodosia.GUI.Managers.CheckboxListManager.TaglistClManager;
+import com.Bluefix.Prodosia.GUI.Managers.ListManager.GuiListManager;
+import com.Bluefix.Prodosia.GUI.Managers.ButtonListManager.TaglistListManager;
+import com.Bluefix.Prodosia.GUI.Managers.ButtonListManager.TrackerListManager;
+import com.Bluefix.Prodosia.GUI.Managers.ButtonListManager.UserListManager;
 import com.Bluefix.Prodosia.GUI.Navigation.VistaNavigator;
 import com.Bluefix.Prodosia.GUI.Taglist.EditTaglistWindow;
 import com.Bluefix.Prodosia.GUI.Tracker.EditTrackerWindow;
@@ -45,22 +46,22 @@ public class ApplicationWindow
 
     @FXML private VBox tap_taglistSelector;
 
-    @FXML public void tap_ratingA(ActionEvent actionEvent)
+    @FXML private void tap_ratingA(ActionEvent actionEvent)
     {
         selectRating(Rating.ALL);
     }
 
-    @FXML public void tap_ratingS(ActionEvent actionEvent)
+    @FXML private void tap_ratingS(ActionEvent actionEvent)
     {
         selectRating(Rating.SAFE);
     }
 
-    @FXML public void tap_ratingQ(ActionEvent actionEvent)
+    @FXML private void tap_ratingQ(ActionEvent actionEvent)
     {
         selectRating(Rating.QUESTIONABLE);
     }
 
-    @FXML public void tap_ratingE(ActionEvent actionEvent)
+    @FXML private void tap_ratingE(ActionEvent actionEvent)
     {
         selectRating(Rating.EXPLICIT);
     }
@@ -75,7 +76,20 @@ public class ApplicationWindow
     }
 
 
+    @FXML
+    private void tap_execute(ActionEvent actionEvent)
+    {
+        String[] items = tap_taglist_cl.getSelectedItems();
 
+        System.out.println("Selected items:");
+
+        for (String i : items)
+        {
+            System.out.println(i);
+        }
+
+        System.out.println();
+    }
 
     //endregion
 
@@ -84,7 +98,8 @@ public class ApplicationWindow
 
     @FXML private VBox trackers_overview;
 
-    public void addTracker(ActionEvent actionEvent)
+    @FXML
+    private void addTracker(ActionEvent actionEvent)
     {
         EditTrackerWindow controller = VistaNavigator.loadVista(VistaNavigator.AppStage.TRACKER_EDIT);
         controller.initialize();
@@ -94,9 +109,10 @@ public class ApplicationWindow
 
     //region Taglists
 
-    @FXML public VBox taglists_overview;
+    @FXML private VBox taglists_overview;
 
-    public void addTaglist(ActionEvent actionEvent)
+    @FXML
+    private void addTaglist(ActionEvent actionEvent)
     {
         EditTaglistWindow controller = VistaNavigator.loadVista(VistaNavigator.AppStage.TAGLIST_EDIT);
         controller.initialize();
@@ -106,9 +122,10 @@ public class ApplicationWindow
 
     //region Users
 
-    @FXML public VBox users_overview;
+    @FXML private VBox users_overview;
 
-    public void addUser(ActionEvent actionEvent)
+    @FXML
+    private void addUser(ActionEvent actionEvent)
     {
         EditUserWindow controller = VistaNavigator.loadVista(VistaNavigator.AppStage.USER_EDIT);
         controller.initialize();
@@ -116,11 +133,14 @@ public class ApplicationWindow
 
     //endregion
 
+    //region Constructor
+
     public ApplicationWindow()
     {
 
     }
-    
+
+    //endregion
 
     //region Initialization
 
@@ -136,9 +156,6 @@ public class ApplicationWindow
 
         // initialize list managers
         setupListManagers();
-
-
-
     }
 
     private void initializeTap()
@@ -147,18 +164,19 @@ public class ApplicationWindow
         tap_parentComment.setText("tap_parentComment");
         tap_parentComment.setDisable(true);
         selectRating(Rating.ALL);
-        TaglistGuiHelper.fillVBoxWithTaglistCheckboxes(tap_taglistSelector);
     }
 
     //endregion
 
     //region List Managers
 
-    @FXML public TextField tracker_filter;
-    @FXML public TextField taglist_filter;
-    @FXML public TextField user_filter;
+    @FXML private TextField tracker_filter;
+    @FXML private TextField taglist_filter;
+    @FXML private TextField user_filter;
 
     private GuiListManager[] listManagers;
+
+    private GuiCheckboxListManager tap_taglist_cl;
 
 
     private void setupListManagers()
@@ -186,6 +204,9 @@ public class ApplicationWindow
         {
             listManagers[2].filter(newVal);
         });
+
+        // setup checkbox gui list managers.
+        tap_taglist_cl = new TaglistClManager(tap_taglistSelector);
     }
 
 

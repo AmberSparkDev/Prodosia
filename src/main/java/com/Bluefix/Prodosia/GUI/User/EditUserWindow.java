@@ -8,7 +8,6 @@
 
 package com.Bluefix.Prodosia.GUI.User;
 
-import com.Bluefix.Prodosia.DataType.Tracker;
 import com.Bluefix.Prodosia.DataType.User;
 import com.Bluefix.Prodosia.GUI.Helpers.DataFieldStorage;
 import com.Bluefix.Prodosia.GUI.Helpers.EditableWindowPane;
@@ -16,7 +15,6 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
 
 public class EditUserWindow extends EditableWindowPane
 {
@@ -29,11 +27,6 @@ public class EditUserWindow extends EditableWindowPane
 
     //region Textfields and labels
 
-    @FXML public TextField txt_imgurName;
-    @FXML public Label lbl_imgurId;
-    @FXML public TextField txt_discordName;
-    @FXML public TextField txt_discordTag;
-    @FXML public TextField txt_discordId;
     @FXML public Label lbl_navigation;
     @FXML public Label lbl_deleteConfirmation;
     @FXML public Button button_confirmDelete;
@@ -45,7 +38,6 @@ public class EditUserWindow extends EditableWindowPane
     @FXML public Button button_back;
     @FXML public Button button_edit;
     @FXML public Button button_delete;
-    @FXML public Button button_checkImgurName;
 
 
 
@@ -93,54 +85,36 @@ public class EditUserWindow extends EditableWindowPane
         {
 
             case VIEW:
-                lbl_navigation.setText("Inspect Tracker");
-
-                txt_imgurName.setDisable(true);
-                txt_discordName.setDisable(true);
-                txt_discordTag.setDisable(true);
-                txt_discordId.setDisable(true);
+                lbl_navigation.setText("Inspect User");
 
                 lbl_deleteConfirmation.setVisible(false);
                 button_confirmDelete.setVisible(false);
                 button_delete.setDisable(false);
                 button_delete.setText("Delete");
-
                 button_back.setText("Back");
                 button_edit.setText("Edit");
-                button_checkImgurName.setDisable(true);
                 button_back.setDisable(false);
                 button_edit.setDisable(false);
-
-
                 break;
-            case EDIT:
-                lbl_navigation.setText("Edit Tracker");
 
-                txt_imgurName.setDisable(false);
-                txt_discordName.setDisable(false);
-                txt_discordTag.setDisable(false);
-                txt_discordId.setDisable(false);
+            case EDIT:
+                lbl_navigation.setText("Edit User");
 
                 lbl_deleteConfirmation.setVisible(false);
                 button_confirmDelete.setVisible(false);
                 button_delete.setDisable(true);
-
                 button_back.setText("Cancel");
                 button_edit.setText("Save");
-                button_checkImgurName.setDisable(false);
                 button_back.setDisable(false);
                 button_edit.setDisable(false);
-
                 break;
+
             case DELETE:
                 lbl_deleteConfirmation.setVisible(true);
                 button_confirmDelete.setVisible(true);
                 button_delete.setText("No");
-
                 button_back.setDisable(true);
                 button_edit.setDisable(true);
-
-
                 break;
         }
     }
@@ -153,11 +127,7 @@ public class EditUserWindow extends EditableWindowPane
 
     private void clearData()
     {
-        txt_imgurName.setText("");
-        lbl_imgurId.setText("");
-        txt_discordName.setText("");
-        txt_discordTag.setText("");
-        txt_discordId.setText("");
+
     }
 
     /**
@@ -182,13 +152,6 @@ public class EditUserWindow extends EditableWindowPane
 
         clearData();
 
-        // if imgur-credentials exist, set them up.
-        if (user.getImgurName() != null)
-        {
-            txt_imgurName.setText(user.getImgurName());
-            lbl_imgurId.setText("" + user.getImgurId());
-        }
-
 
         setState(WindowState.VIEW);
     }
@@ -201,11 +164,6 @@ public class EditUserWindow extends EditableWindowPane
     protected DataFieldStorage storeFields()
     {
         return DataFieldStorage.store(
-                txt_imgurName.getText(),
-                lbl_imgurId.getText(),
-                txt_discordName.getText(),
-                txt_discordTag.getText(),
-                txt_discordId.getText()
         );
     }
 
@@ -214,12 +172,6 @@ public class EditUserWindow extends EditableWindowPane
     {
 
         String[] fields = storage.retrieve();
-
-        txt_imgurName.setText(fields[0]);
-        lbl_imgurId.setText(fields[1]);
-        txt_discordName.setText(fields[2]);
-        txt_discordTag.setText(fields[3]);
-        txt_discordId.setText(fields[4]);
     }
 
     //endregion

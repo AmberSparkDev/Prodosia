@@ -12,6 +12,8 @@ import java.io.PrintStream;
 
 public class GuiApplication extends Application
 {
+    public static String cssSheet;
+
     //region Load FXML window.
 
     public GuiNode loadWindow(String url) throws IOException
@@ -60,7 +62,14 @@ public class GuiApplication extends Application
 
         primaryStage.setTitle("Prodosía - by ReGeX");
         Scene scene = new Scene(root, 640, 480);
-        scene.getStylesheets().add("/com/Bluefix/Prodosia/GUI/stylesheet.css");
+
+
+        if (GuiApplication.cssSheet == null)
+        {
+            GuiApplication.cssSheet = getClass().getResource("/com/Bluefix/Prodosia/GUI/stylesheet.css").toExternalForm();
+        }
+        scene.getStylesheets().add(cssSheet);
+
         primaryStage.setScene(scene);
 
         VistaNavigator.setVistaHolder(loader.getController());

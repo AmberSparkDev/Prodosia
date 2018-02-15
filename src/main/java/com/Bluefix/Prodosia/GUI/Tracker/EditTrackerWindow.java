@@ -8,15 +8,17 @@
 
 package com.Bluefix.Prodosia.GUI.Tracker;
 
-import com.Bluefix.Prodosia.DataType.Tracker;
+import com.Bluefix.Prodosia.DataHandler.TrackerHandler;
+import com.Bluefix.Prodosia.DataType.DataBuilder.TrackerBuilder;
+import com.Bluefix.Prodosia.DataType.Tracker.Tracker;
 import com.Bluefix.Prodosia.GUI.Helpers.DataFieldStorage;
 import com.Bluefix.Prodosia.GUI.Helpers.EditableWindowPane;
-import com.Bluefix.Prodosia.GUI.Navigation.VistaNavigator;
+import com.Bluefix.Prodosia.GUI.Managers.CheckboxListManager.TaglistClManager;
+import com.Bluefix.Prodosia.GUI.Navigation.GuiApplication;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
+import javafx.scene.layout.VBox;
 
 public class EditTrackerWindow extends EditableWindowPane
 {
@@ -111,6 +113,11 @@ public class EditTrackerWindow extends EditableWindowPane
                 button_back.setDisable(false);
                 button_edit.setDisable(false);
 
+                // permissions
+                perm_scrollpane.setDisable(true);
+                perm_filter.setDisable(true);
+                perm_chkAdmin.setDisable(true);
+
 
                 break;
             case EDIT:
@@ -130,6 +137,10 @@ public class EditTrackerWindow extends EditableWindowPane
                 button_checkImgurName.setDisable(false);
                 button_back.setDisable(false);
                 button_edit.setDisable(false);
+
+                // permissions
+                perm_chkAdmin.setDisable(false);
+                adminCheckboxSelection();
 
                 break;
             case DELETE:
@@ -158,6 +169,8 @@ public class EditTrackerWindow extends EditableWindowPane
         txt_discordName.setText("");
         txt_discordTag.setText("");
         txt_discordId.setText("");
+
+        initializePermissions();
     }
 
     /**
@@ -196,6 +209,9 @@ public class EditTrackerWindow extends EditableWindowPane
             txt_discordTag.setText("" + tracker.getDiscordTag());
             txt_discordId.setText("" + tracker.getDiscordId());
         }
+
+        // clear the update data to prevent the window from updating itself.
+        clearUpdate();
 
         setState(WindowState.VIEW);
     }
@@ -244,28 +260,238 @@ public class EditTrackerWindow extends EditableWindowPane
     @Override
     protected void deleteItem()
     {
-
+        TrackerHandler.deleteTracker(curTracker);
     }
 
     @Override
     protected void saveItem()
     {
+        // parse the tracker from the fields.
+        Tracker newTracker = parseTracker();
 
+        if (newTracker != null)
+        {
+            TrackerHandler.UpdateTracker(curTracker, newTracker);
+            curTracker = newTracker;
+        }
     }
 
     //endregion
 
-    //region Tracker Handling
+    //region Api update
+
+    /**
+     * Indicate to the system that an update of the data is not required. This is
+     * the case when a user has just been loaded in.
+     */
+    private void clearUpdate()
+    {
+        clearImgurUpdate();
+        clearDiscordUpdate();
+    }
+
+    private void clearImgurUpdate()
+    {
+        previousImgurName = txt_imgurName.getText();
+    }
+
+    private void clearDiscordUpdate()
+    {
+        previousDiscordName = txt_discordName.getText();
+        previousDiscordTag = txt_discordTag.getText();
+        previousDiscordId = txt_discordId.getText();
+    }
+
+    private String previousImgurName = null;
+    private String previousDiscordName = null;
+    private String previousDiscordTag = null;
+    private String previousDiscordId = null;
+
+    private synchronized void updateImgurData()
+    {
+        if (txt_imgurName.getText().equals(previousImgurName))
+            return;
+
+        // TODO: set the imgur-id dependent on the imgur name.
+
+
+    }
+
+    /**
+     * Update the discord data fields. Will only update if one of the fields was invalidated.
+     * Will update according to the fields that were changed, giving priority to the id.
+     */
+    private synchronized void updateDiscordData()
+    {
+        // if none of the items were changed, return.
+        boolean compId = txt_discordId.getText().equals(previousDiscordId);
+        boolean compName = txt_discordName.getText().equals(previousDiscordName);
+        boolean compTag = txt_discordTag.getText().equals(previousDiscordTag);
+
+        if (compId && compName && compTag)
+            return;
+
+        // update the data.
+        clearDiscordUpdate();
+
+        // TODO: set the discord-data based on the last item that was edited.
+        if (!compId)
+        {
+            updateDiscordDataById();
+        }
+        else if (!compName || !compTag)
+        {
+            updateDiscordDataByName();
+        }
+    }
+
+    private void updateDiscordDataById()
+    {
+        // TODO: Implement update based on id.
+    }
+
+    private void updateDiscordDataByName()
+    {
+        // TODO: implement update based on name & tag.
+    }
+
+
+    //endregion
+
+
+    //region Data extraction and validation
+
+    /**
+     * Parse a tracker from the data in the fields. Will return null iff at least one field is invalid.
+     * @return the tracker as indicated in the fields, or null otherwise.
+     */
+    private Tracker parseTracker()
+    {
+        // TODO: update the api data if necessary.
+        updateImgurData();
+        updateDiscordData();
+
+        DataValidation valImg = validateImgurData();
+        DataValidation valDis = validateDiscordData();
+
+        // if either of the data was erroneous, warn the user.
+
+
+
+
+
+
+        TrackerBuilder builder = TrackerBuilder.getBuilder();
+
+
+
+        return null;
+    }
+
+    private DataValidation validateImgurData()
+    {
+        if (lbl_imgurId.getText().isEmpty())
+        {
+            // if no imgur name was specified, this is normal behavior.
+            if (txt_imgurName.getText().isEmpty())
+            {
+                return DataValidation.MISSING;
+            }
+            else
+            {
+                // there was an imgur name, but no proper id.
+                return DataValidation.ERRONEOUS;
+            }
+        }
+
+        return DataValidation.VALIDATED;
+    }
+
+    private DataValidation validateDiscordData()
+    {
+        // TODO: determine whether the data is valid.
+        return DataValidation.MISSING;
+    }
+
+
+
+    /**
+     * The validation of the specified data.
+     */
+    private enum DataValidation
+    {
+        /**
+         * The data was found to be correct.
+         */
+        VALIDATED,
+
+        /**
+         * The data was found to be at least partially incorrect.
+         */
+        ERRONEOUS,
+
+        /**
+         * The data was missing.
+         */
+        MISSING
+    }
+
+    private void alertUser(String message)
+    {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.getDialogPane().getStylesheets().add(GuiApplication.cssSheet);
+        alert.setTitle("Something went wrong!");
+        alert.setHeaderText("Error!");
+        alert.setContentText("Something went wrong :S");
+        alert.showAndWait();
+    }
+
+    //endregion
+
+
+    //region Permission Handling
+
+    @FXML private CheckBox perm_chkAdmin;
+    @FXML private VBox perm_taglists;
+    @FXML private TextField perm_filter;
+    @FXML private ScrollPane perm_scrollpane;
+
+    private TaglistClManager taglistClManager;
+
+    private void initializePermissions()
+    {
+        perm_filter.setText("");
+        perm_chkAdmin.setSelected(false);
+        taglistClManager = new TaglistClManager(perm_taglists);
+
+        perm_filter.textProperty().addListener((observable, oldValue, newValue) ->
+                taglistClManager.filter(newValue));
+
+        perm_chkAdmin.selectedProperty().addListener((observable, oldValue, newValue) ->
+                adminCheckboxSelection());
+    }
+
+    private void adminCheckboxSelection()
+    {
+        if (perm_chkAdmin.isSelected())
+        {
+            perm_filter.setDisable(true);
+            perm_scrollpane.setDisable(true);
+        }
+        else
+        {
+            perm_filter.setDisable(false);
+            perm_scrollpane.setDisable(false);
+        }
+    }
+
 
 
 
     //endregion
 
-    //region Deletion Handling
 
 
-
-    //endregion
 
 
 

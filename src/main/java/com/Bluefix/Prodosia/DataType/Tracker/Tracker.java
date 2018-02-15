@@ -1,4 +1,12 @@
-package com.Bluefix.Prodosia.DataType;
+/*
+ * Copyright (c) 2018. Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+ * Morbi non lorem porttitor neque feugiat blandit. Ut vitae ipsum eget quam lacinia accumsan.
+ * Etiam sed turpis ac ipsum condimentum fringilla. Maecenas magna.
+ * Proin dapibus sapien vel ante. Aliquam erat volutpat. Pellentesque sagittis ligula eget metus.
+ * Vestibulum commodo. Ut rhoncus gravida arcu.
+ */
+
+package com.Bluefix.Prodosia.DataType.Tracker;
 
 /**
  * A tracker data class.
@@ -19,6 +27,8 @@ public class Tracker
     private String discordName;
     private int discordTag;
     private long discordId;
+
+    private TrackerPermissions permissions;
 
     public String getImgurName()
     {
@@ -45,17 +55,29 @@ public class Tracker
         return discordId;
     }
 
+    public TrackerPermissions getPermissions()
+    {
+        return permissions;
+    }
+
     //endregion
 
     //region Constructor
 
-    public Tracker(String imgurName, long imgurId, String discordName, int discordTag, long discordId)
+    public Tracker(
+            String imgurName,
+            long imgurId,
+            String discordName,
+            int discordTag,
+            long discordId,
+            TrackerPermissions permissions)
     {
         this.imgurName = imgurName;
         this.imgurId = imgurId;
         this.discordName = discordName;
         this.discordTag = discordTag;
         this.discordId = discordId;
+        this.permissions = permissions;
     }
 
 

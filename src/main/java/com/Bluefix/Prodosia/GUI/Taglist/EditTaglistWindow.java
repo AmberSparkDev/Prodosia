@@ -9,16 +9,12 @@
 package com.Bluefix.Prodosia.GUI.Taglist;
 
 import com.Bluefix.Prodosia.DataType.Taglist;
-import com.Bluefix.Prodosia.DataType.Tracker;
 import com.Bluefix.Prodosia.GUI.Helpers.DataFieldStorage;
 import com.Bluefix.Prodosia.GUI.Helpers.EditableWindowPane;
-import com.Bluefix.Prodosia.GUI.Navigation.VistaNavigator;
-import com.Bluefix.Prodosia.GUI.Tracker.EditTrackerWindow;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
 
 public class EditTaglistWindow extends EditableWindowPane
 {
@@ -30,11 +26,7 @@ public class EditTaglistWindow extends EditableWindowPane
 
     //region Textfields and labels
 
-    @FXML public TextField txt_imgurName;
-    @FXML public Label lbl_imgurId;
-    @FXML public TextField txt_discordName;
-    @FXML public TextField txt_discordTag;
-    @FXML public TextField txt_discordId;
+
     @FXML public Label lbl_navigation;
     @FXML public Label lbl_deleteConfirmation;
     @FXML public Button button_confirmDelete;
@@ -46,7 +38,6 @@ public class EditTaglistWindow extends EditableWindowPane
     @FXML public Button button_back;
     @FXML public Button button_edit;
     @FXML public Button button_delete;
-    @FXML public Button button_checkImgurName;
 
 
 
@@ -94,45 +85,30 @@ public class EditTaglistWindow extends EditableWindowPane
         {
 
             case VIEW:
-                lbl_navigation.setText("Inspect Tracker");
-
-                txt_imgurName.setDisable(true);
-                txt_discordName.setDisable(true);
-                txt_discordTag.setDisable(true);
-                txt_discordId.setDisable(true);
+                lbl_navigation.setText("Inspect Taglist");
 
                 lbl_deleteConfirmation.setVisible(false);
                 button_confirmDelete.setVisible(false);
                 button_delete.setDisable(false);
                 button_delete.setText("Delete");
-
                 button_back.setText("Back");
                 button_edit.setText("Edit");
-                button_checkImgurName.setDisable(true);
                 button_back.setDisable(false);
                 button_edit.setDisable(false);
-
-
                 break;
-            case EDIT:
-                lbl_navigation.setText("Edit Tracker");
 
-                txt_imgurName.setDisable(false);
-                txt_discordName.setDisable(false);
-                txt_discordTag.setDisable(false);
-                txt_discordId.setDisable(false);
+            case EDIT:
+                lbl_navigation.setText("Edit Taglist");
 
                 lbl_deleteConfirmation.setVisible(false);
                 button_confirmDelete.setVisible(false);
                 button_delete.setDisable(true);
-
                 button_back.setText("Cancel");
                 button_edit.setText("Save");
-                button_checkImgurName.setDisable(false);
                 button_back.setDisable(false);
                 button_edit.setDisable(false);
-
                 break;
+
             case DELETE:
                 lbl_deleteConfirmation.setVisible(true);
                 button_confirmDelete.setVisible(true);
@@ -140,8 +116,6 @@ public class EditTaglistWindow extends EditableWindowPane
 
                 button_back.setDisable(true);
                 button_edit.setDisable(true);
-
-
                 break;
         }
     }
@@ -154,11 +128,7 @@ public class EditTaglistWindow extends EditableWindowPane
 
     private void clearData()
     {
-        txt_imgurName.setText("");
-        lbl_imgurId.setText("");
-        txt_discordName.setText("");
-        txt_discordTag.setText("");
-        txt_discordId.setText("");
+
     }
 
     /**
@@ -196,11 +166,7 @@ public class EditTaglistWindow extends EditableWindowPane
     protected DataFieldStorage storeFields()
     {
         return DataFieldStorage.store(
-                txt_imgurName.getText(),
-                lbl_imgurId.getText(),
-                txt_discordName.getText(),
-                txt_discordTag.getText(),
-                txt_discordId.getText()
+
         );
     }
 
@@ -210,11 +176,7 @@ public class EditTaglistWindow extends EditableWindowPane
 
         String[] fields = storage.retrieve();
 
-        txt_imgurName.setText(fields[0]);
-        lbl_imgurId.setText(fields[1]);
-        txt_discordName.setText(fields[2]);
-        txt_discordTag.setText(fields[3]);
-        txt_discordId.setText(fields[4]);
+
     }
 
     //endregion
