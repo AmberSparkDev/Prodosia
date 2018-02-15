@@ -37,6 +37,7 @@
                            <tooltip>
                               <Tooltip text="Look up the API key details or edit them if necessary." />
                            </tooltip></Label>
+                        <Button onAction="#test" layoutX="383.0" layoutY="204.0" mnemonicParsing="false" prefHeight="224.0" prefWidth="236.0" text="Test" />
                      </children></AnchorPane>
             </content>
           </Tab>
@@ -74,7 +75,7 @@
                           </items>
                         </MenuButton>
                         <Label layoutX="49.0" layoutY="256.0" text="Rating:" />
-                        <Button onAction="#tap_execute" layoutX="511.0" layoutY="365.0" mnemonicParsing="false" prefHeight="47.0" prefWidth="99.0" text="Post!" />
+                        <Button layoutX="511.0" layoutY="365.0" mnemonicParsing="false" onAction="#tap_execute" prefHeight="47.0" prefWidth="99.0" text="Post!" />
                         <Label layoutX="14.0" layoutY="292.0" styleClass="infomarker" text="?">
                            <tooltip>
                               <Tooltip text="Filters tooltip" />

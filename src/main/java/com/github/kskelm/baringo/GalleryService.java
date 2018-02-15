@@ -308,7 +308,7 @@ public class GalleryService {
 	 * that fits the SearchQuery criteria.
 	 * <p>
         * <b>ACCESS: AUTHENTICATED USER</b>
-	 * @param query the search query to perform
+	 * @param query the search type to perform
 	 * @param sort the method of sorting - Viral | Time | Top
 	 * @param window the time range to return when the sort is Top
 	 * @param page the page number to return, starting at 0
@@ -364,7 +364,7 @@ public class GalleryService {
 	 * that fits the @see CompoundSearchQuery criteria.
 	 * <p>
         * <b>ACCESS: AUTHENTICATED USER</b>
-	 * @param query the search query to perform
+	 * @param query the search type to perform
 	 * @param sort the method of sorting- Viral | Time | Top
 	 * @param window the time range to return when the sort is Top
 	 * @param page the page number to return, starting at 0

@@ -34,6 +34,7 @@ import com.Bluefix.Prodosia.GUI.Navigation.VistaNavigator;
 import com.Bluefix.Prodosia.GUI.Taglist.EditTaglistWindow;
 import com.Bluefix.Prodosia.GUI.Tracker.EditTrackerWindow;
 import com.Bluefix.Prodosia.GUI.User.EditUserWindow;
+import com.Bluefix.Prodosia.SQLite.SqlDatabase;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.MenuButton;
@@ -232,8 +233,17 @@ public class ApplicationWindow
     }
 
 
+
+
     //endregion
 
-
+    /**
+     * Temporary test method.
+     * @param actionEvent
+     */
+    public void test(ActionEvent actionEvent)
+    {
+        SqlDatabase db = SqlDatabase.Database();
+    }
 
 }

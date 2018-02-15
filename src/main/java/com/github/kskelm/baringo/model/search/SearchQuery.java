@@ -10,7 +10,7 @@ import java.util.logging.Logger;
  * 
  * For putting together simple search queries.
  * <p>
- * The simple search query cannot allow some combinations of
+ * The simple search type cannot allow some combinations of
  * operations, such as putting AND and OR clauses into the same search.
  * The same is true for exact <code>thisPhrase()</code> matches.
  * <p>
@@ -93,16 +93,16 @@ public class SearchQuery {
 
 
 	/**
-	 * Set the "or" query string; If a result matches ANY of
+	 * Set the "or" type string; If a result matches ANY of
 	 * the words present, it will be returned. For more complex
 	 * queries, see {@link CompoundSearchQuery}. Only one of the
-	 * query string setters may be called for a given SearchQuery.
-	 * @param anyWords the query to set
+	 * type string setters may be called for a given SearchQuery.
+	 * @param anyWords the type to set
 	 * @return The SearchQuery itself, for functional chaining
 	 */
 	public SearchQuery anyWords(String anyWords) {
 		if( alreadySetQuery ) {
-			log.warning( "SearchQuery string already set, overriding with compound query");
+			log.warning( "SearchQuery string already set, overriding with compound type");
 		} // if
 		alreadySetQuery = true;
 
@@ -121,16 +121,16 @@ public class SearchQuery {
 
 
 	/**
-	 * Set the "and" query string; If a result matches ALL of
+	 * Set the "and" type string; If a result matches ALL of
 	 * the words present, it will be returned. For more complex queries,
 	 * see {@link CompoundSearchQuery}. Only one of the
-	 * query string setters may be called for a given SearchQuery.
-	 * @param allWords the query to set
+	 * type string setters may be called for a given SearchQuery.
+	 * @param allWords the type to set
 	 * @return The SearchQuery itself, for functional chaining
 	 */
 	public SearchQuery allWords(String allWords) {
 		if( alreadySetQuery ) {
-			log.warning( "SearchQuery string already set, overriding with compound query");
+			log.warning( "SearchQuery string already set, overriding with compound type");
 		} // if
 		alreadySetQuery = true;
 
@@ -149,10 +149,10 @@ public class SearchQuery {
 
 
 	/**
-	 * Set the exact match query string; If a result matches the
+	 * Set the exact match type string; If a result matches the
 	 * specific phrase given, it will be returned. Any item with
 	 * this as a substring will be returned. Only one of the
-	 * query string setters may be called for a given SearchQuery.
+	 * type string setters may be called for a given SearchQuery.
 	 * For more complex queries, see {@link CompoundSearchQuery}.
 	 * 
 	 * @param thisPhrase a phrase to include in results
@@ -160,7 +160,7 @@ public class SearchQuery {
 	 */
 	public SearchQuery thisPhrase(String thisPhrase) {
 		if( alreadySetQuery ) {
-			log.warning( "SearchQuery string already set, overriding with compound query");
+			log.warning( "SearchQuery string already set, overriding with compound type");
 		} // if
 		alreadySetQuery = true;
 
@@ -179,7 +179,7 @@ public class SearchQuery {
 
 
 	/**
-	 * Set the exclusion query string; If a result matches the
+	 * Set the exclusion type string; If a result matches the
 	 * specific phrase given, it will NOT be returned. For more
 	 * complex queries, see {@link CompoundSearchQuery}. This MAY
 	 * be used in conjunction with the other search strings.

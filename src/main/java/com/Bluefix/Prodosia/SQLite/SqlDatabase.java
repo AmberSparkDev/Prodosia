@@ -22,9 +22,8 @@
 
 package com.Bluefix.Prodosia.SQLite;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
+import java.sql.*;
+import java.util.ArrayList;
 
 public class SqlDatabase
 {
@@ -34,6 +33,8 @@ public class SqlDatabase
      * The current expected version of the database.
      */
     public static final int DatabaseVersion = 1;
+    public static final String CreatedBy =
+            "Bluefix Development";
 
     private Connection conn;
 
@@ -43,13 +44,7 @@ public class SqlDatabase
 
     private SqlDatabase()
     {
-        try
-        {
-            connect();
-        } catch (SQLException e)
-        {
-            e.printStackTrace();
-        }
+
     }
 
     private static SqlDatabase myDatabase;
@@ -58,7 +53,17 @@ public class SqlDatabase
     {
         if (myDatabase == null)
         {
-            myDatabase = new SqlDatabase();
+            try
+            {
+                myDatabase = new SqlDatabase();
+                myDatabase.connect();
+                myDatabase.conn.setAutoCommit(false);
+                myDatabase.updateDatabase();
+
+            } catch (SQLException e)
+            {
+                e.printStackTrace();
+            }
         }
 
         return myDatabase;
@@ -75,7 +80,6 @@ public class SqlDatabase
         conn = DriverManager.getConnection(url);
 
         System.out.println("Database was connected");
-
     }
 
     //endregion
@@ -90,17 +94,175 @@ public class SqlDatabase
 
     }
 
+
     /**
      * Update the database, based on its current version.
      */
     private void updateDatabase()
     {
+        // first check the version of the database.
+        try
+        {
+            // check if the 'Info' table exists.
+            if (!SqlDatabaseHelper.tableExists( "Info"))
+            {
+                // create the database and set the Version.
+                System.out.println("Info table didn't exist");
 
+                execute(getStatement(SqlStatement.createDatabaseStatement()));
+                SqlDatabaseHelper.setVersion( DatabaseVersion, CreatedBy);
+            }
+            else
+            {
+                System.out.println("Info table did exist");
+                System.out.println("Version: " + SqlDatabaseHelper.getVersion());
+            }
+
+
+            /*
+            Statement st = conn.createStatement();
+            ResultSet rs = st.executeQuery(SqlStatement.getDatabaseVersion());
+
+            while (rs.next())
+            {
+                System.out.println("#####");
+                System.out.println("" + rs.getInt(0));
+            }*/
+
+        } catch (Exception e)
+        {
+            e.printStackTrace();
+        }
     }
-
 
     //endregion
 
+    //region Execute queries
+
+    /**
+     * Execute (several) query statements in succession.
+     * @param statement The statement to be executed.
+     * @return null on query failure, otherwise a dataset for each individual query
+     * @throws SQLException SQL exception, indicative of an erroneous query.
+     */
+    public synchronized static ArrayList<ResultSet> query(PreparedStatement... statement) throws SQLException
+    {
+        return commitAll(SqlBuilder.QueryType.QUERY, statement);
+    }
+
+    /**
+     * Execute (several) execution statements in succession.
+     * @param statement The statement to be executed.
+     * @return null on query failure, otherwise a boolean result for each query, indicating success.
+     * @throws SQLException SQL exception, indicative of an erroneous query.
+     */
+    public synchronized static ArrayList<Boolean> execute(PreparedStatement... statement) throws SQLException
+    {
+        return commitAll(SqlBuilder.QueryType.EXECUTE, statement);
+    }
+
+    /**
+     * Execute (several) update statements in succession.
+     * @param statement The statement to be executed.
+     * @return null on query failure, otherwise an integer for each individual query, indicating the amount of rows changed.
+     * @throws SQLException SQL exception, indicative of an erroneous query.
+     */
+    public synchronized static ArrayList<Integer> update(PreparedStatement... statement) throws SQLException
+    {
+        return commitAll(SqlBuilder.QueryType.UPDATE, statement);
+    }
+
+
+    /**
+     * Execute the prepared statements according to the same query type.
+     * @param type The type of all statements.
+     * @param statement The statements to be executed.
+     * @param <T> The expected return-values
+     * @return An arraylist with the expected return values.
+     * @throws SQLException SQL exception, indicative of an erroneous query.
+     */
+    private static <T> ArrayList<T> commitAll(SqlBuilder.QueryType type, PreparedStatement... statement) throws SQLException
+    {
+        SqlBuilder.StoredQuery[] queries = new SqlBuilder.StoredQuery[statement.length];
+
+        for (int i = 0; i < queries.length; i++)
+        {
+            queries[i] = new SqlBuilder.StoredQuery(statement[i], type);
+        }
+
+        return Commit(queries);
+    }
+
+    /**
+     * Execute all queued queries. Will roll back if any are erroneous.
+     * @param query The queries to be executed.
+     * @param <T> The expected return type. Use 'Object' if there are mixed kinds of queries.
+     * @return The dataset of results based on the queries executed.
+     * @throws SQLException SQL exception, indicative of an erroneous query.
+     */
+    public synchronized static <T extends Object> ArrayList<T> Commit(SqlBuilder.StoredQuery... query) throws SQLException
+    {
+        // initialize an arraylist with the proper size.
+        ArrayList<T> out = new ArrayList<T>(query.length);
+
+        try
+        {
+            for (int i = 0; i < query.length; i++)
+            {
+                switch (query[i].type)
+                {
+
+
+                    case EXECUTE:
+                        out.add(i, (T) Boolean.valueOf(query[i].statement.execute()));
+                        break;
+                    case QUERY:
+                        out.add(i, (T) query[i].statement.executeQuery());
+                        break;
+                    case UPDATE:
+                        out.add(i, (T) Integer.valueOf(query[i].statement.executeUpdate()));
+                        break;
+                    default:
+                        throw new IllegalArgumentException("The type type was not recognized.");
+                }
+            }
+
+            // commit the queries and return the values.
+            myDatabase.conn.commit();
+
+        }
+        catch (SQLException e)
+        {
+            // print stacktrace.
+            e.printStackTrace();
+
+            // rollback the changes.
+            myDatabase.conn.rollback();
+
+            // return null to indicate failure
+            return null;
+        }
+
+
+        return out;
+    }
+
+
+
+
+    /**
+     * Generate a prepared statement from the sql type.
+     * @param sql The sql type
+     * @return A prepared SQL Statement.
+     * @throws SQLException If the SQL statement is erroneous.
+     */
+    public static PreparedStatement getStatement(String sql) throws SQLException
+    {
+
+        return myDatabase.conn.prepareStatement(sql);
+    }
+
+    //endregion
 
 
 }

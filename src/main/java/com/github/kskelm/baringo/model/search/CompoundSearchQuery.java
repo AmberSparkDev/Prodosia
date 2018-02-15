@@ -14,12 +14,12 @@ import java.util.List;
  * From their documentation:
  * [...] This  supports boolean operators
  * (AND, OR, NOT) and indices (tag: user: title: ext: subreddit: album:
- * meme:).An example compound query would be 'title: cats AND dogs ext: gif'
+ * meme:).An example compound type would be 'title: cats AND dogs ext: gif'
  *<p>
  * An example of using this kind of search:
  * <pre>
  * {@code
- * 		CompoundSearchQuery query = new CompoundSearchQuery()
+ * 		CompoundSearchQuery type = new CompoundSearchQuery()
  * 			.title( "cat" )
  * 				.and( "dog" )
  * 			.extension( "gif" );
@@ -42,7 +42,7 @@ public class CompoundSearchQuery  {
 	}
 
 	/**
-	 * Sets the user element for adding new userNames to the query
+	 * Sets the user element for adding new userNames to the type
 	 * @param userName the userName to add
 	 * @return user element
 	 * @throws BaringoApiException a rule was broken 
@@ -53,7 +53,7 @@ public class CompoundSearchQuery  {
 	}
 
 	/**
-	 * Sets the title element for adding new title search words to the query
+	 * Sets the title element for adding new title search words to the type
 	 * @param word the word to add
 	 * @return title element
 	 * @throws BaringoApiException a rule was broken 
@@ -64,7 +64,7 @@ public class CompoundSearchQuery  {
 	}
 
 	/**
-	 * Sets the extension element for adding new file extensions to the query
+	 * Sets the extension element for adding new file extensions to the type
 	 * @param ext the file extension to add
 	 * @return extension element
 	 * @throws BaringoApiException a rule was broken
@@ -75,7 +75,7 @@ public class CompoundSearchQuery  {
 	}
 
 	/**
-	 * Sets the subreddit element for adding new subreddit names to the query
+	 * Sets the subreddit element for adding new subreddit names to the type
 	 * @param subreddit the name of the subreddit to add
 	 * @return subreddit element
 	 * @throws BaringoApiException a rule was broken
@@ -86,7 +86,7 @@ public class CompoundSearchQuery  {
 	}
 
 	/**
-	 * Sets the album element for adding new album search words to the query
+	 * Sets the album element for adding new album search words to the type
 	 * @param word the word to add
 	 * @return album element
 	 * @throws BaringoApiException a rule was broken 
@@ -97,7 +97,7 @@ public class CompoundSearchQuery  {
 	}
 
 	/**
-	 * Sets the meme element for adding new meme search words to the query
+	 * Sets the meme element for adding new meme search words to the type
 	 * @param word the word to add
 	 * @return meme element
 	 * @throws BaringoApiException a rule was broken 
@@ -110,7 +110,7 @@ public class CompoundSearchQuery  {
 	/**
 	 * Adds an AND word to the current element such as user(...) or title(...)
 	 * @param word the word to add
-	 * @return this object for further query refinement
+	 * @return this object for further type refinement
 	 * @throws BaringoApiException a rule was broken
 	 */
 	public CompoundSearchQuery and( String word ) throws BaringoApiException {
@@ -124,7 +124,7 @@ public class CompoundSearchQuery  {
 	/**
 	 * Adds an OR word to the current element such as user(...) or title(...)
 	 * @param word the word to or
-	 * @return this object for further query refinement
+	 * @return this object for further type refinement
 	 * @throws BaringoApiException a rule was broken
 	 */
 	public CompoundSearchQuery or( String word ) throws BaringoApiException {
@@ -171,7 +171,7 @@ public class CompoundSearchQuery  {
 		}
 
 		/**
-		 * Start out a query element with a match word
+		 * Start out a type element with a match word
 		 * @param entry the match word
 		 * @return the QueryElement object itself
 		 * @throws BaringoApiException a rule was broken
@@ -179,7 +179,7 @@ public class CompoundSearchQuery  {
 		public CompoundSearchQuery set( String entry ) throws BaringoApiException {
 			if( !entries.isEmpty() ) {
 				throw new BaringoApiException( "Cannot add SET entries to a"
-						+ " complex query element once other elements have been added" );
+						+ " complex type element once other elements have been added" );
 			} // if
 			entries.add( entry );
 			return parent;
@@ -188,13 +188,13 @@ public class CompoundSearchQuery  {
 		/**
 		 * Add an AND element. It's okay if this is the first entry.
 		 * @param entry a word to add to the and clause
-		 * @return the search query in its current state, for functional chaining
+		 * @return the search type in its current state, for functional chaining
 		 * @throws BaringoApiException a rule was broken
 		 */
 		public CompoundSearchQuery and( String entry ) throws BaringoApiException {
 			if( oring ) {
 				throw new BaringoApiException( "Cannot add AND entries to a"
-						+ " complex query element once OR elements have been added" );
+						+ " complex type element once OR elements have been added" );
 			} // if
 			anding = true;
 			entries.add( entry );
@@ -204,13 +204,13 @@ public class CompoundSearchQuery  {
 		/**
 		 * Add an OR element. It's okay if this is the first entry.
 		 * @param entry a word to add to the or clause
-		 * @return the search query in its current state, for functional chaining
+		 * @return the search type in its current state, for functional chaining
 		 * @throws BaringoApiException a rule was broken
 		 */
 		public CompoundSearchQuery or( String entry ) throws BaringoApiException {
 			if( anding ) {
 				throw new BaringoApiException( "Cannot add OR entries to a"
-						+ " complex query element once AND elements have been added" );
+						+ " complex type element once AND elements have been added" );
 			} // if
 			oring = true;
 			entries.add( entry );
