@@ -1,5 +1,6 @@
 # private files
 private data.txt
+database.db
 
 # Created by https://www.gitignore.io/api/intellij
 

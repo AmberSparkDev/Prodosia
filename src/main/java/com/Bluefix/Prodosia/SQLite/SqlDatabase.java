@@ -20,73 +20,87 @@
  * SOFTWARE.
  */
 
-package com.Bluefix.Prodosia.DataType.DataBuilder;
+package com.Bluefix.Prodosia.SQLite;
 
-import com.Bluefix.Prodosia.DataType.Tracker.Tracker;
-import com.Bluefix.Prodosia.DataType.Tracker.TrackerPermissions;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 
-/**
- * Builder class for Tracker objects.
- */
-public class TrackerBuilder
+public class SqlDatabase
 {
-    //region variables
-    private Tracker tracker;
+    //region Variables
 
-    private String imgurName;
-    private long imgurId;
+    /**
+     * The current expected version of the database.
+     */
+    public static final int DatabaseVersion = 1;
 
-    private String discordName;
-    private int discordTag;
-    private long discordId;
-
-    private TrackerPermissions permissions;
-    //endregion
-
-    //region Constructor
-
-    private TrackerBuilder()
-    {
-
-    }
-
-    public static TrackerBuilder getBuilder()
-    {
-        return new TrackerBuilder();
-    }
+    private Connection conn;
 
     //endregion
 
+    //region Singleton and constructor
 
-    //region Builder methods
-
-    public TrackerBuilder setImgurData(String name, long id)
+    private SqlDatabase()
     {
-        imgurName = name;
-        imgurId =id;
-        return this;
+        try
+        {
+            connect();
+        } catch (SQLException e)
+        {
+            e.printStackTrace();
+        }
     }
 
-    public TrackerBuilder setDiscordData(String name, int tag, long id)
-    {
-        discordName = name;
-        discordTag = tag;
-        discordId = id;
-        return this;
-    }
+    private static SqlDatabase myDatabase;
 
-    public TrackerBuilder setPermissions(TrackerPermissions permissions)
+    public static SqlDatabase Database()
     {
-        this.permissions = permissions;
-        return this;
-    }
+        if (myDatabase == null)
+        {
+            myDatabase = new SqlDatabase();
+        }
 
-    public Tracker build()
-    {
-        return new Tracker(imgurName, imgurId, discordName, discordTag, discordId, permissions);
+        return myDatabase;
     }
 
     //endregion
+
+    //region Connect to Database
+
+    private void connect() throws SQLException
+    {
+        String url = "jdbc:sqlite:database.db";
+
+        conn = DriverManager.getConnection(url);
+
+        System.out.println("Database was connected");
+
+    }
+
+    //endregion
+
+    //region Update the database
+
+    /**
+     * Generate the database from the latest design.
+     */
+    private void createDatabase()
+    {
+
+    }
+
+    /**
+     * Update the database, based on its current version.
+     */
+    private void updateDatabase()
+    {
+
+    }
+
+
+    //endregion
+
 
 
 }
