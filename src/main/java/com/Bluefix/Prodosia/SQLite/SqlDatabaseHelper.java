@@ -80,6 +80,9 @@ public class SqlDatabaseHelper
 
     //endregion
 
+
+
+
     public static boolean tableExists(String table) throws SQLException
     {
         String sql =

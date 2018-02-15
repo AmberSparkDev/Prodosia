@@ -34,13 +34,19 @@ import com.Bluefix.Prodosia.GUI.Navigation.VistaNavigator;
 import com.Bluefix.Prodosia.GUI.Taglist.EditTaglistWindow;
 import com.Bluefix.Prodosia.GUI.Tracker.EditTrackerWindow;
 import com.Bluefix.Prodosia.GUI.User.EditUserWindow;
+import com.Bluefix.Prodosia.Logger.Logger;
 import com.Bluefix.Prodosia.SQLite.SqlDatabase;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.MenuButton;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
+
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 
 public class ApplicationWindow
@@ -56,6 +62,14 @@ public class ApplicationWindow
         // set `ApiKeysWindow` as active window.
         VistaNavigator.loadVista(VistaNavigator.AppStage.API_KEYS);
     }
+
+    private void initializeStatusWindow()
+    {
+        // set the output of the logger to the textarea
+        Logger.setupOutput(statusConsole);
+    }
+
+
 
     //endregion
 
@@ -171,7 +185,8 @@ public class ApplicationWindow
     private void initialize()
     {
         /* Status */
-        statusConsole.setText("This is the console");
+        initializeStatusWindow();
+
 
 
         /* Tag a Post */
@@ -243,7 +258,12 @@ public class ApplicationWindow
      */
     public void test(ActionEvent actionEvent)
     {
-        SqlDatabase db = SqlDatabase.Database();
+        LocalDateTime ldt = LocalDateTime.now();
+        DateTimeFormatter f = DateTimeFormatter.ISO_LOCAL_TIME;
+
+
+
+        Logger.LogMessage("test test");
     }
 
 }

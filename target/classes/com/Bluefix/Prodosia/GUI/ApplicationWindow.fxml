@@ -31,13 +31,13 @@
             <content>
               <AnchorPane>
                      <children>
-                        <TextArea fx:id="statusConsole" layoutX="14.0" layoutY="14.0" prefHeight="325.0" prefWidth="353.0" wrapText="true" />
+                        <TextArea fx:id="statusConsole" editable="false" layoutX="14.0" layoutY="14.0" prefHeight="325.0" prefWidth="353.0" wrapText="true" />
                         <Button layoutX="535.0" layoutY="14.0" mnemonicParsing="false" onAction="#gotoApiKeys" text="API keys" />
                         <Label layoutX="499.0" layoutY="14.0" styleClass="infomarker" text="?">
                            <tooltip>
                               <Tooltip text="Look up the API key details or edit them if necessary." />
                            </tooltip></Label>
-                        <Button onAction="#test" layoutX="383.0" layoutY="204.0" mnemonicParsing="false" prefHeight="224.0" prefWidth="236.0" text="Test" />
+                        <Button layoutX="383.0" layoutY="204.0" mnemonicParsing="false" onAction="#test" prefHeight="224.0" prefWidth="236.0" text="Test" />
                      </children></AnchorPane>
             </content>
           </Tab>

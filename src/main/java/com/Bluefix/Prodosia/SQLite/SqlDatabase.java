@@ -107,10 +107,11 @@ public class SqlDatabase
             if (!SqlDatabaseHelper.tableExists( "Info"))
             {
                 // create the database and set the Version.
-                System.out.println("Info table didn't exist");
 
                 execute(getStatement(SqlStatement.createDatabaseStatement()));
                 SqlDatabaseHelper.setVersion( DatabaseVersion, CreatedBy);
+
+                return;
             }
             else
             {
@@ -197,7 +198,7 @@ public class SqlDatabase
      * Execute all queued queries. Will roll back if any are erroneous.
      * @param query The queries to be executed.
      * @param <T> The expected return type. Use 'Object' if there are mixed kinds of queries.
-     * @return The dataset of results based on the queries executed.
+     * @return null on query failure, otherwise the dataset of results based on the queries executed.
      * @throws SQLException SQL exception, indicative of an erroneous query.
      */
     public synchronized static <T extends Object> ArrayList<T> Commit(SqlBuilder.StoredQuery... query) throws SQLException
@@ -207,12 +208,11 @@ public class SqlDatabase
 
         try
         {
+            // attempt to execute the queries in order.
             for (int i = 0; i < query.length; i++)
             {
                 switch (query[i].type)
                 {
-
-
                     case EXECUTE:
                         out.add(i, (T) Boolean.valueOf(query[i].statement.execute()));
                         break;
