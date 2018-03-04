@@ -1,0 +1,7 @@
+# This document contains a cookie for the imgur API.
+# With a proper functioning cookie you won't need to log in again each time
+# you open the application.
+# if you are having issues with the API, this cookie can be safely deleted.
+# After deleting the cookie, the application should be restarted. Login will be prompted again.
+
+REFRESH 9011ea117263a2977506aa32aa220e8cb9fb679d

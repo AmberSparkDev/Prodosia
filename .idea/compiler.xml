@@ -20,7 +20,7 @@
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
-      <module name="Prodosia" target="1.9" />
+      <module name="Prodosia" target="1.8" />
     </bytecodeTargetLevel>
   </component>
 </project>

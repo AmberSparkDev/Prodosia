@@ -23,6 +23,7 @@
 package com.Bluefix.Prodosia.GUI;
 
 import com.Bluefix.Prodosia.DataType.Data;
+import com.Bluefix.Prodosia.DataType.ImgurKey;
 import com.Bluefix.Prodosia.DataType.Rating;
 import com.Bluefix.Prodosia.GUI.Managers.CheckboxListManager.GuiCheckboxListManager;
 import com.Bluefix.Prodosia.GUI.Managers.CheckboxListManager.TaglistClManager;
@@ -34,10 +35,11 @@ import com.Bluefix.Prodosia.GUI.Navigation.VistaNavigator;
 import com.Bluefix.Prodosia.GUI.Taglist.EditTaglistWindow;
 import com.Bluefix.Prodosia.GUI.Tracker.EditTrackerWindow;
 import com.Bluefix.Prodosia.GUI.User.EditUserWindow;
+import com.Bluefix.Prodosia.ImgurApi.ImgurManager;
 import com.Bluefix.Prodosia.Logger.Logger;
-import com.Bluefix.Prodosia.SQLite.SqlDatabase;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
+import com.Bluefix.Prodosia.Storage.KeyStorage;
+import com.github.kskelm.baringo.BaringoClient;
+import com.github.kskelm.baringo.util.BaringoApiException;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.MenuButton;
@@ -45,8 +47,8 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
+import java.io.IOException;
+import java.net.URISyntaxException;
 
 
 public class ApplicationWindow
@@ -258,12 +260,69 @@ public class ApplicationWindow
      */
     public void test(ActionEvent actionEvent)
     {
-        LocalDateTime ldt = LocalDateTime.now();
-        DateTimeFormatter f = DateTimeFormatter.ISO_LOCAL_TIME;
+
+        try
+        {
+            BaringoClient client = ImgurManager.client();
 
 
 
-        Logger.LogMessage("test test");
+        } catch (IOException e)
+        {
+            e.printStackTrace();
+        } catch (BaringoApiException e)
+        {
+            e.printStackTrace();
+        } catch (URISyntaxException e)
+        {
+            e.printStackTrace();
+        }
     }
 
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

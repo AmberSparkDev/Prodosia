@@ -45,6 +45,7 @@ public class Logger
     //region Singleton and constructor
 
     private static Logger myLogger;
+    private static Severity severity;
 
     public static Logger Logger()
     {
@@ -63,17 +64,63 @@ public class Logger
         controls = new ArrayList<>();
     }
 
-
     //endregion
 
     //region Logger functionality
 
-    public static void LogMessage(String message)
+    /**
+     * Set the current severity of the log that should be maintained.
+     * @param severity
+     */
+    public static void setSeverity(Severity severity)
     {
+        Logger.severity = severity;
+    }
+
+    public enum Severity
+    {
+        EMERGENCY("emerg"),
+        ALERT("alert"),
+        CRITICAL("crit"),
+        ERROR("err"),
+        WARNING("warning"),
+        NOTICE("notice"),
+        INFORMATIONAL("info"),
+        DEBUG("debug");
+
+        private String text;
+
+        Severity(String text)
+        {
+            this.text = text;
+        }
+
+        @Override
+        public String toString()
+        {
+            return text;
+        }
+    }
+
+    /**
+     * Log a message to the logger. Without indication, the severity is expected to be informational.
+     * @param message
+     */
+    public static void logMessage(String message)
+    {
+        logMessage(message, Severity.INFORMATIONAL);
+    }
+
+    public static void logMessage(String message, Severity severity)
+    {
+        // if the severity doesn't override the threshold, ignore the logmessage.
+        if (!threshold(severity))
+            return;
+
         LocalDateTime ldt = LocalDateTime.now();
         DateTimeFormatter f = DateTimeFormatter.ofPattern("H:m:s");
 
-        Logger().log.add("(" + ldt.format(f) + "): " +  message);
+        Logger().log.add("(" + ldt.format(f) + ") " + severity.toString() + ": " + message);
 
         for (int i = maxLogLength; i < Logger().log.size(); i++)
         {
@@ -82,6 +129,65 @@ public class Logger
 
         // update the controls
         Logger().updateControls();
+    }
+
+    /**
+     * Returns true iff the indicated severity is allowed to be logged.
+     * @param severity
+     * @return
+     */
+    private static boolean threshold(Severity severity)
+    {
+        switch (severity)
+        {
+
+            case EMERGENCY:
+                return  severity == Severity.EMERGENCY;
+
+            case ALERT:
+                return  severity == Severity.EMERGENCY ||
+                        severity == Severity.ALERT;
+
+            case CRITICAL:
+                return  severity == Severity.EMERGENCY ||
+                        severity == Severity.ALERT ||
+                        severity == Severity.CRITICAL;
+
+            case ERROR:
+                return  severity == Severity.EMERGENCY ||
+                        severity == Severity.ALERT ||
+                        severity == Severity.CRITICAL ||
+                        severity == Severity.ERROR;
+
+            case WARNING:
+                return  severity == Severity.EMERGENCY ||
+                        severity == Severity.ALERT ||
+                        severity == Severity.CRITICAL ||
+                        severity == Severity.ERROR ||
+                        severity == Severity.WARNING;
+
+            case NOTICE:
+                return  severity == Severity.EMERGENCY ||
+                        severity == Severity.ALERT ||
+                        severity == Severity.CRITICAL ||
+                        severity == Severity.ERROR ||
+                        severity == Severity.WARNING ||
+                        severity == Severity.NOTICE;
+
+            case INFORMATIONAL:
+                return  severity == Severity.EMERGENCY ||
+                        severity == Severity.ALERT ||
+                        severity == Severity.CRITICAL ||
+                        severity == Severity.ERROR ||
+                        severity == Severity.WARNING ||
+                        severity == Severity.NOTICE ||
+                        severity == Severity.INFORMATIONAL;
+
+            case DEBUG:
+                return true;
+        }
+
+        return false;
     }
 
     //endregion

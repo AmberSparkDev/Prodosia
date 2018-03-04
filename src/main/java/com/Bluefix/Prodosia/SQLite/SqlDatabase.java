@@ -107,30 +107,17 @@ public class SqlDatabase
             if (!SqlDatabaseHelper.tableExists( "Info"))
             {
                 // create the database and set the Version.
-
                 execute(getStatement(SqlStatement.createDatabaseStatement()));
                 SqlDatabaseHelper.setVersion( DatabaseVersion, CreatedBy);
 
                 return;
             }
-            else
-            {
-                System.out.println("Info table did exist");
-                System.out.println("Version: " + SqlDatabaseHelper.getVersion());
-            }
 
+            // On subsequent updates, compare the version to the current version and apply the update.
+            int dbVersion = SqlDatabaseHelper.getVersion();
 
-            /*
-            Statement st = conn.createStatement();
-            ResultSet rs = st.executeQuery(SqlStatement.getDatabaseVersion());
-
-            while (rs.next())
-            {
-                System.out.println("#####");
-                System.out.println("" + rs.getInt(0));
-            }*/
-
-        } catch (Exception e)
+        }
+        catch (Exception e)
         {
             e.printStackTrace();
         }
