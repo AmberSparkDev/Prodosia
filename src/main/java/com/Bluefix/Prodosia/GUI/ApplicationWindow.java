@@ -37,6 +37,7 @@ import com.Bluefix.Prodosia.GUI.Tracker.EditTrackerWindow;
 import com.Bluefix.Prodosia.GUI.User.EditUserWindow;
 import com.Bluefix.Prodosia.ImgurApi.ImgurManager;
 import com.Bluefix.Prodosia.Logger.Logger;
+import com.Bluefix.Prodosia.Module.TestModule;
 import com.Bluefix.Prodosia.Storage.KeyStorage;
 import com.github.kskelm.baringo.BaringoClient;
 import com.github.kskelm.baringo.util.BaringoApiException;
@@ -254,29 +255,29 @@ public class ApplicationWindow
 
     //endregion
 
+    TestModule tm;
+    boolean isOn = false;
+
     /**
      * Temporary test method.
      * @param actionEvent
      */
     public void test(ActionEvent actionEvent)
     {
+        if (tm == null)
+            tm = new TestModule(1800);
 
-        try
+        if (isOn)
         {
-            BaringoClient client = ImgurManager.client();
-
-
-
-        } catch (IOException e)
-        {
-            e.printStackTrace();
-        } catch (BaringoApiException e)
-        {
-            e.printStackTrace();
-        } catch (URISyntaxException e)
-        {
-            e.printStackTrace();
+            isOn = false;
+            tm.stop();
         }
+        else
+        {
+            isOn = true;
+            tm.start();
+        }
+
     }
 
 }
