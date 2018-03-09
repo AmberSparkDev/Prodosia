@@ -37,7 +37,7 @@ import com.Bluefix.Prodosia.Logger.Logger;
  * amount of requests and the average requests per cycle, the higher this fluctuation shall be.
  * As such, it is recommended to create more smaller cycles.
  */
-public abstract class ImgurIntervalRunner
+public abstract class ImgurIntervalRunner implements AutoCloseable
 {
     //region Constructor
 
@@ -59,7 +59,6 @@ public abstract class ImgurIntervalRunner
     }
 
     //endregion
-
 
     //region Runner Control
 
@@ -94,7 +93,10 @@ public abstract class ImgurIntervalRunner
     {
         // store the expected cycle to start at.
         expectedCycle = worker.expectedCycle;
+
+        // shut down the current worker.
         isRunning = false;
+        worker.isAlive = false;
         worker = null;
     }
 
@@ -114,7 +116,6 @@ public abstract class ImgurIntervalRunner
     protected abstract int projectedRequests();
 
     //endregion
-
 
     //region Threaded runner logic
 
@@ -143,6 +144,12 @@ public abstract class ImgurIntervalRunner
          */
         private long expectedCycle;
 
+        /**
+         * This boolean indicates that the worker is still functioning and not
+         * scheduled for cancellation.
+         */
+        private boolean isAlive;
+
         //endregion
 
         //region Constructor
@@ -160,6 +167,7 @@ public abstract class ImgurIntervalRunner
             this.runner = runner;
             this.expectedCycle = expectedCycle;
             this.previousProjection = -1;
+            this.isAlive = true;
         }
 
         //endregion
@@ -188,7 +196,7 @@ public abstract class ImgurIntervalRunner
             }
 
             // continually execute the logic until it is stopped.
-            while (runner.isRunning)
+            while (isAlive)
             {
                 try
                 {
@@ -237,6 +245,7 @@ public abstract class ImgurIntervalRunner
             // Execute the logic of the underlying module
             runner.run();
 
+
             // wait the required amount of time.
             long sleepRequired = getSleep(requests);
             long diff = (startTime + sleepRequired) - System.currentTimeMillis();
@@ -250,7 +259,7 @@ public abstract class ImgurIntervalRunner
         /**
          * Retrieve the amount of time that should be waited before resuming
          * @param requests The amount of requests that are added.
-         * @return
+         * @return The amount of milliseconds that should be padded between cycles.
          */
         private long getSleep(int requests)
         {
@@ -260,20 +269,9 @@ public abstract class ImgurIntervalRunner
             // use the requests as a portion of the hour to indicate how much sleep is necessary.
             return (long)Math.ceil(hourMillis * (requests / (double)runner.maximumRequests));
         }
-
-
     }
 
     //endregion
-
-
-    //region Client limit data
-
-
-
-    //endregion
-
-
 
     //region IntervalRunner Exception
 
@@ -284,6 +282,17 @@ public abstract class ImgurIntervalRunner
             super(exception);
         }
     }
+
+    //endregion
+
+    //region Autocloseable implementation
+
+    @Override
+    public void close()
+    {
+        this.stop();
+    }
+
 
     //endregion
 

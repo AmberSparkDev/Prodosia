@@ -23,6 +23,8 @@
 package com.Bluefix.Prodosia.DataType.Tracker;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Objects;
 
 /**
  * Immutable Data class to keep track of tracker permissions.
@@ -35,8 +37,20 @@ public class TrackerPermissions
      */
     public enum TrackerType
     {
-        ADMIN,
-        TRACKER
+        ADMIN(0),
+        TRACKER(1);
+
+        private int value;
+
+        private TrackerType(int value)
+        {
+            this.value = value;
+        }
+
+        public int getValue()
+        {
+            return this.value;
+        }
     }
 
     //region variables and constructor
@@ -53,10 +67,46 @@ public class TrackerPermissions
     private TrackerType type;
 
 
+    /**
+     * Create a new TrackerPermissions object
+     * @param type The type of tracker
+     * @param taglists The taglists pertaining to this tracker, if applicable.
+     */
     public TrackerPermissions(TrackerType type, String... taglists)
     {
         this.type = type;
         this.taglists = taglists;
+    }
+
+
+    /**
+     * Read a taglist from the database, instantiating it.
+     * @param type The type of tracker
+     * @param taglists The taglists, split by separators.
+     */
+    public TrackerPermissions(int type, String taglists) throws Exception
+    {
+        switch (type)
+        {
+            case 0:
+                this.type = TrackerType.ADMIN;
+                break;
+            case 1:
+                this.type = TrackerType.TRACKER;
+                break;
+
+            default:
+                throw new Exception("The type was not recognized");
+        }
+
+        String[] split = taglists.split(" ; ");
+
+        for (int i = 0; i < split.length; i++)
+        {
+            split[i] = split[i].replace(";;", ";");
+        }
+
+        this.taglists = split;
     }
 
 
@@ -72,6 +122,47 @@ public class TrackerPermissions
     public TrackerType getType()
     {
         return type;
+    }
+
+    public int dbGetType()
+    {
+        return this.type.getValue();
+    }
+
+    public String dbGetTaglists()
+    {
+        StringBuilder sb = new StringBuilder();
+
+        for (String s : taglists)
+        {
+            sb.append(s.replace(";", ";;") + " ; ");
+        }
+
+        return sb.toString();
+    }
+
+
+    //endregion
+
+    //region comparison
+
+    @Override
+    public boolean equals(Object o)
+    {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        TrackerPermissions that = (TrackerPermissions) o;
+        return Arrays.equals(taglists, that.taglists) &&
+                type == that.type;
+    }
+
+    @Override
+    public int hashCode()
+    {
+
+        int result = Objects.hash(type);
+        result = 31 * result + Arrays.hashCode(taglists);
+        return result;
     }
 
 

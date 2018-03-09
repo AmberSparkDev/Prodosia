@@ -44,7 +44,7 @@ public class UserListManager extends GuiListManager<Button>
      * in the vbox.
      * @param vbox The VBox element that is used to display the users.
      */
-    public UserListManager(VBox vbox)
+    public UserListManager(VBox vbox) throws Exception
     {
         super(vbox);
     }

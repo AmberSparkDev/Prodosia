@@ -22,6 +22,8 @@
 
 package com.Bluefix.Prodosia.DataType.Tracker;
 
+import java.util.Objects;
+
 /**
  * A tracker data class.
  *
@@ -115,7 +117,30 @@ public class Tracker
 
     //endregion
 
+    //region Comparison methods
+
+    /**
+     * Compare the object to see if it is equal.
+     * @param o
+     * @return
+     */
+    @Override
+    public boolean equals(Object o)
+    {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Tracker tracker = (Tracker) o;
+        return imgurId == tracker.imgurId &&
+                discordId == tracker.discordId;
+    }
+
+    @Override
+    public int hashCode()
+    {
+
+        return Objects.hash(imgurId, discordId);
+    }
 
 
-
+    //endregion
 }

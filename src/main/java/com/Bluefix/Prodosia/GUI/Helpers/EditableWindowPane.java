@@ -22,8 +22,12 @@
 
 package com.Bluefix.Prodosia.GUI.Helpers;
 
+import com.Bluefix.Prodosia.Exception.ExceptionHelper;
 import com.Bluefix.Prodosia.GUI.Navigation.VistaNavigator;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+
+import java.sql.SQLException;
 
 /**
  * This is a helper class aimed at an editable window.
@@ -112,7 +116,13 @@ public abstract class EditableWindowPane
                 setState(WindowState.EDIT);
                 break;
             case EDIT:
-                saveItem();
+                try
+                {
+                    saveItem();
+                } catch (Exception e)
+                {
+                    ExceptionHelper.showWarning(e);
+                }
                 setState(WindowState.VIEW);
                 break;
         }
@@ -134,7 +144,13 @@ public abstract class EditableWindowPane
 
     protected void button_ConfirmDelete()
     {
-        deleteItem();
+        try
+        {
+            deleteItem();
+        } catch (Exception e)
+        {
+            ExceptionHelper.showWarning(e);
+        }
         VistaNavigator.loadVista(VistaNavigator.AppStage.MAIN_MENU);
     }
 
@@ -179,12 +195,12 @@ public abstract class EditableWindowPane
     /**
      * Deletion has been confirmed.
      */
-    protected abstract void deleteItem();
+    protected abstract void deleteItem() throws Exception;
 
     /**
      * Store the current data.
      */
-    protected abstract void saveItem();
+    protected abstract void saveItem() throws Exception;
 
     //endregion
 

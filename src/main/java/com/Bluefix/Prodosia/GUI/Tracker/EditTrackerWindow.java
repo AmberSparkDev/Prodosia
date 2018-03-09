@@ -25,6 +25,7 @@ package com.Bluefix.Prodosia.GUI.Tracker;
 import com.Bluefix.Prodosia.DataHandler.TrackerHandler;
 import com.Bluefix.Prodosia.DataType.DataBuilder.TrackerBuilder;
 import com.Bluefix.Prodosia.DataType.Tracker.Tracker;
+import com.Bluefix.Prodosia.Exception.ExceptionHelper;
 import com.Bluefix.Prodosia.GUI.Helpers.DataFieldStorage;
 import com.Bluefix.Prodosia.GUI.Helpers.EditableWindowPane;
 import com.Bluefix.Prodosia.GUI.Managers.CheckboxListManager.TaglistClManager;
@@ -33,6 +34,8 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
+
+import java.sql.SQLException;
 
 public class EditTrackerWindow extends EditableWindowPane
 {
@@ -272,20 +275,20 @@ public class EditTrackerWindow extends EditableWindowPane
     }
 
     @Override
-    protected void deleteItem()
+    protected void deleteItem() throws Exception
     {
-        TrackerHandler.deleteTracker(curTracker);
+        TrackerHandler.removeTracker(curTracker);
     }
 
     @Override
-    protected void saveItem()
+    protected void saveItem() throws Exception
     {
         // parse the tracker from the fields.
         Tracker newTracker = parseTracker();
 
         if (newTracker != null)
         {
-            TrackerHandler.UpdateTracker(curTracker, newTracker);
+            TrackerHandler.updateTracker(curTracker, newTracker);
             curTracker = newTracker;
         }
     }
@@ -476,7 +479,13 @@ public class EditTrackerWindow extends EditableWindowPane
     {
         perm_filter.setText("");
         perm_chkAdmin.setSelected(false);
-        taglistClManager = new TaglistClManager(perm_taglists);
+        try
+        {
+            taglistClManager = new TaglistClManager(perm_taglists);
+        } catch (Exception e)
+        {
+            ExceptionHelper.showWarning(e);
+        }
 
         perm_filter.textProperty().addListener((observable, oldValue, newValue) ->
                 taglistClManager.filter(newValue));

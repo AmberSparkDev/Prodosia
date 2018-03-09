@@ -31,6 +31,8 @@ import com.Bluefix.Prodosia.GUI.Tracker.EditTrackerWindow;
 import javafx.scene.control.Button;
 import javafx.scene.layout.VBox;
 
+import java.util.ArrayList;
+
 /**
  * A GUI Manager that will keep track of a list of users.
  */
@@ -44,7 +46,7 @@ public class TrackerListManager extends GuiListManager<Button>
      * in the vbox.
      * @param vbox The VBox element that is used to display the users.
      */
-    public TrackerListManager(VBox vbox)
+    public TrackerListManager(VBox vbox) throws Exception
     {
         super(vbox);
     }
@@ -54,14 +56,14 @@ public class TrackerListManager extends GuiListManager<Button>
     //region GuiListManager implementation
 
     @Override
-    protected Button[] listItems()
+    protected Button[] listItems() throws Exception
     {
-        Tracker[] data = TrackerHandler.getAllTrackers();
-        Button[] buttons = new Button[data.length];
+        ArrayList<Tracker> data = TrackerHandler.getTrackers();
+        Button[] buttons = new Button[data.size()];
 
-        for (int i = 0; i < data.length; i++)
+        for (int i = 0; i < data.size(); i++)
         {
-            Tracker tr = data[i];
+            Tracker tr = data.get(i);
 
             Button button = new Button(tr.getName());
             button.setMaxWidth(Double.MAX_VALUE);

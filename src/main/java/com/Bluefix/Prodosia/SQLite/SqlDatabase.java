@@ -22,6 +22,8 @@
 
 package com.Bluefix.Prodosia.SQLite;
 
+import com.Bluefix.Prodosia.DataHandler.TrackerHandler;
+
 import java.sql.*;
 import java.util.ArrayList;
 
@@ -107,7 +109,13 @@ public class SqlDatabase
             if (!SqlDatabaseHelper.tableExists( "Info"))
             {
                 // create the database and set the Version.
-                execute(getStatement(SqlStatement.createDatabaseStatement()));
+                String[] tableQueries = SqlStatement.createDatabaseStatement();
+
+                for (String q : tableQueries)
+                {
+                    myDatabase.conn.prepareStatement(q).execute();
+                }
+
                 SqlDatabaseHelper.setVersion( DatabaseVersion, CreatedBy);
 
                 return;
@@ -215,7 +223,7 @@ public class SqlDatabase
             }
 
             // commit the queries and return the values.
-            myDatabase.conn.commit();
+            Database().conn.commit();
 
         }
         catch (SQLException e)
@@ -224,7 +232,7 @@ public class SqlDatabase
             e.printStackTrace();
 
             // rollback the changes.
-            myDatabase.conn.rollback();
+            Database().conn.rollback();
 
             // return null to indicate failure
             return null;
@@ -239,14 +247,13 @@ public class SqlDatabase
 
     /**
      * Generate a prepared statement from the sql type.
-     * @param sql The sql type
+     * @param sql The sql query
      * @return A prepared SQL Statement.
      * @throws SQLException If the SQL statement is erroneous.
      */
     public static PreparedStatement getStatement(String sql) throws SQLException
     {
-
-        return myDatabase.conn.prepareStatement(sql);
+        return Database().conn.prepareStatement(sql);
     }
 
     //endregion

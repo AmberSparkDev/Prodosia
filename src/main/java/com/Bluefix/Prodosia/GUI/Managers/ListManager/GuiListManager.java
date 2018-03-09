@@ -44,7 +44,7 @@ public abstract class GuiListManager<T extends Labeled>
      * from `listItems()`
      * @param root The root in which the items will be displayed.
      */
-    public GuiListManager(Pane root)
+    public GuiListManager(Pane root) throws Exception
     {
         this.root = root;
 
@@ -56,7 +56,7 @@ public abstract class GuiListManager<T extends Labeled>
     /**
      * Fill the root-pane with the items that we retrieve from the subclass.
      */
-    private void fill()
+    private void fill() throws Exception
     {
         root.getChildren().clear();
 
@@ -80,7 +80,7 @@ public abstract class GuiListManager<T extends Labeled>
      * @return All Region-items that should be included in the Pane, in
      * the proper order.
      */
-    protected abstract T[] listItems();
+    protected abstract T[] listItems() throws Exception;
 
 
 

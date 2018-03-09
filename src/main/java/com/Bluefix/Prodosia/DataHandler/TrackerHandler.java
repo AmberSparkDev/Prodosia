@@ -24,58 +24,269 @@ package com.Bluefix.Prodosia.DataHandler;
 
 
 import com.Bluefix.Prodosia.DataType.Tracker.Tracker;
+import com.Bluefix.Prodosia.DataType.Tracker.TrackerPermissions;
+import com.Bluefix.Prodosia.SQLite.SqlBuilder;
+import com.Bluefix.Prodosia.SQLite.SqlDatabase;
+
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
 
 /**
  * Handler for Tracker management.
+ *
+ * This handles the storage and retrieval of data from the database and keeps
+ * a local memory copy for speed purposes.
  */
 public class TrackerHandler
 {
+    //region variables
 
+    /**
+     * Local copy of the available trackers.
+     */
+    private ArrayList<Tracker> trackers;
 
+    //endregion
 
+    //region Singleton and Constructor
 
-    public static Tracker[] getAllTrackers()
+    private static TrackerHandler me;
+
+    private static TrackerHandler handler()
     {
-        // TODO: Link method to SQLite database.
-        Tracker t0 = new Tracker("name0", 1, null,1234, 1, null);
-        Tracker t1 = new Tracker("name1asdfasdfasdfasdf", 2, "",1234, 2, null);
-        Tracker t2 = new Tracker("name2", 3, "",1234, 3, null);
-        Tracker t3 = new Tracker("name3", 4, "",1234, 4, null);
-        Tracker t4 = new Tracker("name4", 5, "",1234, 5, null);
-        Tracker t5 = new Tracker("name5", 6, "",1234, 6, null);
-        Tracker t6 = new Tracker("name6", 7, "",1234, 7, null);
-        Tracker t7 = new Tracker("name7", 7, "",1234, 7, null);
-        Tracker t8 = new Tracker("name8", 7, "",1234, 7, null);
-        Tracker t9 = new Tracker("name9", 7, "",1234, 7, null);
-        Tracker t10 = new Tracker("name10", 7, "",1234, 7, null);
-        Tracker t11 = new Tracker("name11", 7, "",1234, 7, null);
-        Tracker t12 = new Tracker("name12", 7, "",1234, 7, null);
-        Tracker t13 = new Tracker("name13", 7, "",1234, 7, null);
-        Tracker t14 = new Tracker("name14", 7, "",1234, 7, null);
-        Tracker t15 = new Tracker("name15", 7, "",1234, 7, null);
-        Tracker t16 = new Tracker("name16", 7, "",1234, 7, null);
-        Tracker t17 = new Tracker("name17", 7, "",1234, 7, null);
-
-        return new Tracker[]{t0, t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13, t14, t15, t16, t17};
-    }
-
-
-
-    public static void deleteTracker(Tracker tracker)
-    {
-        // TODO: delete tracker from local storage and perm storage.
-        // TODO: update the tracker-list.
-    }
-
-
-    public static void UpdateTracker(Tracker oldTracker, Tracker newTracker)
-    {
-        // if the old tracker isn't null, delete it from the system.
-        if (oldTracker != null)
+        if (me == null)
         {
-            // TODO: delete old tracker from system.
+            me = new TrackerHandler();
         }
 
-        // TODO: add the new tracker to the system.
+        return me;
     }
+
+    private TrackerHandler()
+    {
+        trackers = null;
+    }
+
+
+    //endregion
+
+    //region Static visible methods
+
+    /**
+     * Add a tracker to the collection.
+     * @param tracker the tracker to be added.
+     * @throws SQLException
+     */
+    public synchronized static void addTracker(Tracker tracker) throws Exception
+    {
+        if (tracker == null)
+            return;
+
+        // remove the tracker if it already existed
+        removeTracker(tracker);
+
+        handler().trackers.add(tracker);
+        dbAddTracker(tracker);
+    }
+
+    /**
+     * Remove the tracker from the collection.
+     * @param tracker The tracker to be removed.
+     * @throws SQLException
+     */
+    public synchronized static void removeTracker(Tracker tracker) throws Exception
+    {
+        if (tracker == null)
+            return;
+
+        // remove the tracker from the list and database.
+        handler().trackers.remove(tracker);
+        dbRemoveTracker(tracker);
+    }
+
+    /**
+     * Update the old tracker, replacing it with the new one.
+     * @param oldTracker
+     * @param newTracker
+     * @throws SQLException
+     */
+    public synchronized static void updateTracker(Tracker oldTracker, Tracker newTracker) throws Exception
+    {
+        // remove the old tracker and add the new one.
+        removeTracker(oldTracker);
+        addTracker(newTracker);
+    }
+
+    /**
+     * Retrieve all trackers in the system.
+     * @return A list with all current trackers.
+     */
+    public synchronized static ArrayList<Tracker> getTrackers() throws Exception
+    {
+        if (handler().trackers == null)
+        {
+            handler().trackers = dbGetTrackers();
+        }
+
+        return handler().trackers;
+    }
+
+    //endregion
+
+
+    //region Database management
+
+    private synchronized static void dbAddTracker(Tracker t) throws Exception
+    {
+        if (t == null)
+            return;
+
+        // first insert the tracker
+        String query0 =
+                "INSERT INTO Tracker " +
+                "(imgurId, imgurName, discordId, discordName, discordTag) " +
+                "VALUES (?,?,?,?,?);";
+
+        PreparedStatement prep0 = SqlDatabase.getStatement(query0);
+        prep0.setLong(1, t.getImgurId());
+        prep0.setString(2, t.getImgurName());
+        prep0.setLong(3, t.getDiscordId());
+        prep0.setString(4, t.getDiscordName());
+        prep0.setInt(5, t.getDiscordTag());
+
+        // retrieve the rowid of the freshly inserted tracker
+        String query1 = "SELECT last_insert_rowid()";
+        PreparedStatement prep1 = SqlDatabase.getStatement(query1);
+
+        ArrayList<Object> result = SqlBuilder.Builder()
+                .execute(prep0)
+                .query(prep1)
+                .commit();
+
+        if (result == null)
+            throw new Exception("SqlDatabase exception: query result was null");
+
+        if (result.size() != 2)
+            throw new Exception("SqlDatabase exception: Expected result size did not match (was " + result.size() + ")");
+
+        ResultSet rs = (ResultSet)result.get(1);
+
+        if (!rs.next())
+            throw new Exception("SqlDatabase exception: The database did not provide a row-id for the inserted tracker");
+
+        int trackerIndex = rs.getInt(1);
+
+        // next, insert its permissions.
+        String query2 =
+                "INSERT INTO Permission " +
+                "(trackerId, isAdmin, taglists) " +
+                "VALUES (?,?,?);";
+
+        PreparedStatement prep2 = SqlDatabase.getStatement(query2);
+        prep2.setLong(1, trackerIndex);
+        prep2.setInt(2, t.getPermissions().dbGetType());
+        prep2.setString(3, t.getPermissions().dbGetTaglists());
+
+        SqlDatabase.execute(prep2);
+    }
+
+    private synchronized static void dbRemoveTracker(Tracker t) throws Exception
+    {
+        // first, retrieve the id for the tracker.
+        String query0 =
+                "SELECT id " +
+                "FROM Tracker as T " +
+                "WHERE imgurId = ? " +
+                    "AND discordId = ?;";
+
+        PreparedStatement prep0 = SqlDatabase.getStatement(query0);
+        prep0.setLong(1, t.getImgurId());
+        prep0.setLong(2, t.getDiscordId());
+
+        ArrayList<ResultSet> result = SqlDatabase.query(prep0);
+
+        // if the database does not contain the tracker, quietly exit.
+        if (result == null)
+            return;
+
+        if (result.size() != 1)
+            return;
+
+        ResultSet rs = result.get(0);
+
+        if (!rs.next())
+            return;
+
+        long trackerId = rs.getLong(1);
+
+        // delete the entry from Tracker and Permission
+        String query1 =
+                "DELETE FROM Tracker " +
+                "WHERE id = ?;";
+        PreparedStatement prep1 = SqlDatabase.getStatement(query1);
+        prep1.setLong(1, trackerId);
+
+        String query2 =
+                "DELETE FROM Permission " +
+                "WHERE trackerId = ?;";
+        PreparedStatement prep2 = SqlDatabase.getStatement(query2);
+        prep2.setLong(1, trackerId);
+
+        SqlBuilder.Builder()
+                .execute(prep1)
+                .execute(prep2)
+                .commit();
+    }
+
+    private synchronized static ArrayList<Tracker> dbGetTrackers() throws Exception
+    {
+        String query =
+                "SELECT " +
+                    "T.imgurId, " +
+                    "T.imgurName, " +
+                    "T.discordId, " +
+                    "T.discordName, " +
+                    "T.discordTag, " +
+                    "P.isAdmin, " +
+                    "P.taglists " +
+                "FROM Tracker as T " +
+                "INNER JOIN Permission as P ON T.id = P.trackerId;";
+
+        PreparedStatement prep = SqlDatabase.getStatement(query);
+        ArrayList<ResultSet> result = SqlDatabase.query(prep);
+
+        if (result.size() != 1)
+            throw new Exception("SqlDatabase exception: Expected result size did not match (was " + result.size() + ")");
+
+        ResultSet rs = result.get(0);
+        ArrayList<Tracker> trackers = new ArrayList<>();
+
+        while (rs.next())
+        {
+            long imgurId = rs.getLong(1);
+            String imgurName = rs.getString(2);
+            long discordId = rs.getLong(3);
+            String discordName = rs.getString(4);
+            int discordTag = rs.getInt(5);
+            int permType = rs.getInt(6);
+            String permTaglists = rs.getString(7);
+
+            // initiate the permissions and create the tagger
+            TrackerPermissions perm = new TrackerPermissions(permType, permTaglists);
+
+            Tracker myT = new Tracker(imgurName, imgurId, discordName, discordTag, discordId, perm);
+
+            trackers.add(myT);
+        }
+
+        return trackers;
+    }
+
+
+
+
+
+    //endregion
 }

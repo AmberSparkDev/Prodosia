@@ -29,58 +29,55 @@ public class SqlStatement
 {
     //region Database creation
 
-    public static String createDatabaseStatement()
+    public static String[] createDatabaseStatement()
     {
-        return
+        return new String[]{
                 /* --- Info Table --- */
-                "CREATE TABLE IF NOT EXISTS Info (" +
-                    "version integer, " +
-                    "created_by text); " +
+                        "CREATE TABLE IF NOT EXISTS Info (" +
+                        "version integer, " +
+                        "created_by text); ",
                 /* --- Api Credentials --- */
-                "CREATE TABLE IF NOT EXISTS ApiCredentials (" +
-                    "imgurId text, " +
-                    "imgurSecret text, " +
-                    "discordToken text); " +
+                        "CREATE TABLE IF NOT EXISTS ApiCredentials (" +
+                        "imgurId text, " +
+                        "imgurSecret text, " +
+                        "discordToken text); ",
                 /* --- Tracker --- */
-                "CREATE TABLE IF NOT EXISTS Tracker (" +
-                    "id integer PRIMARY KEY, " +
-                    "imgurId integer, " +
-                    "imgurName text, " +
-                    "discordId integer, " +
-                    "discordName text, " +
-                    "discordTag text); " +
+                        "CREATE TABLE IF NOT EXISTS Tracker (" +
+                        "id integer PRIMARY KEY, " +
+                        "imgurId integer, " +
+                        "imgurName text, " +
+                        "discordId integer, " +
+                        "discordName text, " +
+                        "discordTag integer); ",
                 /* --- Permission --- */
-                "CREATE TABLE IF NOT EXISTS Permission (" +
-                    "trackerId integer PRIMARY KEY, " +
-                    "isAdmin integer, " +
-                    "taglists text); " +
+                        "CREATE TABLE IF NOT EXISTS Permission (" +
+                        "trackerId integer PRIMARY KEY, " +
+                        "isAdmin integer, " +
+                        "taglists text); ",
                 /* --- User --- */
-                "CREATE TABLE IF NOT EXISTS User (" +
-                    "id integer primary key, " +
-                    "name text, " +
-                    "imgurId integer); " +
+                        "CREATE TABLE IF NOT EXISTS User (" +
+                        "id integer primary key, " +
+                        "name text, " +
+                        "imgurId integer); ",
                 /* --- UserSubscription --- */
-                "CREATE TABLE IF NOT EXISTS UserSubscription (" +
-                    "userId integer, " +
-                    "taglistId integer, " +
-                    "ratings text, " +
-                    "filters text); " +
+                        "CREATE TABLE IF NOT EXISTS UserSubscription (" +
+                        "userId integer, " +
+                        "taglistId integer, " +
+                        "ratings text, " +
+                        "filters text); ",
                 /* --- Taglist --- */
-                "CREATE TABLE IF NOT EXISTS Taglist (" +
-                    "id integer primary key, " +
-                    "abbreviation text, " +
-                    "description text); " +
+                        "CREATE TABLE IF NOT EXISTS Taglist (" +
+                        "id integer primary key, " +
+                        "abbreviation text, " +
+                        "description text); ",
                 /* --- Archive --- */
-                "CREATE TABLE IF NOT EXISTS Archive (" +
-                    "taglistId integer, " +
-                    "channel integer, " +
-                    "ratings text, " +
-                    "filters text); "
+                        "CREATE TABLE IF NOT EXISTS Archive (" +
+                        "taglistId integer, " +
+                        "channel integer, " +
+                        "ratings text, " +
+                        "filters text); "
 
-
-
-
-                ;
+        };
     }
 
     //endregion

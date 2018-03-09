@@ -44,7 +44,7 @@ public abstract class GuiCheckboxListManager extends GuiListManager<CheckBox>
      *
      * @param root The root in which the items will be displayed.
      */
-    public GuiCheckboxListManager(Pane root)
+    public GuiCheckboxListManager(Pane root) throws Exception
     {
         super(root);
     }

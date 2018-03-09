@@ -43,7 +43,7 @@ public class TaglistListManager extends GuiListManager<Button>
      * in the vbox.
      * @param vbox The VBox element that is used to display the users.
      */
-    public TaglistListManager(VBox vbox)
+    public TaglistListManager(VBox vbox) throws Exception
     {
         super(vbox);
     }

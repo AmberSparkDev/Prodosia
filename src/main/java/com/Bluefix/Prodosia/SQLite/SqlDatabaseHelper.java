@@ -24,6 +24,9 @@ package com.Bluefix.Prodosia.SQLite;
 
 import java.sql.*;
 
+/**
+ * Class that helps with initiating the database.
+ */
 public class SqlDatabaseHelper
 {
 

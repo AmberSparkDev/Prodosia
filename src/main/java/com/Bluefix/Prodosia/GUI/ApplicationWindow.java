@@ -25,6 +25,7 @@ package com.Bluefix.Prodosia.GUI;
 import com.Bluefix.Prodosia.DataType.Data;
 import com.Bluefix.Prodosia.DataType.ImgurKey;
 import com.Bluefix.Prodosia.DataType.Rating;
+import com.Bluefix.Prodosia.Exception.ExceptionHelper;
 import com.Bluefix.Prodosia.GUI.Managers.CheckboxListManager.GuiCheckboxListManager;
 import com.Bluefix.Prodosia.GUI.Managers.CheckboxListManager.TaglistClManager;
 import com.Bluefix.Prodosia.GUI.Managers.ListManager.GuiListManager;
@@ -225,9 +226,38 @@ public class ApplicationWindow
         listManagers = new GuiListManager[3];
 
         // tracker list
-        listManagers[0] = new TrackerListManager(trackers_overview);
-        listManagers[1] = new TaglistListManager(taglists_overview);
-        listManagers[2] = new UserListManager(users_overview);
+        try
+        {
+            listManagers[0] = new TrackerListManager(trackers_overview);
+        } catch (Exception e)
+        {
+            ExceptionHelper.showWarning(e);
+        }
+
+        try
+        {
+            listManagers[1] = new TaglistListManager(taglists_overview);
+        } catch (Exception e)
+        {
+            ExceptionHelper.showWarning(e);
+        }
+
+        try
+        {
+            listManagers[2] = new UserListManager(users_overview);
+        } catch (Exception e)
+        {
+            ExceptionHelper.showWarning(e);
+        }
+
+        try
+        {
+            // setup checkbox gui list managers.
+            tap_taglist_cl = new TaglistClManager(tap_taglistSelector);
+        } catch (Exception e)
+        {
+            ExceptionHelper.showWarning(e);
+        }
 
         // setup listeners for their respective filters.
 
@@ -246,8 +276,7 @@ public class ApplicationWindow
             listManagers[2].filter(newVal);
         });
 
-        // setup checkbox gui list managers.
-        tap_taglist_cl = new TaglistClManager(tap_taglistSelector);
+
     }
 
 
@@ -265,7 +294,7 @@ public class ApplicationWindow
     public void test(ActionEvent actionEvent)
     {
         if (tm == null)
-            tm = new TestModule(1800);
+            tm = new TestModule(360);
 
         if (isOn)
         {

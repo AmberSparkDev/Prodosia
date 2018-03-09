@@ -80,6 +80,11 @@ public class SqlBuilder
 
     /**
      * Commit all the statements to the database.
+     *
+     * Data entries will be either
+     * Boolean (for execute),
+     * Integer (for update) or
+     * ResultSet (for query)
      * @return an array with the results of the individual queries.
      */
     public ArrayList<Object> commit() throws SQLException
