@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Bas Boellaard
+ * Copyright (c) 2018 J.S. Boellaard
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -294,7 +294,7 @@ public class ApplicationWindow
     public void test(ActionEvent actionEvent)
     {
         if (tm == null)
-            tm = new TestModule(360);
+            tm = new TestModule(3600);
 
         if (isOn)
         {

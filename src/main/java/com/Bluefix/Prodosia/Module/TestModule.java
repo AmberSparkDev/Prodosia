@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Bas Boellaard
+ * Copyright (c) 2018 J.S. Boellaard
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -38,6 +38,8 @@ public class TestModule extends ImgurIntervalRunner
     public TestModule(int maximumRequests)
     {
         super(maximumRequests);
+
+        counter = 1;
     }
 
     @Override
@@ -46,9 +48,11 @@ public class TestModule extends ImgurIntervalRunner
         System.out.println(ZonedDateTime.now().format(DateTimeFormatter.RFC_1123_DATE_TIME));
     }
 
+    private int counter;
+
     @Override
     protected int projectedRequests()
     {
-        return 1;
+        return counter++;
     }
 }
