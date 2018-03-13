@@ -69,7 +69,8 @@ public class SqlStatement
                         "CREATE TABLE IF NOT EXISTS Taglist (" +
                         "id integer primary key, " +
                         "abbreviation text, " +
-                        "description text); ",
+                        "description text, " +
+                        "hasRatings integer); ",
                 /* --- Archive --- */
                         "CREATE TABLE IF NOT EXISTS Archive (" +
                         "taglistId integer, " +

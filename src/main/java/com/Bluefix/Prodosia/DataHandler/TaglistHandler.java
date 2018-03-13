@@ -23,53 +23,160 @@
 package com.Bluefix.Prodosia.DataHandler;
 
 import com.Bluefix.Prodosia.DataType.Taglist;
+import com.Bluefix.Prodosia.SQLite.SqlDatabase;
 
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 
 /**
  * Handler for taglist management.
  */
-public class TaglistHandler
+public class TaglistHandler extends LocalStorageHandler<Taglist>
 {
+    //region Singleton and Constructor
 
+    private static TaglistHandler me;
+
+    public static TaglistHandler handler()
+    {
+        if (me == null)
+            me = new TaglistHandler();
+
+        return me;
+    }
+
+    private TaglistHandler()
+    {
+        super(true);
+    }
+
+    //endregion
+
+
+    //region Local Storage Handler implementation
 
     /**
-     * retrieve all taglists in the system.
-     * @return All taglists in the system.
+     * Add an item to the storage.
+     *
+     * @param t
      */
-    public static Taglist[] getTaglists()
+    @Override
+    protected void addItem(Taglist t) throws Exception
     {
-        Taglist t0 = new Taglist("fur", "furry taglist");
-        Taglist t1 = new Taglist("mlp", "");
-        Taglist t2 = new Taglist("yos", "");
-        Taglist t3 = new Taglist("htm", "");
-        Taglist t4 = new Taglist("twd", "");
-        Taglist t5 = new Taglist("kot", "");
-        Taglist t6 = new Taglist("ott", "");
-        Taglist t7 = new Taglist("che", "");
-        Taglist t8 = new Taglist("box", "");
-        Taglist t9 = new Taglist("scp", "");
-        Taglist t10 = new Taglist("pkm", "");
-
-        return new Taglist[]{t0, t1, t2, t3, t4, t5, t6, t7, t8, t9, t10};
+        dbAddTaglist(t);
     }
 
     /**
-     * retrieve all the taglists sorted.
-     * @return All taglists ordered by their abbreviation.
+     * Remove an item from the storage.
+     *
+     * @param t
      */
-    public static Taglist[] getTaglistsSorted()
+    @Override
+    protected void removeItem(Taglist t) throws Exception
     {
-        Taglist[] tls = getTaglists();
-        Arrays.sort(tls, new TaglistComparator());
-
-        return tls;
+        dbRemoveTaglist(t);
     }
 
     /**
+     * Retrieve all items from the storage in no particular order.
+     *
+     * @return
+     */
+    @Override
+    protected ArrayList<Taglist> getAllItems() throws Exception
+    {
+        return dbGetTaglists();
+    }
+
+    //endregion
+
+    //region Database management
+
+    private synchronized static void dbAddTaglist(Taglist t) throws SQLException
+    {
+        if (t == null)
+            return;
+
+        // insert the tracker into the database.
+        String query =
+                "INSERT INTO Taglist " +
+                "(abbreviation, description, hasRatings) " +
+                "VALUES (?,?, ?);";
+
+        PreparedStatement prep = SqlDatabase.getStatement(query);
+        prep.setString(1, t.getAbbreviation());
+        prep.setString(2, t.getDescription());
+        prep.setBoolean(3, t.hasRatings());
+
+        SqlDatabase.execute(prep);
+    }
+
+    private synchronized static void dbRemoveTaglist(Taglist t) throws SQLException
+    {
+        // if the abbreviation fits, remove the taglist.
+        String query =
+                "DELETE FROM Taglist " +
+                "WHERE abbreviation = ?;";
+
+        PreparedStatement prep = SqlDatabase.getStatement(query);
+        prep.setString(1, t.getAbbreviation());
+
+        SqlDatabase.execute(prep);
+    }
+
+    private synchronized static ArrayList<Taglist> dbGetTaglists() throws Exception
+    {
+        String query =
+                "SELECT abbreviation, description, hasRatings " +
+                "FROM Taglist;";
+
+        PreparedStatement prep = SqlDatabase.getStatement(query);
+        ArrayList<ResultSet> result = SqlDatabase.query(prep);
+
+        if (result.size() != 1)
+            throw new Exception("SqlDatabase exception: Expected result size did not match (was " + result.size() + ")");
+
+        ResultSet rs = result.get(0);
+        ArrayList<Taglist> taglists = new ArrayList<>();
+
+        while (rs.next())
+        {
+            String abbr = rs.getString(1);
+            String desc = rs.getString(2);
+            boolean hasRatings = rs.getBoolean(3);
+
+            taglists.add(new Taglist(abbr, desc, hasRatings));
+        }
+
+        return taglists;
+    }
+
+    //endregion
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    /*
      * Comparator class for taglists. Compares by abbreviation.
-     */
+     *
     static class TaglistComparator implements Comparator<Taglist>
     {
         @Override
@@ -77,5 +184,5 @@ public class TaglistHandler
         {
             return o1.getAbbreviation().compareTo(o2.getAbbreviation());
         }
-    }
+    }*/
 }

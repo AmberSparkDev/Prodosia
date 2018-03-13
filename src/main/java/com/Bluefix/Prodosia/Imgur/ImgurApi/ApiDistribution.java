@@ -20,43 +20,19 @@
  * SOFTWARE.
  */
 
-package com.Bluefix.Prodosia.GUI.Managers.CheckboxListManager;
+package com.Bluefix.Prodosia.Imgur.ImgurApi;
 
-import com.Bluefix.Prodosia.DataHandler.TaglistHandler;
-import com.Bluefix.Prodosia.DataType.Taglist;
-import javafx.scene.layout.Pane;
-
-import java.util.ArrayList;
-
-public class TaglistClManager extends GuiCheckboxListManager
+/**
+ * Data class indicating what the hourly distribution for different modules is.
+ *
+ * At current, the daily limit is 12500
+ */
+public class ApiDistribution
 {
     /**
-     * Create a new GuiListManager object that is linked to the root pane.
-     * This list-manager will instantiate itself by filling the items
-     * from `listItems()`
-     *
-     * @param root The root in which the items will be displayed.
+     * Comment-module uses 250 requests on average per hour.
+     * This is 24 * 250 = 6000 per day (48%)
      */
-    public TaglistClManager(Pane root) throws Exception
-    {
-        super(root);
-    }
+    public static final int CommentModule = 250;
 
-    @Override
-    protected String[] listOptions() throws Exception
-    {
-        ArrayList<Taglist> taglists = TaglistHandler.handler().getAll();
-
-        if (taglists == null || taglists.size() <= 0)
-            return null;
-
-        String[] out = new String[taglists.size()];
-
-        for (int i = 0; i < taglists.size(); i++)
-        {
-            out[i] = taglists.get(i).getAbbreviation();
-        }
-
-        return out;
-    }
 }

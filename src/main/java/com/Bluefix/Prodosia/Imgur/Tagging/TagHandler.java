@@ -20,17 +20,21 @@
  * SOFTWARE.
  */
 
-package com.Bluefix.Prodosia.ImgurApi;
+package com.Bluefix.Prodosia.Imgur.Tagging;
 
 /**
- * Data class indicating what the hourly distribution for different modules is.
+ * Imgur helper class that handles post tagging.
  */
-public class ApiDistribution
+public class TagHandler
 {
-    /**
-     * Comment-module uses 250 requests on average per hour.
-     * This is 24 * 250 = 6000 per day (48%)
-     */
-    public static final int CommentModule = 250;
+
+
+
+
+
+
+
+
+
 
 }

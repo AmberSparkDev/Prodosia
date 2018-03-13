@@ -20,7 +20,7 @@
  * SOFTWARE.
  */
 
-package com.Bluefix.Prodosia.ImgurApi;
+package com.Bluefix.Prodosia.Imgur.ImgurApi;
 
 
 import com.Bluefix.Prodosia.Authorization.ImgurAuthorization;
@@ -45,8 +45,9 @@ public class ImgurManager
     /**
      * Retrieve the Imgur Api client that allows access to the underlying API.
      * @return The Imgur API client.
-     * @throws IOException
-     * @throws BaringoApiException
+     * @throws IOException Exception reading/writing cookies. Non-essential, but good to know anyways.
+     * @throws BaringoApiException Baringo framework exception.
+     * @throws URISyntaxException Might pertain to an incompatibility with the imgur API.
      */
     public static BaringoClient client() throws IOException, BaringoApiException, URISyntaxException
     {

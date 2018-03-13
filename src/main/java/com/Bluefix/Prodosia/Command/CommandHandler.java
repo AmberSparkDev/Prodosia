@@ -193,7 +193,7 @@ public class CommandHandler
      * regarding the available commands in the system and acts as an entry point for an
      * unknown user.
      * @param arguments The arguments provided with the help command.
-     * @return The result object which contains the provided information as its message. 
+     * @return The result object which contains the provided information as its message.
      */
     private static CommandResult executeHelp(String[] arguments)
     {

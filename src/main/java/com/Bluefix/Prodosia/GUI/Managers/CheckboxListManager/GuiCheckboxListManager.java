@@ -77,7 +77,7 @@ public abstract class GuiCheckboxListManager extends GuiListManager<CheckBox>
      * @return
      */
     @Override
-    protected CheckBox[] listItems()
+    protected CheckBox[] listItems() throws Exception
     {
         String[] options = listOptions();
 
@@ -101,7 +101,7 @@ public abstract class GuiCheckboxListManager extends GuiListManager<CheckBox>
      * Retrieve all the options available for this checkbox-list.
      * @return
      */
-    protected abstract String[] listOptions();
+    protected abstract String[] listOptions() throws Exception;
 
 
 

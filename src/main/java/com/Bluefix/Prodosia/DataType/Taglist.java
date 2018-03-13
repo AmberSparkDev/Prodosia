@@ -22,6 +22,8 @@
 
 package com.Bluefix.Prodosia.DataType;
 
+import java.util.Objects;
+
 /**
  * Data class for a single Taglist.
  */
@@ -30,9 +32,9 @@ public class Taglist
 
 
     //region Data Setters and Getters
-    private long id;
     private String abbreviation;
     private String description;
+    private boolean hasRatings;
 
     public String getAbbreviation()
     {
@@ -44,20 +46,48 @@ public class Taglist
         return description;
     }
 
+    public boolean hasRatings()
+    {
+        return hasRatings;
+    }
+
     //endregion
 
     //region Constructor
 
-    public Taglist(String abbreviation, String description)
+    public Taglist(String abbreviation, String description, boolean hasRatings)
     {
         this.abbreviation = abbreviation;
         this.description = description;
+        this.hasRatings = hasRatings;
     }
 
     //endregion
 
 
+    //region Equals
+
+    /**
+     * Equals only needs to be unique for the abbreviation.
+     * @param o
+     * @return
+     */
+    @Override
+    public boolean equals(Object o)
+    {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Taglist taglist = (Taglist) o;
+        return Objects.equals(abbreviation, taglist.abbreviation);
+    }
+
+    @Override
+    public int hashCode()
+    {
+
+        return Objects.hash(abbreviation);
+    }
 
 
-
+    //endregion
 }

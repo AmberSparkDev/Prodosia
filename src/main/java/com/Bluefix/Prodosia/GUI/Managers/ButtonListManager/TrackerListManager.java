@@ -58,7 +58,7 @@ public class TrackerListManager extends GuiListManager<Button>
     @Override
     protected Button[] listItems() throws Exception
     {
-        ArrayList<Tracker> data = TrackerHandler.getTrackers();
+        ArrayList<Tracker> data = TrackerHandler.handler().getAll();
         Button[] buttons = new Button[data.size()];
 
         for (int i = 0; i < data.size(); i++)

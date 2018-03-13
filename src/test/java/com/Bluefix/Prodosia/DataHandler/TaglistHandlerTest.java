@@ -22,8 +22,7 @@
 
 package com.Bluefix.Prodosia.DataHandler;
 
-import com.Bluefix.Prodosia.DataType.Tracker.Tracker;
-import com.Bluefix.Prodosia.DataType.Tracker.TrackerPermissions;
+import com.Bluefix.Prodosia.DataType.Taglist;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -32,57 +31,46 @@ import java.util.ArrayList;
 
 import static org.junit.Assert.*;
 
-public class TrackerHandlerTest
+public class TaglistHandlerTest
 {
-    private TrackerHandler handler;
-    private Tracker tracker;
-
-    private TrackerPermissions perm;
+    private TaglistHandler handler;
+    private Taglist taglist;
 
     @Before
     public void setUp() throws Exception
     {
-        handler = TrackerHandler.handler();
+        handler = TaglistHandler.handler();
 
-        perm = new TrackerPermissions(TrackerPermissions.TrackerType.ADMIN);
-
-        tracker = new Tracker(
-                "imgurname",
-                1,
-                "discordname",
-                1234,
-                2,
-                perm);
-
-
+        taglist = new Taglist("my_abbreviation", "my_description", true);
     }
+
 
     @After
     public void tearDown() throws Exception
     {
-
     }
+
 
     @Test
     public void testFunctionalityWithLocalStorage() throws Exception
     {
         handler.setLocalStorage(true);
 
-        ArrayList<Tracker> trackers = handler.getAll();
+        ArrayList<Taglist> taglists = handler.getAll();
 
-        if (trackers.contains(tracker))
+        if (taglists.contains(taglist))
             fail();
 
-        handler.add(tracker);
-        trackers = handler.getAll();
+        handler.add(taglist);
+        taglists = handler.getAll();
 
-        if (!trackers.contains(tracker))
+        if (!taglists.contains(taglist))
             fail();
 
-        handler.remove(tracker);
-        trackers = handler.getAll();
+        handler.remove(taglist);
+        taglists = handler.getAll();
 
-        if (trackers.contains(tracker))
+        if (taglists.contains(taglist))
             fail();
 
 
@@ -93,21 +81,25 @@ public class TrackerHandlerTest
     {
         handler.setLocalStorage(false);
 
-        ArrayList<Tracker> trackers = handler.getAll();
+        ArrayList<Taglist> taglists = handler.getAll();
 
-        if (trackers.contains(tracker))
+        if (taglists.contains(taglist))
             fail();
 
-        handler.add(tracker);
-        trackers = handler.getAll();
+        handler.add(taglist);
+        taglists = handler.getAll();
 
-        if (!trackers.contains(tracker))
+        if (!taglists.contains(taglist))
             fail();
 
-        handler.remove(tracker);
-        trackers = handler.getAll();
+        handler.remove(taglist);
+        taglists = handler.getAll();
 
-        if (trackers.contains(tracker))
+        if (taglists.contains(taglist))
             fail();
     }
+
+
+
+
 }

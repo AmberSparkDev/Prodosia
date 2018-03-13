@@ -39,98 +39,50 @@ import java.util.ArrayList;
  * This handles the storage and retrieval of data from the database and keeps
  * a local memory copy for speed purposes.
  */
-public class TrackerHandler
+public class TrackerHandler extends LocalStorageHandler<Tracker>
 {
-    //region variables
-
-    /**
-     * Local copy of the available trackers.
-     */
-    private ArrayList<Tracker> trackers;
-
-    //endregion
-
     //region Singleton and Constructor
 
     private static TrackerHandler me;
 
-    private static TrackerHandler handler()
+    /**
+     * Retrieve the TrackerHandler object.
+     * @return The TrackerHandler object.
+     */
+    public static TrackerHandler handler()
     {
         if (me == null)
-        {
             me = new TrackerHandler();
-        }
 
         return me;
     }
 
     private TrackerHandler()
     {
-        trackers = null;
+        super(true);
     }
-
 
     //endregion
 
-    //region Static visible methods
 
-    /**
-     * Add a tracker to the collection.
-     * @param tracker the tracker to be added.
-     * @throws SQLException
-     */
-    public synchronized static void addTracker(Tracker tracker) throws Exception
+    //region Local Storage Handler implementation
+
+    @Override
+    protected void addItem(Tracker t) throws Exception
     {
-        if (tracker == null)
-            return;
-
-        // remove the tracker if it already existed
-        removeTracker(tracker);
-
-        handler().trackers.add(tracker);
-        dbAddTracker(tracker);
+        dbAddTracker(t);
     }
 
-    /**
-     * Remove the tracker from the collection.
-     * @param tracker The tracker to be removed.
-     * @throws SQLException
-     */
-    public synchronized static void removeTracker(Tracker tracker) throws Exception
+    @Override
+    protected void removeItem(Tracker t) throws Exception
     {
-        if (tracker == null)
-            return;
-
-        // remove the tracker from the list and database.
-        handler().trackers.remove(tracker);
-        dbRemoveTracker(tracker);
+        dbRemoveTracker(t);
     }
 
-    /**
-     * Update the old tracker, replacing it with the new one.
-     * @param oldTracker
-     * @param newTracker
-     * @throws SQLException
-     */
-    public synchronized static void updateTracker(Tracker oldTracker, Tracker newTracker) throws Exception
+    @Override
+    protected ArrayList<Tracker> getAllItems() throws Exception
     {
-        // remove the old tracker and add the new one.
-        removeTracker(oldTracker);
-        addTracker(newTracker);
-    }
-
-    /**
-     * Retrieve all trackers in the system.
-     * @return A list with all current trackers.
-     */
-    public synchronized static ArrayList<Tracker> getTrackers() throws Exception
-    {
-        if (handler().trackers == null)
-        {
-            handler().trackers = dbGetTrackers();
-        }
-
-        return handler().trackers;
+        return dbGetTrackers();
     }
 
     //endregion

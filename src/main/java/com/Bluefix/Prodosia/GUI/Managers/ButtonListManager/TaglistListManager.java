@@ -31,6 +31,8 @@ import com.Bluefix.Prodosia.GUI.Taglist.EditTaglistWindow;
 import javafx.scene.control.Button;
 import javafx.scene.layout.VBox;
 
+import java.util.ArrayList;
+
 /**
  * A GUI Manager that will keep track of a list of users.
  */
@@ -53,14 +55,14 @@ public class TaglistListManager extends GuiListManager<Button>
     //region IListManager implementation
 
     @Override
-    protected Button[] listItems()
+    protected Button[] listItems() throws Exception
     {
-        Taglist[] data = TaglistHandler.getTaglistsSorted();
-        Button[] buttons = new Button[data.length];
+        ArrayList<Taglist> data = TaglistHandler.handler().getAll();
+        Button[] buttons = new Button[data.size()];
 
-        for (int i = 0; i < data.length; i++)
+        for (int i = 0; i < data.size(); i++)
         {
-            Taglist tl = data[i];
+            Taglist tl = data.get(i);
 
             Button button = new Button(tl.getAbbreviation());
             button.setMaxWidth(Double.MAX_VALUE);
