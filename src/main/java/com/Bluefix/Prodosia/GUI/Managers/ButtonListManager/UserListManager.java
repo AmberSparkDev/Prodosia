@@ -24,7 +24,7 @@ package com.Bluefix.Prodosia.GUI.Managers.ButtonListManager;
 
 
 import com.Bluefix.Prodosia.DataHandler.UserHandler;
-import com.Bluefix.Prodosia.DataType.User;
+import com.Bluefix.Prodosia.DataType.User.User;
 import com.Bluefix.Prodosia.GUI.Managers.ListManager.GuiListManager;
 import com.Bluefix.Prodosia.GUI.Navigation.VistaNavigator;
 import com.Bluefix.Prodosia.GUI.User.EditUserWindow;

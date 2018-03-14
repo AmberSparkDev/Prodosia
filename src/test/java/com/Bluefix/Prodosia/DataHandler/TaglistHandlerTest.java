@@ -22,7 +22,7 @@
 
 package com.Bluefix.Prodosia.DataHandler;
 
-import com.Bluefix.Prodosia.DataType.Taglist;
+import com.Bluefix.Prodosia.DataType.Taglist.Taglist;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

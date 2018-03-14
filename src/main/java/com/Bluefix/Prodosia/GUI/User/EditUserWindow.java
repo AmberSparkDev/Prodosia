@@ -22,7 +22,7 @@
 
 package com.Bluefix.Prodosia.GUI.User;
 
-import com.Bluefix.Prodosia.DataType.User;
+import com.Bluefix.Prodosia.DataType.User.User;
 import com.Bluefix.Prodosia.GUI.Helpers.DataFieldStorage;
 import com.Bluefix.Prodosia.GUI.Helpers.EditableWindowPane;
 import javafx.event.ActionEvent;

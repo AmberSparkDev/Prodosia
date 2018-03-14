@@ -20,11 +20,12 @@
  * SOFTWARE.
  */
 
-package com.Bluefix.Prodosia.DataType;
+package com.Bluefix.Prodosia.DataType.User;
 
 import com.Bluefix.Prodosia.DataHandler.TaglistHandler;
+import com.Bluefix.Prodosia.DataType.Taglist.Rating;
+import com.Bluefix.Prodosia.DataType.Taglist.Taglist;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 
 public class UserSubscription

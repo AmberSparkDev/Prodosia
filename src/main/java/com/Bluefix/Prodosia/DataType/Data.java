@@ -22,6 +22,8 @@
 
 package com.Bluefix.Prodosia.DataType;
 
+import com.Bluefix.Prodosia.DataType.Taglist.Rating;
+
 /**
  * Generic conversion for data types
  */

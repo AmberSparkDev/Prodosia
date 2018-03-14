@@ -24,7 +24,7 @@ package com.Bluefix.Prodosia.GUI.Managers.ButtonListManager;
 
 
 import com.Bluefix.Prodosia.DataHandler.TaglistHandler;
-import com.Bluefix.Prodosia.DataType.Taglist;
+import com.Bluefix.Prodosia.DataType.Taglist.Taglist;
 import com.Bluefix.Prodosia.GUI.Managers.ListManager.GuiListManager;
 import com.Bluefix.Prodosia.GUI.Navigation.VistaNavigator;
 import com.Bluefix.Prodosia.GUI.Taglist.EditTaglistWindow;

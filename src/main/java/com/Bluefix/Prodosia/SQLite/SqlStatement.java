@@ -76,6 +76,13 @@ public class SqlStatement
                         "taglistId integer, " +
                         "channel integer, " +
                         "ratings text, " +
+                        "filters text); ",
+                /* --- TagQueue --- */
+                        "CREATE TABLE IF NOT EXISTS TagQueue (" +
+                        "imgurId text NOT NULL UNIQUE, " +
+                        "parentComment text, " +
+                        "taglists text, " +
+                        "rating integer, " +
                         "filters text); "
 
         };

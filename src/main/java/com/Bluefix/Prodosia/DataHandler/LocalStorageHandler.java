@@ -35,6 +35,9 @@ public abstract class LocalStorageHandler <T>
 {
     //region Variables and constructor
 
+    /**
+     * The local storage data
+     */
     private ArrayList<T> data;
 
     public LocalStorageHandler()

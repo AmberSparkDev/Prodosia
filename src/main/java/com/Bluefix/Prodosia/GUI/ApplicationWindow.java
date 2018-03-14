@@ -23,7 +23,7 @@
 package com.Bluefix.Prodosia.GUI;
 
 import com.Bluefix.Prodosia.DataType.Data;
-import com.Bluefix.Prodosia.DataType.Rating;
+import com.Bluefix.Prodosia.DataType.Taglist.Rating;
 import com.Bluefix.Prodosia.Exception.ExceptionHelper;
 import com.Bluefix.Prodosia.GUI.Managers.CheckboxListManager.GuiCheckboxListManager;
 import com.Bluefix.Prodosia.GUI.Managers.CheckboxListManager.TaglistClManager;

@@ -23,7 +23,7 @@
 package com.Bluefix.Prodosia.GUI.Managers.CheckboxListManager;
 
 import com.Bluefix.Prodosia.DataHandler.TaglistHandler;
-import com.Bluefix.Prodosia.DataType.Taglist;
+import com.Bluefix.Prodosia.DataType.Taglist.Taglist;
 import javafx.scene.layout.Pane;
 
 import java.util.ArrayList;

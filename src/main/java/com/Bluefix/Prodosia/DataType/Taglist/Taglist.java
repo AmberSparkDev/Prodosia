@@ -20,13 +20,12 @@
  * SOFTWARE.
  */
 
-package com.Bluefix.Prodosia.DataType;
+package com.Bluefix.Prodosia.DataType.Taglist;
 
 import com.Bluefix.Prodosia.SQLite.SqlDatabase;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Objects;
 

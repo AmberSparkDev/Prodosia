@@ -23,8 +23,8 @@
 package com.Bluefix.Prodosia.DataHandler;
 
 
-import com.Bluefix.Prodosia.DataType.User;
-import com.Bluefix.Prodosia.DataType.UserSubscription;
+import com.Bluefix.Prodosia.DataType.User.User;
+import com.Bluefix.Prodosia.DataType.User.UserSubscription;
 import com.Bluefix.Prodosia.SQLite.SqlBuilder;
 import com.Bluefix.Prodosia.SQLite.SqlDatabase;
 

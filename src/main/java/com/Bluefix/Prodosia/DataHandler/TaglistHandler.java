@@ -22,15 +22,13 @@
 
 package com.Bluefix.Prodosia.DataHandler;
 
-import com.Bluefix.Prodosia.DataType.Taglist;
+import com.Bluefix.Prodosia.DataType.Taglist.Taglist;
 import com.Bluefix.Prodosia.SQLite.SqlDatabase;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
 
 /**
  * Handler for taglist management.

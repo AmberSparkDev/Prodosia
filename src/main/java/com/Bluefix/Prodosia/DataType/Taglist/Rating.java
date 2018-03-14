@@ -20,7 +20,7 @@
  * SOFTWARE.
  */
 
-package com.Bluefix.Prodosia.DataType;
+package com.Bluefix.Prodosia.DataType.Taglist;
 
 /**
  * The rating modifier for a post.

@@ -22,6 +22,9 @@
 
 package com.Bluefix.Prodosia.DataType.Tracker;
 
+import com.Bluefix.Prodosia.DataHandler.TaglistHandler;
+import com.Bluefix.Prodosia.DataType.Taglist.Taglist;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Objects;
@@ -59,7 +62,7 @@ public class TrackerPermissions
      * A list with taglists. These taglists indicate permissions for the tracker
      * to edit them.
      */
-    private String[] taglists;
+    private ArrayList<Taglist> taglists;
 
     /**
      * The type of tracker.
@@ -72,10 +75,13 @@ public class TrackerPermissions
      * @param type The type of tracker
      * @param taglists The taglists pertaining to this tracker, if applicable.
      */
-    public TrackerPermissions(TrackerType type, String... taglists)
+    public TrackerPermissions(TrackerType type, Taglist... taglists)
     {
         this.type = type;
-        this.taglists = taglists;
+        this.taglists = new ArrayList<Taglist>();
+
+        for (Taglist t : taglists)
+            this.taglists.add(t);
     }
 
 
@@ -99,14 +105,17 @@ public class TrackerPermissions
                 throw new Exception("The type was not recognized");
         }
 
-        String[] split = taglists.split(" ; ");
+        String[] split = taglists.split(";");
+        this.taglists = new ArrayList<>();
 
-        for (int i = 0; i < split.length; i++)
+        for (String s : split)
         {
-            split[i] = split[i].replace(";;", ";");
-        }
+            // skip empty taglists.
+            if (s == null || s.isEmpty())
+                continue;
 
-        this.taglists = split;
+            this.taglists.add(TaglistHandler.getTaglist(Long.parseLong(s)));
+        }
     }
 
 
@@ -114,7 +123,7 @@ public class TrackerPermissions
 
     //region Getters
 
-    public String[] getTaglists()
+    public ArrayList<Taglist> getTaglists()
     {
         return taglists;
     }
@@ -129,13 +138,13 @@ public class TrackerPermissions
         return this.type.getValue();
     }
 
-    public String dbGetTaglists()
+    public String dbGetTaglists() throws Exception
     {
         StringBuilder sb = new StringBuilder();
 
-        for (String s : taglists)
+        for (Taglist t : taglists)
         {
-            sb.append(s.replace(";", ";;") + " ; ");
+            sb.append(t.getId() + ";");
         }
 
         return sb.toString();
@@ -152,7 +161,7 @@ public class TrackerPermissions
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         TrackerPermissions that = (TrackerPermissions) o;
-        return Arrays.equals(taglists, that.taglists) &&
+        return Objects.equals(taglists, that.taglists) &&
                 type == that.type;
     }
 
@@ -160,9 +169,7 @@ public class TrackerPermissions
     public int hashCode()
     {
 
-        int result = Objects.hash(type);
-        result = 31 * result + Arrays.hashCode(taglists);
-        return result;
+        return Objects.hash(taglists, type);
     }
 
 

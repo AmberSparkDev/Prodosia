@@ -22,10 +22,10 @@
 
 package com.Bluefix.Prodosia.DataHandler;
 
-import com.Bluefix.Prodosia.DataType.Rating;
-import com.Bluefix.Prodosia.DataType.Taglist;
-import com.Bluefix.Prodosia.DataType.User;
-import com.Bluefix.Prodosia.DataType.UserSubscription;
+import com.Bluefix.Prodosia.DataType.Taglist.Rating;
+import com.Bluefix.Prodosia.DataType.Taglist.Taglist;
+import com.Bluefix.Prodosia.DataType.User.User;
+import com.Bluefix.Prodosia.DataType.User.UserSubscription;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

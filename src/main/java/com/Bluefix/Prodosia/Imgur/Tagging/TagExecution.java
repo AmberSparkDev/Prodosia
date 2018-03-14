@@ -22,19 +22,11 @@
 
 package com.Bluefix.Prodosia.Imgur.Tagging;
 
-/**
- * Imgur helper class that handles post tagging.
- */
-public class TagHandler
+public class TagExecution extends Thread
 {
+    @Override
+    public void run()
+    {
 
-
-
-
-
-
-
-
-
-
+    }
 }
