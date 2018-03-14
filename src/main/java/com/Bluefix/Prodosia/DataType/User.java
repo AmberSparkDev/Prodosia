@@ -22,9 +22,51 @@
 
 package com.Bluefix.Prodosia.DataType;
 
+import java.util.*;
+
 public class User
 {
-    //region Data
+    //region Variables
+
+    private String imgurName;
+
+    private long imgurId;
+
+    /**
+     * A hashmap that maps a taglist-id to the corresponding user subscription.
+     */
+    private HashMap<Long, UserSubscription> subscriptions;
+
+    //endregion
+
+    //region Constructor
+
+    public User(String imgurName, long imgurId, Iterator<UserSubscription> subscriptionData) throws Exception
+    {
+        if (imgurName == null || imgurName.trim().isEmpty())
+            throw new IllegalArgumentException("The imgur name was empty");
+
+        if (imgurId <= 0)
+            throw new IllegalArgumentException("The imgur id was faulty");
+
+        if (subscriptionData == null)
+            throw new IllegalArgumentException("No subscription data was provided.");
+
+
+        this.imgurName = imgurName;
+        this.imgurId = imgurId;
+        this.subscriptions = new HashMap<>();
+
+        while (subscriptionData.hasNext())
+        {
+            UserSubscription us = subscriptionData.next();
+
+            this.subscriptions.put(us.getTaglist().getId(), us);
+        }
+    }
+
+    //endregion
+
 
     public String getImgurName()
     {
@@ -36,23 +78,43 @@ public class User
         return imgurId;
     }
 
-    private String imgurName;
-    private long imgurId;
-    private UserRating rating;
-
-    //endregion
-
-    //region Constructor
-
-    public User(String imgurName, long imgurId, UserRating rating)
+    /**
+     * Retrieve the UserSubscription data for the specified taglist.
+     * @param taglistId The taglist to retrieve the data for.
+     * @return The subscription data, or null if this user was not subscribed to the taglist.
+     */
+    public UserSubscription getSubscription(long taglistId)
     {
-        this.imgurName = imgurName;
-        this.imgurId = imgurId;
-        this.rating = rating;
+        return subscriptions.get(taglistId);
+    }
+
+    /**
+     * Retrieve all available subscriptions.
+     * @return
+     */
+    public Collection<UserSubscription> getSubscriptions()
+    {
+        return subscriptions.values();
+    }
+
+
+    //region Equals
+
+    @Override
+    public boolean equals(Object o)
+    {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        User user = (User) o;
+        return imgurId == user.imgurId;
+    }
+
+    @Override
+    public int hashCode()
+    {
+
+        return Objects.hash(imgurId);
     }
 
     //endregion
-
-
-
 }

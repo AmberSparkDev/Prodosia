@@ -131,7 +131,7 @@ public class TaglistHandler extends LocalStorageHandler<Taglist>
     private synchronized static ArrayList<Taglist> dbGetTaglists() throws Exception
     {
         String query =
-                "SELECT abbreviation, description, hasRatings " +
+                "SELECT id, abbreviation, description, hasRatings " +
                 "FROM Taglist;";
 
         PreparedStatement prep = SqlDatabase.getStatement(query);
@@ -145,11 +145,12 @@ public class TaglistHandler extends LocalStorageHandler<Taglist>
 
         while (rs.next())
         {
-            String abbr = rs.getString(1);
-            String desc = rs.getString(2);
-            boolean hasRatings = rs.getBoolean(3);
+            long id = rs.getLong(1);
+            String abbr = rs.getString(2);
+            String desc = rs.getString(3);
+            boolean hasRatings = rs.getBoolean(4);
 
-            taglists.add(new Taglist(abbr, desc, hasRatings));
+            taglists.add(new Taglist(id, abbr, desc, hasRatings));
         }
 
         return taglists;
@@ -158,31 +159,27 @@ public class TaglistHandler extends LocalStorageHandler<Taglist>
     //endregion
 
 
+    //region Helper methods
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    /*
-     * Comparator class for taglists. Compares by abbreviation.
-     *
-    static class TaglistComparator implements Comparator<Taglist>
+    /**
+     * Retrieve the taglist that corresponds to the id.
+     * @param taglistId
+     * @return
+     */
+    public static synchronized Taglist getTaglist(long taglistId) throws Exception
     {
-        @Override
-        public int compare(Taglist o1, Taglist o2)
+        // TODO: if this methods is used frequently, it might be worth making a HashMap<long, Taglist>
+        ArrayList<Taglist> taglists = handler().getAll();
+
+        for (Taglist tl : taglists)
         {
-            return o1.getAbbreviation().compareTo(o2.getAbbreviation());
+            if (taglistId == tl.getId())
+                return tl;
         }
-    }*/
+
+        return null;
+    }
+
+    //endregion
+
 }

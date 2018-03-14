@@ -22,6 +22,12 @@
 
 package com.Bluefix.Prodosia.DataType;
 
+import com.Bluefix.Prodosia.SQLite.SqlDatabase;
+
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Objects;
 
 /**
@@ -32,6 +38,7 @@ public class Taglist
 
 
     //region Data Setters and Getters
+    private long id;
     private String abbreviation;
     private String description;
     private boolean hasRatings;
@@ -51,12 +58,46 @@ public class Taglist
         return hasRatings;
     }
 
+    public long getId() throws Exception
+    {
+        if (id < 0)
+        {
+            // retrieve the id first.
+            String query = "SELECT id FROM Taglist WHERE abbreviation = ?;";
+            PreparedStatement prep = SqlDatabase.getStatement(query);
+            prep.setString(1, abbreviation);
+
+            ArrayList<ResultSet> result = SqlDatabase.query(prep);
+
+            if (result.size() != 1)
+                throw new Exception("SqlDatabase exception: Expected result size did not match (was " + result.size() + ")");
+
+            ResultSet rs = result.get(0);
+
+            if (!rs.next())
+                throw new Exception("This Taglist was not stored in the database. Make sure you have added it first.");
+
+            this.id = rs.getLong(1);
+        }
+
+        return id;
+    }
+
     //endregion
 
     //region Constructor
 
+    public Taglist(long id, String abbreviation, String description, boolean hasRatings)
+    {
+        this.id = id;
+        this.abbreviation = abbreviation;
+        this.description = description;
+        this.hasRatings = hasRatings;
+    }
+
     public Taglist(String abbreviation, String description, boolean hasRatings)
     {
+        this.id = -1;
         this.abbreviation = abbreviation;
         this.description = description;
         this.hasRatings = hasRatings;

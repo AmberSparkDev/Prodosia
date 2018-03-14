@@ -22,6 +22,10 @@
 
 package com.Bluefix.Prodosia.DataHandler;
 
+import com.Bluefix.Prodosia.SQLite.SqlBuilder;
+import com.Bluefix.Prodosia.SQLite.SqlDatabase;
+
+import java.sql.PreparedStatement;
 import java.util.ArrayList;
 
 /**
@@ -151,7 +155,7 @@ public abstract class LocalStorageHandler <T>
     //region Abstract methods
 
     /**
-     * Add an item to the storage.
+     * Retrieve the prepared statements necessary for adding an item.
      * @param t
      */
     protected abstract void addItem(T t) throws Exception;

@@ -27,10 +27,46 @@ package com.Bluefix.Prodosia.DataType;
  */
     public enum Rating
 {
-    ALL,
-    SAFE,
-    QUESTIONABLE,
-    EXPLICIT,
-    UNKNOWN
+    ALL(0),
+    SAFE(1),
+    QUESTIONABLE(2),
+    EXPLICIT(3),
+    UNKNOWN(4);
+
+    private int value;
+
+    private Rating(int value)
+    {
+        this.value = value;
+    }
+
+    public int getValue()
+    {
+        return value;
+    }
+
+    public static Rating parseValue(int value)
+    {
+        switch (value)
+        {
+            case 0:
+                return ALL;
+
+            case 1:
+                return SAFE;
+
+            case 2:
+                return QUESTIONABLE;
+
+            case 3:
+                return EXPLICIT;
+
+            case 4:
+                return UNKNOWN;
+
+            default:
+                throw new IllegalArgumentException("This rating value was not recognized");
+        }
+    }
 }
 

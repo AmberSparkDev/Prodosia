@@ -31,6 +31,8 @@ import com.Bluefix.Prodosia.GUI.User.EditUserWindow;
 import javafx.scene.control.Button;
 import javafx.scene.layout.VBox;
 
+import java.util.ArrayList;
+
 /**
  * A GUI Manager that will keep track of a list of users.
  */
@@ -53,14 +55,14 @@ public class UserListManager extends GuiListManager<Button>
     //region IListManager implementation
 
     @Override
-    protected Button[] listItems()
+    protected Button[] listItems() throws Exception
     {
-        User[] data = UserHandler.getUsersSorted();
-        Button[] buttons = new Button[data.length];
+        ArrayList<User> data = UserHandler.handler().getAll();
+        Button[] buttons = new Button[data.size()];
 
-        for (int i = 0; i < data.length; i++)
+        for (int i = 0; i < data.size(); i++)
         {
-            User u = data[i];
+            User u = data.get(i);
 
             Button button = new Button(u.getImgurName());
             button.setMaxWidth(Double.MAX_VALUE);

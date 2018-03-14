@@ -58,7 +58,7 @@ public class SqlStatement
                         "CREATE TABLE IF NOT EXISTS User (" +
                         "id integer primary key, " +
                         "name text, " +
-                        "imgurId integer); ",
+                        "imgurId integer UNIQUE); ",
                 /* --- UserSubscription --- */
                         "CREATE TABLE IF NOT EXISTS UserSubscription (" +
                         "userId integer, " +
@@ -68,7 +68,7 @@ public class SqlStatement
                 /* --- Taglist --- */
                         "CREATE TABLE IF NOT EXISTS Taglist (" +
                         "id integer primary key, " +
-                        "abbreviation text, " +
+                        "abbreviation text NOT NULL UNIQUE, " +
                         "description text, " +
                         "hasRatings integer); ",
                 /* --- Archive --- */

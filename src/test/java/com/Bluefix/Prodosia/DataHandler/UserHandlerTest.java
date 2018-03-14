@@ -22,32 +22,53 @@
 
 package com.Bluefix.Prodosia.DataHandler;
 
+import com.Bluefix.Prodosia.DataType.Rating;
 import com.Bluefix.Prodosia.DataType.Taglist;
+import com.Bluefix.Prodosia.DataType.User;
+import com.Bluefix.Prodosia.DataType.UserSubscription;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 
 import static org.junit.Assert.*;
 
-public class TaglistHandlerTest
+public class UserHandlerTest
 {
-    private TaglistHandler handler;
+    private UserHandler handler;
     private Taglist taglist;
+    private User user;
+
+
 
     @Before
     public void setUp() throws Exception
     {
-        handler = TaglistHandler.handler();
-
         taglist = new Taglist(-1,"my_abbreviation", "my_description", true);
-    }
+        TaglistHandler.handler().add(taglist);
 
+        handler = UserHandler.handler();
+
+        ArrayList<UserSubscription> subData = new ArrayList<>();
+
+        HashSet<Rating> ratings = new HashSet<>();
+        ratings.add(Rating.EXPLICIT);
+        ratings.add(Rating.QUESTIONABLE);
+        ratings.add(Rating.SAFE);
+
+        subData.add(new UserSubscription(taglist, ratings, "filter"));
+
+
+
+        user = new User("4a70ab7a-7966-4c44-93b4-49770b74813d", 1, subData.iterator());
+    }
 
     @After
     public void tearDown() throws Exception
     {
+        TaglistHandler.handler().remove(taglist);
     }
 
 
@@ -56,21 +77,21 @@ public class TaglistHandlerTest
     {
         handler.setLocalStorage(true);
 
-        ArrayList<Taglist> taglists = handler.getAll();
+        ArrayList<User> users = handler.getAll();
 
-        if (taglists.contains(taglist))
+        if (users.contains(user))
             fail();
 
-        handler.add(taglist);
-        taglists = handler.getAll();
+        handler.add(user);
+        users = handler.getAll();
 
-        if (!taglists.contains(taglist))
+        if (!users.contains(user))
             fail();
 
-        handler.remove(taglist);
-        taglists = handler.getAll();
+        handler.remove(user);
+        users = handler.getAll();
 
-        if (taglists.contains(taglist))
+        if (users.contains(user))
             fail();
 
 
@@ -81,25 +102,21 @@ public class TaglistHandlerTest
     {
         handler.setLocalStorage(false);
 
-        ArrayList<Taglist> taglists = handler.getAll();
+        ArrayList<User> users = handler.getAll();
 
-        if (taglists.contains(taglist))
+        if (users.contains(user))
             fail();
 
-        handler.add(taglist);
-        taglists = handler.getAll();
+        handler.add(user);
+        users = handler.getAll();
 
-        if (!taglists.contains(taglist))
+        if (!users.contains(user))
             fail();
 
-        handler.remove(taglist);
-        taglists = handler.getAll();
+        handler.remove(user);
+        users = handler.getAll();
 
-        if (taglists.contains(taglist))
+        if (users.contains(user))
             fail();
     }
-
-
-
-
 }
