@@ -39,22 +39,9 @@ import java.util.ArrayList;
  */
 public class TagRequestHandler extends LocalStorageHandler<TagRequest>
 {
-    /**
-     * The amount of tag requests that should be executed.
-     * Recommended to have higher than 1, so that exceptionally large
-     * taglists don't clog the tag requests.
-     */
-    private static final int SimultaneousTagRequest = 4;
-
-
     //region Singleton and constructor
 
     private static TagRequestHandler me;
-
-    /**
-     * The thread that handles the actual tagging.
-     */
-    private static TagExecution tagExecution;
 
     public static TagRequestHandler handler()
     {
@@ -63,8 +50,7 @@ public class TagRequestHandler extends LocalStorageHandler<TagRequest>
             me = new TagRequestHandler();
 
             // start an underlying thread that handles the tagrequests.
-            tagExecution = new TagExecution();
-            tagExecution.start();
+            TagExecution.tagExecution().start();
         }
 
         return me;
@@ -161,7 +147,7 @@ public class TagRequestHandler extends LocalStorageHandler<TagRequest>
 
         PreparedStatement prep = SqlDatabase.getStatement(query);
         prep.setString(1, t.getImgurId());
-        prep.setString(2, t.getParentComment());
+        prep.setLong(2, t.getParentComment());
         prep.setString(3, t.getDbTaglists());
         prep.setInt(4, t.getRating().getValue());
         prep.setString(5, t.getFilters());
@@ -198,7 +184,7 @@ public class TagRequestHandler extends LocalStorageHandler<TagRequest>
         while (rs.next())
         {
             String imgurId = rs.getString(1);
-            String parentComment = rs.getString(2);
+            long parentComment = rs.getLong(2);
             String taglists = rs.getString(3);
             int rating = rs.getInt(4);
             String filters = rs.getString(5);

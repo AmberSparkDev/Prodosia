@@ -35,13 +35,13 @@ import java.util.Objects;
 public class TagRequest
 {
     private String imgurId;
-    private String parentComment;
+    private long parentComment;
     private HashSet<Taglist> taglists;
     private Rating rating;
     private String filters;
 
 
-    public TagRequest(String imgurId, String parentComment, HashSet<Taglist> taglists, Rating rating, String filters)
+    public TagRequest(String imgurId, long parentComment, HashSet<Taglist> taglists, Rating rating, String filters)
     {
         if (imgurId == null || imgurId.trim().isEmpty())
             throw new IllegalArgumentException("The imgur-id cannot be null or empty");
@@ -51,8 +51,7 @@ public class TagRequest
 
         this.imgurId = imgurId.trim();
 
-        if (parentComment != null)
-            this.parentComment = parentComment.trim();
+        this.parentComment = parentComment;
 
         this.taglists = taglists;
         this.rating = rating;
@@ -67,7 +66,7 @@ public class TagRequest
      * @param rating
      * @param filters
      */
-    public TagRequest(String imgurId, String parentComment, String taglists, int rating, String filters) throws Exception
+    public TagRequest(String imgurId, long parentComment, String taglists, int rating, String filters) throws Exception
     {
         if (imgurId == null || imgurId.trim().isEmpty())
             throw new IllegalArgumentException("The imgur-id cannot be null or empty");
@@ -77,8 +76,7 @@ public class TagRequest
 
         this.imgurId = imgurId.trim();
 
-        if (parentComment != null)
-            this.parentComment = parentComment.trim();
+        this.parentComment = parentComment;
 
         this.taglists = new HashSet<>();
         String[] tlArr = taglists.split(";");
@@ -122,10 +120,11 @@ public class TagRequest
         return imgurId;
     }
 
-    public String getParentComment()
+    public long getParentComment()
     {
         return parentComment;
     }
+
 
     @Override
     public boolean equals(Object o)
@@ -141,6 +140,24 @@ public class TagRequest
     {
 
         return Objects.hash(imgurId);
+    }
+
+
+    /**
+     * Check if a tag-request deep equals the other object.
+     * @param o
+     * @return
+     */
+    public boolean deepEquals(Object o)
+    {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        TagRequest that = (TagRequest) o;
+        return Objects.equals(imgurId, that.imgurId) &&
+                Objects.equals(parentComment, that.parentComment) &&
+                Objects.equals(taglists, that.taglists) &&
+                rating == that.rating &&
+                Objects.equals(filters, that.filters);
     }
 
     /**
@@ -162,9 +179,9 @@ public class TagRequest
         mTag.addAll(o.taglists);
 
         // default to the other parentComment
-        String parentComment;
+        long parentComment;
 
-        if (o.parentComment != null && !o.parentComment.trim().isEmpty())
+        if (o.parentComment > 0)
             parentComment = o.parentComment;
         else
             parentComment = this.parentComment;

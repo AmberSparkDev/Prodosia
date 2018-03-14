@@ -22,6 +22,7 @@
 
 package com.Bluefix.Prodosia.Logger;
 
+import javafx.application.Platform;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextInputControl;
 import org.slf4j.LoggerFactory;
@@ -128,7 +129,9 @@ public class Logger
         }
 
         // update the controls
-        Logger().updateControls();
+        Platform.runLater(
+                () -> Logger().updateControls()
+        );
     }
 
     /**

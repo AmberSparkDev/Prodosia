@@ -55,7 +55,7 @@ public class TagRequestHandlerTest
         HashSet<Taglist> tlSet = new HashSet<>();
         tlSet.add(taglist);
 
-        this.request = new TagRequest("a", "b", tlSet, Rating.ALL, "filters");
+        this.request = new TagRequest("a", -1, tlSet, Rating.ALL, "filters");
     }
 
     @After

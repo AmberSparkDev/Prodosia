@@ -8,7 +8,7 @@
     -fx-background: rgb(225, 228, 203);
 }
 
-.text-area .text
+.text-area .content
 {
 
 }
@@ -43,6 +43,14 @@
     /*-fx-border-style: solid;
     -fx-border-width: 1px;*/
 }
+
+
+#logger
+{
+    -fx-font-size: 9pt;
+}
+
+
 
 
 
