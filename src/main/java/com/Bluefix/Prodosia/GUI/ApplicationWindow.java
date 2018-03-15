@@ -38,6 +38,7 @@ import com.Bluefix.Prodosia.GUI.Navigation.VistaNavigator;
 import com.Bluefix.Prodosia.GUI.Taglist.EditTaglistWindow;
 import com.Bluefix.Prodosia.GUI.Tracker.EditTrackerWindow;
 import com.Bluefix.Prodosia.GUI.User.EditUserWindow;
+import com.Bluefix.Prodosia.Imgur.Tagging.TagRequestComments;
 import com.Bluefix.Prodosia.Imgur.Tagging.TagRequestHandler;
 import com.Bluefix.Prodosia.Logger.Logger;
 import com.Bluefix.Prodosia.Module.TestModule;
@@ -49,6 +50,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 
 import java.util.HashSet;
+import java.util.LinkedList;
 
 
 public class ApplicationWindow
@@ -292,6 +294,14 @@ public class ApplicationWindow
     public void test(ActionEvent actionEvent) throws Exception
     {
         Logger.logMessage("test test test\ntest test\ntest");
+
+        LinkedList<String> comments = TagRequestComments.parseCommentsForTagRequest(null);
+
+        for (String s : comments)
+        {
+            System.out.println("(" + s.length() + "): " + s);
+        }
+
 
 
         /*

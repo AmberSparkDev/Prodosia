@@ -22,6 +22,7 @@
 
 package com.Bluefix.Prodosia.Imgur.Tagging;
 
+import com.Bluefix.Prodosia.Algorithm.Partition;
 import com.Bluefix.Prodosia.DataType.TagRequest;
 
 import java.util.ArrayList;
@@ -43,31 +44,21 @@ public class TagRequestComments
         // find all the users necessary for the tag request.
         ArrayList<String> users = findUsersForTagRequest(tr);
 
-        // for now, use a very rudimentary algorithm that simply adds people to a line
-        // so long as they fit
-        // TODO: use a proper algorithm.
+        // convert the users into tag-entries
+        LinkedList<String> tagEntries = new LinkedList<>();
+
+        for (String u : users)
+            tagEntries.add("@" + u + " ");
+
+        // partition the users
+        // we use the max comment length + 1 because the last space can be omitted.
+        LinkedList<String> partitionResult = Partition.partitionEntries(tagEntries, MaxCommentLength + 1);
+
+        // trim the final space from every item.
         LinkedList<String> output = new LinkedList<>();
 
-        StringBuilder sb = new StringBuilder();
-
-        for (String s : users)
-        {
-            if (s == null || s.isEmpty())
-                continue;
-
-            // if this user will exceed comment length, store the comment and begin a new one.
-            if (sb.length() + s.length() + 2 > MaxCommentLength)
-            {
-                output.add(sb.toString());
-
-                sb = new StringBuilder();
-            }
-
-            sb.append("@" + s + " ");
-        }
-
-        if (sb.length() > 0)
-            output.add(sb.toString());
+        for (String s : partitionResult)
+            output.add(s.trim());
 
         return output;
     }
@@ -76,11 +67,20 @@ public class TagRequestComments
 
     private static ArrayList<String> findUsersForTagRequest(TagRequest tr)
     {
+
         ArrayList<String> users = new ArrayList<>();
 
-        for (int i = 0; i < 20; i++)
+        for (int i = 0; i < MaxCommentLength; i++)
         {
-            users.add("mashedstew");
+            StringBuilder sb = new StringBuilder();
+
+            for (int j = 0; j < i; j++)
+            {
+                sb.append("a");
+            }
+
+            if (sb.length() > 0)
+                users.add(sb.toString());
         }
 
 
