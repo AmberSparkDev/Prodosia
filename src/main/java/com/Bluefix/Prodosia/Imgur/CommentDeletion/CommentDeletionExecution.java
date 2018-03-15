@@ -23,13 +23,26 @@
 package com.Bluefix.Prodosia.Imgur.CommentDeletion;
 
 import com.Bluefix.Prodosia.Imgur.ImgurApi.ApiDistribution;
+import com.Bluefix.Prodosia.Imgur.ImgurApi.ImgurManager;
 import com.Bluefix.Prodosia.Module.ImgurIntervalRunner;
+
+import java.util.ArrayList;
+import java.util.Iterator;
 
 /**
  * Module class for deleting the items provided in `CommentDeletionStorage`
  */
 public class CommentDeletionExecution extends ImgurIntervalRunner
 {
+    //region variables
+
+    /**
+     * Separate the cycles in parts of 6, 10 minutes in between each.
+     */
+    private static final int DeletionItemsPerCycle = ApiDistribution.DeletionModule / 6;
+
+    //endregion
+
     //region Singleton and Constructor
 
     private static CommentDeletionExecution me;
@@ -47,11 +60,13 @@ public class CommentDeletionExecution extends ImgurIntervalRunner
     }
 
     /**
-     * Create a new Module object for the Comment Deletion funtionality.
+     * Create a new Module object for the Comment Deletion functionality.
      */
     private CommentDeletionExecution()
     {
         super(ApiDistribution.DeletionModule);
+
+        requestCounter = 0;
     }
 
     //endregion
@@ -61,12 +76,43 @@ public class CommentDeletionExecution extends ImgurIntervalRunner
 
 
 
-
+    private int requestCounter;
 
     @Override
     public void run()
     {
 
+        try
+        {
+            // retrieve as many items from the Deletion Storage as our cycle permits.
+            ArrayList<Long> deletions = CommentDeletionStorage.handler().getAll();
+
+            Iterator<Long> dIt = deletions.iterator();
+
+            while (dIt.hasNext() && requestCounter < DeletionItemsPerCycle)
+            {
+                // delete the item from imgur and from the storage.
+                long value = dIt.next();
+                requestCounter++;
+                ImgurManager.client().commentService().deleteComment(dIt.next());
+                CommentDeletionStorage.handler().remove(value);
+            }
+
+        } catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+        finally
+        {
+            try
+            {
+                // whether successful or not, always sleep in this thread.
+                Thread.sleep(20000);
+            } catch (InterruptedException e)
+            {
+                e.printStackTrace();
+            }
+        }
     }
 
     /**
@@ -77,6 +123,8 @@ public class CommentDeletionExecution extends ImgurIntervalRunner
     @Override
     protected int projectedRequests()
     {
-        return 0;
+        int tmpReq = requestCounter;
+        requestCounter = 0;
+        return tmpReq;
     }
 }
