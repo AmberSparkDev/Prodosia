@@ -20,26 +20,33 @@
  * SOFTWARE.
  */
 
-package com.Bluefix.Prodosia.Imgur.ImgurApi;
+package com.Bluefix.Prodosia.Imgur.CommentScanner;
+
+import com.Bluefix.Prodosia.DataType.Tracker.Tracker;
+import com.github.kskelm.baringo.model.Comment;
+
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 /**
- * Data class indicating what the hourly distribution for different modules is.
- *
- * At current, the daily limit is 12500
+ * Parses comments that were retrieved for trackers.
  */
-public class ApiDistribution
+public class CommentScannerParser
 {
-    /**
-     * Comment-module uses 250 requests on average per hour.
-     * This is 24 * 250 = 6000 per day (48%)
-     */
-    public static final int CommentModule = 250;
 
+    public static void parseComments(Tracker t, List<Comment> comments)
+    {
+        System.out.println("\n\n\n\n########\n\n(" + ZonedDateTime.now().format(DateTimeFormatter.RFC_1123_DATE_TIME) + " ; User = " + t.getImgurName() + "): Going to parse the following " + comments.size() + " comments:");
 
-    /**
-     * Deletion module uses 50 requests on average per hour.
-     * This is 24 * 50 = 1200 per day (9.6%)
-     */
-    public static final int DeletionModule = 50;
+        for (Comment c : comments)
+        {
+            System.out.println(c.getComment());
+        }
+
+        System.out.println("\n\n########\n\n\n");
+
+    }
+
 
 }

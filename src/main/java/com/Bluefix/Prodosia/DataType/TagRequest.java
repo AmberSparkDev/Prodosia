@@ -110,6 +110,10 @@ public class TagRequest
         return rating;
     }
 
+    /**
+     * Will return a regular expression that matches with filters by a user.
+     * @return
+     */
     public String getFilters()
     {
         return filters;

@@ -22,11 +22,12 @@
 
 package com.Bluefix.Prodosia.GUI;
 
-import com.Bluefix.Prodosia.DataHandler.TaglistHandler;
+import com.Bluefix.Prodosia.DataHandler.TrackerHandler;
 import com.Bluefix.Prodosia.DataType.Data;
-import com.Bluefix.Prodosia.DataType.TagRequest;
 import com.Bluefix.Prodosia.DataType.Taglist.Rating;
-import com.Bluefix.Prodosia.DataType.Taglist.Taglist;
+import com.Bluefix.Prodosia.DataType.Tracker.Tracker;
+import com.Bluefix.Prodosia.DataType.Tracker.TrackerBuilder;
+import com.Bluefix.Prodosia.DataType.Tracker.TrackerPermissions;
 import com.Bluefix.Prodosia.Exception.ExceptionHelper;
 import com.Bluefix.Prodosia.GUI.Managers.CheckboxListManager.GuiCheckboxListManager;
 import com.Bluefix.Prodosia.GUI.Managers.CheckboxListManager.TaglistClManager;
@@ -39,9 +40,10 @@ import com.Bluefix.Prodosia.GUI.Taglist.EditTaglistWindow;
 import com.Bluefix.Prodosia.GUI.Tracker.EditTrackerWindow;
 import com.Bluefix.Prodosia.GUI.User.EditUserWindow;
 import com.Bluefix.Prodosia.Imgur.Tagging.TagRequestComments;
-import com.Bluefix.Prodosia.Imgur.Tagging.TagRequestHandler;
 import com.Bluefix.Prodosia.Logger.Logger;
+import com.Bluefix.Prodosia.Module.ModuleManager;
 import com.Bluefix.Prodosia.Module.TestModule;
+import com.github.kskelm.baringo.util.BaringoApiException;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.MenuButton;
@@ -49,7 +51,8 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 
-import java.util.HashSet;
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.LinkedList;
 
 
@@ -293,6 +296,14 @@ public class ApplicationWindow
      */
     public void test(ActionEvent actionEvent) throws Exception
     {
+        //addStewTracker();
+
+        ModuleManager.start();
+
+
+
+
+        /*
         Logger.logMessage("test test test\ntest test\ntest");
 
         LinkedList<String> comments = TagRequestComments.parseCommentsForTagRequest(null);
@@ -302,7 +313,7 @@ public class ApplicationWindow
             System.out.println("(" + s.length() + "): " + s);
         }
 
-
+*/
 
         /*
         Taglist taglist = new Taglist("derp", "desc", true);
@@ -315,10 +326,20 @@ public class ApplicationWindow
 
         TagRequest tr = new TagRequest(imgurId, -1, tlSet, Rating.EXPLICIT, "");
 
-        TagRequestHandler.handler().add(tr);
+        TagRequestStorage.handler().add(tr);
         */
 
 
+    }
+
+    private static void addStewTracker() throws Exception
+    {
+        Tracker myTracker = TrackerBuilder.builder()
+                .setImgurName("mashedstew")
+                .setPermissions(new TrackerPermissions(TrackerPermissions.TrackerType.ADMIN))
+                .build();
+
+        TrackerHandler.handler().add(myTracker);
     }
 
 }

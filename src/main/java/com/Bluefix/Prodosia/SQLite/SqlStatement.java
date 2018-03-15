@@ -83,7 +83,15 @@ public class SqlStatement
                         "parentComment integer, " +
                         "taglists text, " +
                         "rating integer, " +
-                        "filters text); "
+                        "filters text); ",
+                /* --- CommentDeletion --- */
+                        "CREATE TABLE IF NOT EXISTS CommentDeletion (" +
+                        "id integer PRIMARY KEY); ",
+                /* --- CommentScanner --- */
+                        "CREATE TABLE IF NOT EXISTS CommentScanner (" +
+                        "imgurId integer PRIMARY KEY, " +
+                        "lastCommentId integer, " +
+                        "lastCommentTime integer); "
 
         };
     }

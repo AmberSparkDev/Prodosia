@@ -37,17 +37,17 @@ import java.util.ArrayList;
  *
  * `TagExecution` uses this class to tag the items in the queue. This class merely handles the storage.
  */
-public class TagRequestHandler extends LocalStorageHandler<TagRequest>
+public class TagRequestStorage extends LocalStorageHandler<TagRequest>
 {
     //region Singleton and constructor
 
-    private static TagRequestHandler me;
+    private static TagRequestStorage me;
 
-    public static TagRequestHandler handler()
+    public static TagRequestStorage handler()
     {
         if (me == null)
         {
-            me = new TagRequestHandler();
+            me = new TagRequestStorage();
 
             // start an underlying thread that handles the tagrequests.
             TagExecution.tagExecution().start();
@@ -56,7 +56,7 @@ public class TagRequestHandler extends LocalStorageHandler<TagRequest>
         return me;
     }
 
-    private TagRequestHandler()
+    private TagRequestStorage()
     {
         super(true);
     }

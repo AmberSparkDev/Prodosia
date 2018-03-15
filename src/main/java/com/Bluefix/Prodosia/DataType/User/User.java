@@ -22,6 +22,8 @@
 
 package com.Bluefix.Prodosia.DataType.User;
 
+import com.Bluefix.Prodosia.DataType.TagRequest;
+
 import java.util.*;
 
 public class User
@@ -117,4 +119,61 @@ public class User
     }
 
     //endregion
+
+    //region Tag Request
+
+    /**
+     * Returns true iff the user should be added to the tag request.
+     * @param tr The tag request in effect.
+     * @return true iff the user should be tagged, false otherwise.
+     */
+    public boolean partOfTagRequest(TagRequest tr)
+    {
+        // loop through all subscriptions. If any of the subscriptions matches with the tag-request,
+        // return true.
+        for (UserSubscription us : subscriptions.values())
+        {
+            if (us.partOf(tr))
+                return true;
+        }
+
+        // since none of our subscriptions matched the tag request, return false
+        return false;
+    }
+
+    //endregion
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

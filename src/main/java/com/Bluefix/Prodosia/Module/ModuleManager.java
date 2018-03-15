@@ -20,8 +20,51 @@
  * SOFTWARE.
  */
 
-package com.Bluefix.Prodosia.Imgur.CommentDeletion;
+package com.Bluefix.Prodosia.Module;
 
-public class CommentDeletionHandler
+import com.Bluefix.Prodosia.Imgur.CommentDeletion.CommentDeletionExecution;
+import com.Bluefix.Prodosia.Imgur.CommentScanner.CommentScannerExecution;
+
+/**
+ * Global module manager
+ */
+public class ModuleManager
 {
+    //region Variables, Constructor and Singleton
+
+    private CommentDeletionExecution commentDeletionExecution;
+    private CommentScannerExecution commentScannerExecution;
+
+    private static ModuleManager me;
+
+    private static ModuleManager handler()
+    {
+        if (me == null)
+            me = new ModuleManager();
+
+        return me;
+    }
+
+    private ModuleManager()
+    {
+
+    }
+
+    //endregion
+
+
+    /**
+     * Start execution of the application modules.
+     */
+    public static void start()
+    {
+        // initialize all the module values
+        handler().commentScannerExecution = CommentScannerExecution.handler();
+        // handler().commentDeletionExecution = CommentDeletionExecution.handler();
+
+        // start the modules
+        handler().commentScannerExecution.start();
+        //handler().commentDeletionExecution.start();
+    }
+
 }

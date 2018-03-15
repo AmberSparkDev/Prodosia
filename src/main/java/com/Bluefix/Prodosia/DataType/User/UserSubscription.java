@@ -23,6 +23,7 @@
 package com.Bluefix.Prodosia.DataType.User;
 
 import com.Bluefix.Prodosia.DataHandler.TaglistHandler;
+import com.Bluefix.Prodosia.DataType.TagRequest;
 import com.Bluefix.Prodosia.DataType.Taglist.Rating;
 import com.Bluefix.Prodosia.DataType.Taglist.Taglist;
 
@@ -98,4 +99,40 @@ public class UserSubscription
     {
         return filters;
     }
+
+
+    //region Tag Request
+
+    /**
+     * Returns true iff this UserSubscription object would be part of a tag request.
+     * @param tr the tag request to check against.
+     * @return True iff part of the tag request, false otherwise.
+     */
+    public boolean partOf(TagRequest tr)
+    {
+        // first check to see if our taglist is contained in the tag request.
+        if (!tr.getTaglists().contains(this.taglist))
+            return false;
+
+        // next, check to see if any of our ratings match with the taglist.
+        // this check is only used if the taglist incorporates ratings at all.
+        if (this.taglist.hasRatings())
+        {
+            if (!this.ratings.contains(tr.getRating()))
+            {
+                return false;
+            }
+        }
+
+        // finally check to see if any filters apply
+        if (this.filters.matches(tr.getFilters()))
+            return false;
+
+        // since everything passed, this subscription is part of the tag request.
+        return true;
+    }
+
+    //endregion
+
+
 }

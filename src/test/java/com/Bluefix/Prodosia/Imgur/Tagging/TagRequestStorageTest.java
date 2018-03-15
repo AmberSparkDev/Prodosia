@@ -36,9 +36,9 @@ import java.util.HashSet;
 
 import static org.junit.Assert.*;
 
-public class TagRequestHandlerTest
+public class TagRequestStorageTest
 {
-    private TagRequestHandler handler;
+    private TagRequestStorage handler;
 
     private Taglist taglist;
     private TagRequest request;
@@ -50,7 +50,7 @@ public class TagRequestHandlerTest
         taglist = new Taglist(-1,"my_abbreviation", "my_description", true);
         TaglistHandler.handler().add(taglist);
 
-        this.handler = TagRequestHandler.handler();
+        this.handler = TagRequestStorage.handler();
 
         HashSet<Taglist> tlSet = new HashSet<>();
         tlSet.add(taglist);

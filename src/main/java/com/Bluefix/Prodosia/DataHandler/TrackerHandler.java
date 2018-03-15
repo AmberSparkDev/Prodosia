@@ -235,9 +235,42 @@ public class TrackerHandler extends LocalStorageHandler<Tracker>
         return trackers;
     }
 
+    //endregion
 
+    //region Helper methods
 
+    /**
+     * Retrieve the Tracker by imgur id. Returns the corresponding tracker or null if it didn't exist.
+     * @param imgurId
+     * @return
+     */
+    public static Tracker getTrackerByImgurId(long imgurId) throws Exception
+    {
+        // return null on invalid imgur id.
+        if (imgurId < 0)
+            return null;
+
+        ArrayList<Tracker> trackers = handler().getAll();
+
+        for (Tracker t : trackers)
+        {
+            if (t.getImgurId() == imgurId)
+                return t;
+        }
+
+        return null;
+    }
 
 
     //endregion
+
+
+
+
+
+
+
+
+
+
 }

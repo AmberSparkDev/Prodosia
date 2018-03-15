@@ -39,6 +39,11 @@ import java.util.*;
  * API costs:
  * 6 POST calls per minute for posting comments.
  * 1 GET call per unique TagRequest added.
+ *
+ * Although the ImgurIntervalRunner could have been used for this class, it is
+ * not expected to cause a serious strain on the Imgur API due to the low amount of
+ * GET requests and the fact that only 60*6 = 360 (out of 1250) POST requests
+ * can be physically executed by this class.
  */
 public class TagExecution extends Thread
 {
@@ -101,7 +106,7 @@ public class TagExecution extends Thread
      * @param item The item to be added.
      * @return The amount of comments that the new item will post.
      */
-    private int addItem(TagRequest item)
+    private int addItem(TagRequest item) throws Exception
     {
         // if the item already existed, we will be replacing it.
         removeItem(item);
@@ -172,7 +177,7 @@ public class TagExecution extends Thread
         for (TagRequest tr : deletionList)
         {
             actions.remove(tr);
-            TagRequestHandler.handler().remove(tr);
+            TagRequestStorage.handler().remove(tr);
             Logger.logMessage("Post \"" + tr.getImgurId() + "\" successfully tagged.");
         }
 
@@ -182,7 +187,7 @@ public class TagExecution extends Thread
             return;
 
         // retrieve all current tag requests. Create a local copy.
-        ArrayList<TagRequest> queueItems = new ArrayList<>(TagRequestHandler.handler().getAll());
+        ArrayList<TagRequest> queueItems = new ArrayList<>(TagRequestStorage.handler().getAll());
 
         // if an old tagRequest has changed, replace it.
         for (TagRequest tr : actions.keySet())

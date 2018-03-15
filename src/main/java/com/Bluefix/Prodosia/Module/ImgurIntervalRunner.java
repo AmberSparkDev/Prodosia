@@ -36,6 +36,11 @@ import com.Bluefix.Prodosia.Logger.Logger;
  * hourly limit but not on the daily limit. The smaller the difference between the maximum
  * amount of requests and the average requests per cycle, the higher this fluctuation shall be.
  * As such, it is recommended to create more smaller cycles.
+ *
+ * The disadvantage about more, smaller cycles means that if a user only keeps the application open
+ * for a short amount of time, The Imgur API isn't optimally used.
+ *
+ * Recommendation is to create cycles of about 1/6th of the GET requests, so that it runs every 10 minutes.
  */
 public abstract class ImgurIntervalRunner implements AutoCloseable
 {
@@ -110,7 +115,7 @@ public abstract class ImgurIntervalRunner implements AutoCloseable
     protected abstract void run();
 
     /**
-     * Indicate the maximum amount of GET requests expected to be used during the next cycle.
+     * Indicate the total amount of GET requests that were executed during the last cycle
      * @return The maximum amount of GET requests.
      */
     protected abstract int projectedRequests();

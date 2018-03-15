@@ -23,7 +23,9 @@
 package com.Bluefix.Prodosia.Imgur.Tagging;
 
 import com.Bluefix.Prodosia.Algorithm.Partition;
+import com.Bluefix.Prodosia.DataHandler.UserHandler;
 import com.Bluefix.Prodosia.DataType.TagRequest;
+import com.Bluefix.Prodosia.DataType.User.User;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -39,7 +41,7 @@ public class TagRequestComments
     public static final int MaxCommentLength = 140;
 
 
-    public static LinkedList<String> parseCommentsForTagRequest(TagRequest tr)
+    public static LinkedList<String> parseCommentsForTagRequest(TagRequest tr) throws Exception
     {
         // find all the users necessary for the tag request.
         ArrayList<String> users = findUsersForTagRequest(tr);
@@ -65,26 +67,27 @@ public class TagRequestComments
 
     //region User handling
 
-    private static ArrayList<String> findUsersForTagRequest(TagRequest tr)
+    /**
+     * Retrieve all users for the specified tag request.
+     * @param tr the tag request to be used as filter.
+     * @return A list of users that correspond with the tag request.
+     * @throws Exception Issue retrieving users in `UserHandler`
+     */
+    private static ArrayList<String> findUsersForTagRequest(TagRequest tr) throws Exception
     {
+        ArrayList<String> output = new ArrayList<>();
 
-        ArrayList<String> users = new ArrayList<>();
+        // retrieve all users and filter out the ones that do not adhere to the tag request filters.
+        ArrayList<User> users = UserHandler.handler().getAll();
 
-        for (int i = 0; i < MaxCommentLength; i++)
+        for (User u : users)
         {
-            StringBuilder sb = new StringBuilder();
-
-            for (int j = 0; j < i; j++)
-            {
-                sb.append("a");
-            }
-
-            if (sb.length() > 0)
-                users.add(sb.toString());
+            // add all users that were part of the tag request.
+            if (u.partOfTagRequest(tr))
+                output.add(u.getImgurName());
         }
 
-
-        return users;
+        return output;
     }
 
     //endregion

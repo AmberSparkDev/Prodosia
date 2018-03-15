@@ -20,63 +20,67 @@
  * SOFTWARE.
  */
 
-package com.Bluefix.Prodosia.Imgur.CommentDeletion;
+package com.Bluefix.Prodosia.DataType.Tracker;
 
-import com.Bluefix.Prodosia.Imgur.ImgurApi.ApiDistribution;
-import com.Bluefix.Prodosia.Module.ImgurIntervalRunner;
+import com.github.kskelm.baringo.model.Comment;
+
+import java.util.Date;
+import java.util.Objects;
 
 /**
- * Module class for deleting the items provided in `CommentDeletionStorage`
+ * Data class to keep track of a tracker bookmark. This indicates the last comment of the user that
+ * was read.
  */
-public class CommentDeletionExecution extends ImgurIntervalRunner
+public class TrackerBookmark
 {
-    //region Singleton and Constructor
-
-    private static CommentDeletionExecution me;
+    /**
+     * Id of the last comment.
+     */
+    private long lastCommentId;
 
     /**
-     * Retrieve the Comment Deletion Module object.
-     * @return The Comment Deletion Module object.
+     * time of the comment
      */
-    public static CommentDeletionExecution handler()
-    {
-        if (me == null)
-            me = new CommentDeletionExecution();
+    private Date lastCommentTime;
 
-        return me;
+    private Tracker tracker;
+
+
+    public TrackerBookmark(long lastCommentId, Date lastCommentTime, Tracker tracker)
+    {
+        this.lastCommentId = lastCommentId;
+        this.lastCommentTime = lastCommentTime;
+        this.tracker = tracker;
     }
 
-    /**
-     * Create a new Module object for the Comment Deletion funtionality.
-     */
-    private CommentDeletionExecution()
+    public long getLastCommentId()
     {
-        super(ApiDistribution.DeletionModule);
+        return lastCommentId;
     }
 
-    //endregion
+    public Date getLastCommentTime()
+    {
+        return lastCommentTime;
+    }
 
-
-
-
-
-
-
+    public Tracker getTracker()
+    {
+        return tracker;
+    }
 
     @Override
-    public void run()
+    public boolean equals(Object o)
     {
-
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        TrackerBookmark that = (TrackerBookmark) o;
+        return Objects.equals(tracker, that.tracker);
     }
 
-    /**
-     * Indicate the maximum amount of GET requests expected to be used during the next cycle.
-     *
-     * @return The maximum amount of GET requests.
-     */
     @Override
-    protected int projectedRequests()
+    public int hashCode()
     {
-        return 0;
+
+        return Objects.hash(tracker);
     }
 }
