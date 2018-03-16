@@ -25,30 +25,14 @@ package com.Bluefix.Prodosia.Command;
 import com.Bluefix.Prodosia.DataType.CommandResult;
 
 /**
- * Class that can parse Imgur commands
+ *
  */
-public class ImgurCommandHandler implements ICommandHandler
+public interface ICommandHandler
 {
-
-    //region ICommandHandler implementation
-
     /**
      * Execute the command if the input consisted of a command. Ignore
      * the input if not.
-     *
      * @param input The input to be executed.
      */
-    @Override
-    public CommandResult execute(String input)
-    {
-        return null;
-    }
-
-    //endregion
-
-    //region Command logic
-
-
-
-    //endregion
+    public CommandResult execute(String input);
 }

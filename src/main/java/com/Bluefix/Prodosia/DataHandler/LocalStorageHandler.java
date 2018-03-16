@@ -89,6 +89,10 @@ public abstract class LocalStorageHandler <T>
      */
     public void add(T t) throws Exception
     {
+        // if t did not exist, skip this phase.
+        if (t == null)
+            return;
+
         // if the local storage is used, add the item to the data.
         if (useLocalStorage)
         {
@@ -111,6 +115,10 @@ public abstract class LocalStorageHandler <T>
      */
     public void remove(T t) throws Exception
     {
+        // if t did not exist, skip this phase.
+        if (t == null)
+            return;
+
         // if the local storage is in use, remove the item
         if (useLocalStorage && data != null)
             data.remove(t);

@@ -91,7 +91,11 @@ public class SqlStatement
                         "CREATE TABLE IF NOT EXISTS CommentScanner (" +
                         "imgurId integer PRIMARY KEY, " +
                         "lastCommentId integer, " +
-                        "lastCommentTime integer); "
+                        "lastCommentTime integer); ",
+                /* --- CommandPrefix --- */
+                        "CREATE TABLE IF NOT EXISTS CommandPrefix (" +
+                        "type integer PRIMARY KEY, " +
+                        "regex text); "
 
         };
     }
