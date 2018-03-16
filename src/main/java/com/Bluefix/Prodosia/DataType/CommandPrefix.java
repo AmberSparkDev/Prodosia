@@ -115,7 +115,7 @@ public class CommandPrefix
      * @param comment The comment with a potential command on it.
      * @return The index after the prefix, or -1 if no command was detected.
      */
-    private int matchIndex(String comment)
+    public int matchIndex(String comment)
     {
         Pattern p = Pattern.compile(this.regex);
 
@@ -125,6 +125,34 @@ public class CommandPrefix
             return matcher.end();
 
         return -1;
+    }
+
+
+    public static String parsePatternForItems(String... items)
+    {
+        StringBuilder sb = new StringBuilder();
+
+        // commands are case-insensitive
+        sb.append("(?i)");
+
+        // the start of a match should either be the start of a line or after a whitespace.
+        sb.append("(^|\\s)");
+
+        // next come the different possible prefixes
+        sb.append("(");
+        for (String i : items)
+        {
+            sb.append(i + "|");
+        }
+
+        // if there was at least one item, remove the final superfluous `|`
+        if (items.length > 0)
+            sb.setLength(sb.length()-1);
+
+        // close the set of prefixes
+        sb.append(")");
+
+        return sb.toString();
     }
 
 

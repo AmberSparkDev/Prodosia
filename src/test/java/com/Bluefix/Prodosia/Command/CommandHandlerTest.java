@@ -23,6 +23,7 @@
 package com.Bluefix.Prodosia.Command;
 
 import com.Bluefix.Prodosia.DataType.CommandResult;
+import com.Bluefix.Prodosia.DataType.Tracker.Tracker;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -48,7 +49,7 @@ public class CommandHandlerTest
     @Test
     public void execute()
     {
-        CommandResult result = CommandHandler.execute("list");
+        CommandResult result = CommandHandler.execute(null, "list");
         System.out.println(result.getMessage());
 
         Assert.assertEquals("list", result.getCommand());
@@ -57,7 +58,7 @@ public class CommandHandlerTest
     @Test
     public void execute1()
     {
-        CommandResult result = CommandHandler.execute("tag something something something");
+        CommandResult result = CommandHandler.execute(null, "tag something something something");
     }
 
     @Test

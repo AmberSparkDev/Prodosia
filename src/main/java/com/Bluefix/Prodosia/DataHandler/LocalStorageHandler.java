@@ -93,6 +93,9 @@ public abstract class LocalStorageHandler <T>
         if (t == null)
             return;
 
+        // remove the old item before storing the new one.
+        remove(t);
+
         // if the local storage is used, add the item to the data.
         if (useLocalStorage)
         {
@@ -100,11 +103,11 @@ public abstract class LocalStorageHandler <T>
             if (data == null)
                 data = getAllItems();
 
-            // remove the item if it already existed and add it to the list.
-            remove(t);
+            // add it to the list.
             data.add(t);
         }
 
+        // add the new item to the storage.
         addItem(t);
     }
 

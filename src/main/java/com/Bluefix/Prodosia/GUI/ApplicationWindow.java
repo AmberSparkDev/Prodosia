@@ -22,7 +22,9 @@
 
 package com.Bluefix.Prodosia.GUI;
 
+import com.Bluefix.Prodosia.DataHandler.CommandPrefixStorage;
 import com.Bluefix.Prodosia.DataHandler.TrackerHandler;
+import com.Bluefix.Prodosia.DataType.CommandPrefix;
 import com.Bluefix.Prodosia.DataType.Data;
 import com.Bluefix.Prodosia.DataType.Taglist.Rating;
 import com.Bluefix.Prodosia.DataType.Tracker.Tracker;
@@ -54,6 +56,7 @@ import javafx.scene.layout.VBox;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.LinkedList;
+import java.util.regex.Pattern;
 
 
 public class ApplicationWindow
@@ -297,39 +300,12 @@ public class ApplicationWindow
     public void test(ActionEvent actionEvent) throws Exception
     {
         //addStewTracker();
+        //addPrefix();
+
+
+
 
         ModuleManager.start();
-
-
-
-
-        /*
-        Logger.logMessage("test test test\ntest test\ntest");
-
-        LinkedList<String> comments = TagRequestComments.parseCommentsForTagRequest(null);
-
-        for (String s : comments)
-        {
-            System.out.println("(" + s.length() + "): " + s);
-        }
-
-*/
-
-        /*
-        Taglist taglist = new Taglist("derp", "desc", true);
-
-        TaglistHandler.handler().add(taglist);
-
-        String imgurId = "ZqWMmil";
-        HashSet<Taglist> tlSet = new HashSet<>();
-        tlSet.add(taglist);
-
-        TagRequest tr = new TagRequest(imgurId, -1, tlSet, Rating.EXPLICIT, "");
-
-        TagRequestStorage.handler().add(tr);
-        */
-
-
     }
 
     private static void addStewTracker() throws Exception
@@ -340,6 +316,20 @@ public class ApplicationWindow
                 .build();
 
         TrackerHandler.handler().add(myTracker);
+
+        Logger.logMessage("mashedstew successfully added as tracker.");
+    }
+
+    private static void addPrefix() throws Exception
+    {
+        String regex = CommandPrefix.parsePatternForItems("@mashedstew ");
+
+        CommandPrefix prefix = new CommandPrefix(CommandPrefix.Type.IMGUR,
+                regex);
+
+        CommandPrefixStorage.handler().add(prefix);
+
+        Logger.logMessage("`@mashedstew ` prefix successfully added.");
     }
 
 }

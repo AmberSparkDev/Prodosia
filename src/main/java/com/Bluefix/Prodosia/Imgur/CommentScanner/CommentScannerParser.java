@@ -22,7 +22,11 @@
 
 package com.Bluefix.Prodosia.Imgur.CommentScanner;
 
+import com.Bluefix.Prodosia.Command.CommandHandler;
+import com.Bluefix.Prodosia.DataHandler.CommandPrefixStorage;
+import com.Bluefix.Prodosia.DataType.CommandPrefix;
 import com.Bluefix.Prodosia.DataType.Tracker.Tracker;
+import com.Bluefix.Prodosia.Logger.Logger;
 import com.github.kskelm.baringo.model.Comment;
 
 import java.time.ZonedDateTime;
@@ -34,19 +38,48 @@ import java.util.List;
  */
 public class CommentScannerParser
 {
-
     public static void parseComments(Tracker t, List<Comment> comments)
     {
-        System.out.println("\n\n\n\n########\n\n(" + ZonedDateTime.now().format(DateTimeFormatter.RFC_1123_DATE_TIME) + " ; User = " + t.getImgurName() + "): Going to parse the following " + comments.size() + " comments:");
+        CommandPrefix cPref;
 
-        for (Comment c : comments)
+        try
         {
-            System.out.println(c.getComment());
+            // Retrieve the command prefix for imgur comments.
+            cPref = CommandPrefixStorage.getPrefixForType(CommandPrefix.Type.IMGUR);
+
+            // if the command prefix wasn't set, simply ignore
+            if (cPref == null)
+            {
+                Logger.logMessage("### There was no prefix info!", Logger.Severity.WARNING);
+                return;
+            }
+        }
+        catch (Exception e)
+        {
+            Logger.logMessage("CommentScannerParser::parseComments -> " + e.getMessage(), Logger.Severity.ERROR);
+            return;
         }
 
-        System.out.println("\n\n########\n\n\n");
+        // loop through the comments.
+        for (Comment c : comments)
+        {
+            // if a single comment fails something it should not inhibit execution of others comments.
+            try
+            {
+                // retrieve the command index for the specified comment.
+                int comIndex = cPref.matchIndex(c.getComment());
 
+                // continue if the comment contains no command.
+                if (comIndex < 0)
+                    continue;
+
+                // execute the command.
+                CommandHandler.execute(t, c.getComment().substring(comIndex));
+
+            } catch (Exception e)
+            {
+                Logger.logMessage("CommentScannerParser::parseComments -> " + e.getMessage(), Logger.Severity.ERROR);
+            }
+        }
     }
-
-
 }

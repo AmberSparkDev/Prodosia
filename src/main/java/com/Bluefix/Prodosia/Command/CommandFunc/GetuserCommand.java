@@ -24,11 +24,12 @@ package com.Bluefix.Prodosia.Command.CommandFunc;
 
 import com.Bluefix.Prodosia.Command.CommandHandler;
 import com.Bluefix.Prodosia.DataType.CommandResult;
+import com.Bluefix.Prodosia.DataType.Tracker.Tracker;
 
 public class GetuserCommand implements ICommandFunc
 {
     @Override
-    public CommandResult execute(String[] arguments)
+    public CommandResult execute(Tracker t, String[] arguments)
     {
         return null;
     }

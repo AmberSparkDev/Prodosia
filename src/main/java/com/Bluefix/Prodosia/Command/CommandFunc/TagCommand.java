@@ -24,11 +24,12 @@ package com.Bluefix.Prodosia.Command.CommandFunc;
 
 import com.Bluefix.Prodosia.Command.CommandHandler;
 import com.Bluefix.Prodosia.DataType.CommandResult;
+import com.Bluefix.Prodosia.DataType.Tracker.Tracker;
 
 public class TagCommand implements ICommandFunc
 {
     @Override
-    public CommandResult execute(String[] arguments)
+    public CommandResult execute(Tracker t, String[] arguments)
     {
         System.out.println("Tag is successfully being executed with " + arguments.length + " arguments!!");
 

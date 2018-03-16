@@ -164,6 +164,9 @@ public class CommentScannerExecution extends ImgurIntervalRunner
             // since the tracker-bookmark wasn't known, parse it for the user.
             tb = getBookmarkForUser(tracker);
             usedGet = true;
+
+            // store the bookmark
+            CommentScannerStorage.handler().add(tb);
         }
 
         // add a default queue item
@@ -257,7 +260,7 @@ public class CommentScannerExecution extends ImgurIntervalRunner
      * @param allowedRequests The maximum amount of requests allowed
      * @return The total amount of GET requests used.
      */
-    private int loopQueue(int allowedRequests) throws BaringoApiException, IOException, URISyntaxException
+    private int loopQueue(int allowedRequests) throws Exception
     {
         // skip this method if the queue is empty
         if (trackerMap.isEmpty())
@@ -292,7 +295,7 @@ public class CommentScannerExecution extends ImgurIntervalRunner
      * @param allowedRequests The maximum amount of allowed requests
      * @return The amount of requests that were used.
      */
-    private int processQueue(int allowedRequests) throws BaringoApiException, IOException, URISyntaxException
+    private int processQueue(int allowedRequests) throws Exception
     {
         // return if no requests were allowed
         if (allowedRequests <= 0)
@@ -340,9 +343,6 @@ public class CommentScannerExecution extends ImgurIntervalRunner
             while (cIt.hasNext() && !q.isReached())
             {
                 Comment c = cIt.next();
-
-                //System.out.println("current comment time is \t" + q.getBookmark().getLastCommentTime().toString());
-                //System.out.println("actual comment time is  \t" + c.getCreatedAt().toString());
 
                 if (c.getId() == q.getBookmark().getLastCommentId() ||
                     c.getCreatedAt().compareTo(q.getBookmark().getLastCommentTime()) <= 0)
@@ -437,13 +437,16 @@ public class CommentScannerExecution extends ImgurIntervalRunner
         /**
          * Indicate that we have reached the previous bookmark.
          */
-        public void setReached()
+        public void setReached() throws Exception
         {
             // replace the bookmark with the new one
             if (newBookmark != null)
                 bookmark = newBookmark;
 
             newBookmark = null;
+
+            //update the bookmark for the user.
+            CommentScannerStorage.handler().add(bookmark);
         }
 
         public int getPage()

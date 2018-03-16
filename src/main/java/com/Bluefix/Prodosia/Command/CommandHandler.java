@@ -24,6 +24,7 @@ package com.Bluefix.Prodosia.Command;
 
 import com.Bluefix.Prodosia.Command.CommandFunc.*;
 import com.Bluefix.Prodosia.DataType.CommandResult;
+import com.Bluefix.Prodosia.DataType.Tracker.Tracker;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -93,21 +94,21 @@ public class CommandHandler
      * @param command The command to be executed.
      * @return The command result after execution.
      */
-    public static CommandResult execute(String command)
+    public static CommandResult execute(Tracker t, String command)
     {
         String trimmed = command.trim();
 
         int firstSpace = trimmed.indexOf(' ');
 
         if (firstSpace < 0)
-            return execute(trimmed, new String[]{});
+            return execute(t, trimmed, new String[]{});
         else
         {
             // split the command from the arguments and execute.
             String actualCommand = trimmed.substring(0, firstSpace);
             String arguments = trimmed.substring(firstSpace + 1);
 
-            return execute(actualCommand, arguments);
+            return execute(t, actualCommand, arguments);
         }
     }
 
@@ -117,11 +118,11 @@ public class CommandHandler
      * @param arguments The arguments, separated by a space
      * @return The command result after execution.
      */
-    public static CommandResult execute(String command, String arguments)
+    public static CommandResult execute(Tracker t, String command, String arguments)
     {
         String[] splitArguments = arguments.trim().split("\\s+");
 
-        return execute(command, splitArguments);
+        return execute(t, command, splitArguments);
     }
 
     /**
@@ -130,7 +131,7 @@ public class CommandHandler
      * @param arguments The arguments for the command.
      * @return The command result after execution.
      */
-    public static CommandResult execute(String command, String[] arguments)
+    public static CommandResult execute(Tracker t, String command, String[] arguments)
     {
         String lCom = command.toLowerCase();
 
@@ -174,7 +175,7 @@ public class CommandHandler
                 // execute the command
                 try
                 {
-                    return func.execute(fArguments);
+                    return func.execute(t, fArguments);
                 }
                 catch (Exception e)
                 {
