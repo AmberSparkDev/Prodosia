@@ -22,7 +22,7 @@
 
 package com.Bluefix.Prodosia.DataHandler;
 
-import com.Bluefix.Prodosia.DataType.CommandPrefix;
+import com.Bluefix.Prodosia.DataType.Command.CommandPrefix;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

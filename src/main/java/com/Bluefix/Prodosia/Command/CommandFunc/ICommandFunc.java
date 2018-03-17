@@ -22,19 +22,19 @@
 
 package com.Bluefix.Prodosia.Command.CommandFunc;
 
-import com.Bluefix.Prodosia.Command.CommandHandler;
-import com.Bluefix.Prodosia.DataType.CommandResult;
+import com.Bluefix.Prodosia.DataType.Command.CommandInformation;
+import com.Bluefix.Prodosia.DataType.Command.CommandResult;
 import com.Bluefix.Prodosia.DataType.Tracker.Tracker;
 
 public interface ICommandFunc
 {
     /**
      * Execute the command with the specified parameters.
-     * @param t The tracker that issued the command.
+     * @param ci Information pertaining to the command.
      * @param arguments The parameters for the command.
      * @return The response text for executing this command.
      */
-    CommandResult execute(Tracker t, String[] arguments);
+    CommandResult execute(CommandInformation ci, String[] arguments);
 
 
     /**

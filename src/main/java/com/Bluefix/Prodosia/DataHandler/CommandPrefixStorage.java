@@ -22,7 +22,7 @@
 
 package com.Bluefix.Prodosia.DataHandler;
 
-import com.Bluefix.Prodosia.DataType.CommandPrefix;
+import com.Bluefix.Prodosia.DataType.Command.CommandPrefix;
 import com.Bluefix.Prodosia.SQLite.SqlDatabase;
 
 import java.sql.PreparedStatement;

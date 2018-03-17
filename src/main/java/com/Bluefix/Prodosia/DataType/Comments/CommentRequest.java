@@ -20,41 +20,46 @@
  * SOFTWARE.
  */
 
-package com.Bluefix.Prodosia.DataType;
+package com.Bluefix.Prodosia.DataType.Comments;
+
+import java.util.LinkedList;
 
 /**
- * Helper class that contains all necessary information after command execution.
+ * Request to post a comment.
  */
-public  class CommandResult
+public interface CommentRequest
 {
-    private String message;
-    private String command;
+    /**
+     * Retrieve the imgur-id that should be replied to.
+     * @return
+     */
+    String getImgurId();
 
     /**
-     * Create a new ExecutionResult object.
-     * @param message The message pertaining to the execution of the command.
-     * @param command The command that was executed. Null if no command was recognized.
+     * Retrieve the parent-id that should be replied to. Return -1 to indicate there is no existing
+     * parent comment.
+     * @return
      */
-    public CommandResult(String message, String command)
-    {
-        this.message = message;
-        this.command = command;
-    }
+    long getParent();
 
     /**
-     * Retrieve the message for the executed command.
-     * @return The message to be displayed to the user that issued the command.
+     * Retrieve all comments that should be executed by this tag request.
+     * @return
      */
-    public String getMessage()
-    {
-        return message;
-    }
+    LinkedList<String> getComments() throws Exception;
+
 
     /**
-     * @return The command issued by the user, or null if the command was not recognized.
+     * Indicate whether the entry deep-equals the other request.
+     * @param cq
+     * @return
      */
-    public String getCommand()
-    {
-        return command;
-    }
+    boolean deepEquals(CommentRequest cq);
+
+
+    /**
+     * Remove the item from the storage.
+     */
+    void remove() throws Exception;
+
 }

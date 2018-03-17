@@ -23,11 +23,11 @@
 package com.Bluefix.Prodosia.Imgur.Tagging;
 
 import com.Bluefix.Prodosia.DataHandler.TaglistHandler;
+import com.Bluefix.Prodosia.DataType.Comments.SimpleCommentRequest;
 import com.Bluefix.Prodosia.DataType.Comments.TagRequest;
 import com.Bluefix.Prodosia.DataType.Taglist.Rating;
 import com.Bluefix.Prodosia.DataType.Taglist.Taglist;
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -36,32 +36,24 @@ import java.util.HashSet;
 
 import static org.junit.Assert.*;
 
-public class TagRequestStorageTest
+public class SimpleCommentRequestStorageTest
 {
-    private TagRequestStorage handler;
 
-    private Taglist taglist;
-    private TagRequest request;
+
+    private SimpleCommentRequestStorage handler;
+    private SimpleCommentRequest request;
 
 
     @Before
     public void setUp() throws Exception
     {
-        taglist = new Taglist(-1,"my_abbreviation", "my_description", true);
-        TaglistHandler.handler().add(taglist);
-
-        this.handler = TagRequestStorage.handler();
-
-        HashSet<Taglist> tlSet = new HashSet<>();
-        tlSet.add(taglist);
-
-        this.request = new TagRequest("a", -1, tlSet, Rating.ALL, "filters");
+        this.handler = SimpleCommentRequestStorage.handler();
+        this.request = new SimpleCommentRequest(1, "five");
     }
 
     @After
     public void tearDown() throws Exception
     {
-        TaglistHandler.handler().remove(taglist);
     }
 
 
@@ -70,7 +62,7 @@ public class TagRequestStorageTest
     {
         handler.setLocalStorage(true);
 
-        ArrayList<TagRequest> requests = handler.getAll();
+        ArrayList<SimpleCommentRequest> requests = handler.getAll();
 
         if (requests.contains(request))
             fail();
@@ -86,16 +78,15 @@ public class TagRequestStorageTest
 
         if (requests.contains(request))
             fail();
-
-
     }
 
     @Test
     public void testFunctionalityWithoutLocalStorage() throws Exception
     {
+
         handler.setLocalStorage(false);
 
-        ArrayList<TagRequest> requests = handler.getAll();
+        ArrayList<SimpleCommentRequest> requests = handler.getAll();
 
         if (requests.contains(request))
             fail();
@@ -105,62 +96,6 @@ public class TagRequestStorageTest
 
         if (!requests.contains(request))
             fail();
-
-        handler.remove(request);
-        requests = handler.getAll();
-
-        if (requests.contains(request))
-            fail();
-    }
-
-    @Test
-    public void testMergeWithLocalStorage() throws Exception
-    {
-        handler.setLocalStorage(true);
-
-        ArrayList<TagRequest> requests = handler.getAll();
-        int size = requests.size();
-
-        if (requests.contains(request))
-            fail();
-
-        handler.add(request);
-        requests = handler.getAll();
-
-        Assert.assertEquals(size + 1, requests.size());
-
-        handler.add(request);
-        requests = handler.getAll();
-
-        Assert.assertEquals(size + 1, requests.size());
-
-        handler.remove(request);
-        requests = handler.getAll();
-
-        if (requests.contains(request))
-            fail();
-    }
-
-    @Test
-    public void testMergeWithoutLocalStorage() throws Exception
-    {
-        handler.setLocalStorage(false);
-
-        ArrayList<TagRequest> requests = handler.getAll();
-        int size = requests.size();
-
-        if (requests.contains(request))
-            fail();
-
-        handler.add(request);
-        requests = handler.getAll();
-
-        Assert.assertEquals(size + 1, requests.size());
-
-        handler.add(request);
-        requests = handler.getAll();
-
-        Assert.assertEquals(size + 1, requests.size());
 
         handler.remove(request);
         requests = handler.getAll();

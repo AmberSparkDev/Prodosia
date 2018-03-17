@@ -20,47 +20,54 @@
  * SOFTWARE.
  */
 
-package com.Bluefix.Prodosia.Command;
+package com.Bluefix.Prodosia.DataType.Command;
 
-import com.Bluefix.Prodosia.DataType.Command.CommandResult;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-
-public class CommandHandlerTest
+/**
+ * Helper class that contains all necessary information after command execution.
+ */
+public  class CommandResult
 {
+    private String message;
+    private String command;
 
-    @Before
-    public void setUp() throws Exception
+    /**
+     * Create a new ExecutionResult object.
+     * @param message The message pertaining to the execution of the command.
+     */
+    public CommandResult(String message)
     {
-
+        this.message = message;
     }
 
-    @After
-    public void tearDown() throws Exception
+    /**
+     * Create a new ExecutionResult object together with its command.
+     * @param message The message pertaining to the execution of the command.
+     */
+    public CommandResult(String message, String command)
     {
-
+        this.message = message;
+        this.command = command;
     }
 
-    @Test
-    public void execute()
+    /**
+     * Retrieve the message for the executed command.
+     * @return The message to be displayed to the user that issued the command.
+     */
+    public String getMessage()
     {
-        CommandResult result = CommandHandler.execute(null, "list");
-        System.out.println(result.getMessage());
-
-        Assert.assertEquals("list", result.getCommand());
+        return message;
     }
 
-    @Test
-    public void execute1()
+    /**
+     * @return The command issued by the user, or null if the command was not recognized.
+     */
+    public String getCommand()
     {
-
+        return command;
     }
 
-    @Test
-    public void execute2()
+    public void setCommand(String command)
     {
-
+        this.command = command;
     }
 }

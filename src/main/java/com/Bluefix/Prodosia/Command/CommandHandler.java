@@ -23,7 +23,8 @@
 package com.Bluefix.Prodosia.Command;
 
 import com.Bluefix.Prodosia.Command.CommandFunc.*;
-import com.Bluefix.Prodosia.DataType.CommandResult;
+import com.Bluefix.Prodosia.DataType.Command.CommandInformation;
+import com.Bluefix.Prodosia.DataType.Command.CommandResult;
 import com.Bluefix.Prodosia.DataType.Tracker.Tracker;
 
 import java.util.ArrayList;
@@ -85,30 +86,32 @@ public class CommandHandler
 
     //region Parse Command
 
+
     /**
      * Execute the command specified.
      *
      * The very first item in the command, separated by a space
      * from the rest of the data, will be considered the command.
      * The rest will be considered the arguments.
+     * @param ci The command information pertaining to the execution request.
      * @param command The command to be executed.
-     * @return The command result after execution.
+     * @return
      */
-    public static CommandResult execute(Tracker t, String command)
+    public static CommandResult execute(CommandInformation ci, String command)
     {
         String trimmed = command.trim();
 
         int firstSpace = trimmed.indexOf(' ');
 
         if (firstSpace < 0)
-            return execute(t, trimmed, new String[]{});
+            return execute(ci, trimmed, new String[]{});
         else
         {
             // split the command from the arguments and execute.
             String actualCommand = trimmed.substring(0, firstSpace);
             String arguments = trimmed.substring(firstSpace + 1);
 
-            return execute(t, actualCommand, arguments);
+            return execute(ci, actualCommand, arguments);
         }
     }
 
@@ -118,11 +121,11 @@ public class CommandHandler
      * @param arguments The arguments, separated by a space
      * @return The command result after execution.
      */
-    public static CommandResult execute(Tracker t, String command, String arguments)
+    public static CommandResult execute(CommandInformation ci, String command, String arguments)
     {
         String[] splitArguments = arguments.trim().split("\\s+");
 
-        return execute(t, command, splitArguments);
+        return execute(ci, command, splitArguments);
     }
 
     /**
@@ -131,7 +134,7 @@ public class CommandHandler
      * @param arguments The arguments for the command.
      * @return The command result after execution.
      */
-    public static CommandResult execute(Tracker t, String command, String[] arguments)
+    public static CommandResult execute(CommandInformation ci, String command, String[] arguments)
     {
         String lCom = command.toLowerCase();
 
@@ -175,7 +178,9 @@ public class CommandHandler
                 // execute the command
                 try
                 {
-                    return func.execute(t, fArguments);
+                    CommandResult res = func.execute(ci, fArguments);
+                    res.setCommand(lCom);
+                    return res;
                 }
                 catch (Exception e)
                 {
@@ -237,8 +242,6 @@ public class CommandHandler
 
             message = bMessage.toString();
         }
-
-
 
         return new CommandResult(message, "help");
     }

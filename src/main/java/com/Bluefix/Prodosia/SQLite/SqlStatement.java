@@ -95,7 +95,12 @@ public class SqlStatement
                 /* --- CommandPrefix --- */
                         "CREATE TABLE IF NOT EXISTS CommandPrefix (" +
                         "type integer PRIMARY KEY, " +
-                        "regex text); "
+                        "regex text); ",
+                /* --- CommentQueue --- */
+                        "CREATE TABLE IF NOT EXISTS CommentQueue (" +
+                        "imgurId text, " +
+                        "parentId integer, " +
+                        "lines text); "
 
         };
     }

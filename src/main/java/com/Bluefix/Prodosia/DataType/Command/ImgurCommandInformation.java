@@ -20,35 +20,29 @@
  * SOFTWARE.
  */
 
-package com.Bluefix.Prodosia.Command;
+package com.Bluefix.Prodosia.DataType.Command;
 
-import com.Bluefix.Prodosia.DataType.Command.CommandResult;
+import com.Bluefix.Prodosia.DataType.Comments.TagRequest;
+import com.Bluefix.Prodosia.DataType.Tracker.Tracker;
 
-/**
- * Class that can parse Imgur commands
- */
-public class ImgurCommandHandler implements ICommandHandler
+public class ImgurCommandInformation extends CommandInformation
 {
 
-    //region ICommandHandler implementation
 
-    /**
-     * Execute the command if the input consisted of a command. Ignore
-     * the input if not.
-     *
-     * @param input The input to be executed.
-     */
-    @Override
-    public CommandResult execute(String input)
+
+    public ImgurCommandInformation(Tracker tracker)
     {
-        return null;
+        super(tracker);
     }
 
-    //endregion
-
-    //region Command logic
-
-
-
-    //endregion
+    /**
+     * Reply to the user with the following entries.
+     *
+     * @param entries The entries to reply to the user to.
+     */
+    @Override
+    protected void reply(String[] entries)
+    {
+        //TagRequest tr = new TagRequest();
+    }
 }

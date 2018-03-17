@@ -24,7 +24,7 @@ package com.Bluefix.Prodosia.Imgur.Tagging;
 
 import com.Bluefix.Prodosia.Algorithm.Partition;
 import com.Bluefix.Prodosia.DataHandler.UserHandler;
-import com.Bluefix.Prodosia.DataType.TagRequest;
+import com.Bluefix.Prodosia.DataType.Comments.TagRequest;
 import com.Bluefix.Prodosia.DataType.User.User;
 
 import java.util.ArrayList;
@@ -41,10 +41,20 @@ public class TagRequestComments
     public static final int MaxCommentLength = 140;
 
 
+    /**
+     * Parse the comments that are necessary for the specified tag request.
+     *
+     *
+     * @param tr
+     * @return
+     * @throws Exception
+     */
     public static LinkedList<String> parseCommentsForTagRequest(TagRequest tr) throws Exception
     {
         // find all the users necessary for the tag request.
         ArrayList<String> users = findUsersForTagRequest(tr);
+
+        // TODO: Filter out users that have already commented / posted (will take 1 extra GET request)
 
         // convert the users into tag-entries
         LinkedList<String> tagEntries = new LinkedList<>();

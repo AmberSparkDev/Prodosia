@@ -22,7 +22,7 @@
 
 package com.Bluefix.Prodosia.Command;
 
-import com.Bluefix.Prodosia.DataType.CommandResult;
+import com.Bluefix.Prodosia.DataType.Command.CommandResult;
 
 /**
  *

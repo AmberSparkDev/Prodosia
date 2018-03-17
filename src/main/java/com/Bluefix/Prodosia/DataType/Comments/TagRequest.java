@@ -20,19 +20,22 @@
  * SOFTWARE.
  */
 
-package com.Bluefix.Prodosia.DataType;
+package com.Bluefix.Prodosia.DataType.Comments;
 
 import com.Bluefix.Prodosia.DataHandler.TaglistHandler;
 import com.Bluefix.Prodosia.DataType.Taglist.Rating;
 import com.Bluefix.Prodosia.DataType.Taglist.Taglist;
+import com.Bluefix.Prodosia.Imgur.Tagging.TagRequestComments;
+import com.Bluefix.Prodosia.Imgur.Tagging.TagRequestStorage;
 
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.Objects;
 
 /**
  * Simple struct for a tag request.
  */
-public class TagRequest
+public class TagRequest implements CommentRequest
 {
     private String imgurId;
     private long parentComment;
@@ -90,10 +93,12 @@ public class TagRequest
         this.filters = filters;
     }
 
+
     public HashSet<Taglist> getTaglists()
     {
         return taglists;
     }
+
 
     public String getDbTaglists() throws Exception
     {
@@ -104,6 +109,7 @@ public class TagRequest
 
         return sb.toString();
     }
+
 
     public Rating getRating()
     {
@@ -119,15 +125,74 @@ public class TagRequest
         return filters;
     }
 
+    //region Comment Request implementation
+
+    /**
+     * Retrieve the imgur id for the post.
+     * @return
+     */
+    @Override
     public String getImgurId()
     {
         return imgurId;
     }
 
-    public long getParentComment()
+
+
+    /**
+     * Retrieve the parent-id that should be replied to. Return -1 to indicate there is no existing
+     * parent comment.
+     *
+     * @return
+     */
+    @Override
+    public long getParent()
     {
-        return parentComment;
+        return this.parentComment;
     }
+
+    /**
+     * Retrieve all comments that should be executed by this tag request.
+     *
+     * @return
+     */
+    @Override
+    public LinkedList<String> getComments() throws Exception
+    {
+        return TagRequestComments.parseCommentsForTagRequest(this);
+    }
+
+    /**
+     * Indicate whether the entry deep-equals the other request.
+     *
+     * @param cq
+     * @return
+     */
+    @Override
+    public boolean deepEquals(CommentRequest cq)
+    {
+        if (this == cq) return true;
+        if (cq == null || getClass() != cq.getClass()) return false;
+        TagRequest that = (TagRequest) cq;
+        return Objects.equals(imgurId, that.imgurId) &&
+                Objects.equals(parentComment, that.parentComment) &&
+                Objects.equals(taglists, that.taglists) &&
+                rating == that.rating &&
+                Objects.equals(filters, that.filters);
+    }
+
+    /**
+     * Remove the item from the storage.
+     */
+    @Override
+    public void remove() throws Exception
+    {
+        TagRequestStorage.handler().remove(this);
+    }
+
+    //endregion
+
+    //region Equals
 
 
     @Override
@@ -146,23 +211,7 @@ public class TagRequest
         return Objects.hash(imgurId);
     }
 
-
-    /**
-     * Check if a tag-request deep equals the other object.
-     * @param o
-     * @return
-     */
-    public boolean deepEquals(Object o)
-    {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        TagRequest that = (TagRequest) o;
-        return Objects.equals(imgurId, that.imgurId) &&
-                Objects.equals(parentComment, that.parentComment) &&
-                Objects.equals(taglists, that.taglists) &&
-                rating == that.rating &&
-                Objects.equals(filters, that.filters);
-    }
+    //endregion
 
     /**
      * Merge two requests together. Only possible if they share the same post-id.

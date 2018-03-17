@@ -22,7 +22,11 @@
 
 package com.Bluefix.Prodosia.Imgur.CommentScanner;
 
+import com.Bluefix.Prodosia.Command.CommandRecognition;
 import com.Bluefix.Prodosia.DataHandler.TrackerHandler;
+import com.Bluefix.Prodosia.DataType.Command.CommandInformation;
+import com.Bluefix.Prodosia.DataType.Command.CommandPrefix;
+import com.Bluefix.Prodosia.DataType.Command.ImgurCommandInformation;
 import com.Bluefix.Prodosia.DataType.Tracker.Tracker;
 import com.Bluefix.Prodosia.DataType.Tracker.TrackerBookmark;
 import com.Bluefix.Prodosia.Imgur.ImgurApi.ApiDistribution;
@@ -352,8 +356,12 @@ public class CommentScannerExecution extends ImgurIntervalRunner
             }
 
             // Let another class parse these comments.
-            if (!newComments.isEmpty())
-                CommentScannerParser.parseComments(t, newComments);
+            for (Comment c : newComments)
+            {
+                CommandInformation ci = new ImgurCommandInformation(t);
+
+                CommandRecognition.executeEntry(CommandPrefix.Type.IMGUR, ci, c.getComment());
+            }
 
             // if we have reached the maximum amount of allowed requests, return.
             if (requestsUsed >= allowedRequests)

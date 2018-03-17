@@ -23,7 +23,9 @@
 package com.Bluefix.Prodosia.Imgur.Tagging;
 
 import com.Bluefix.Prodosia.DataHandler.LocalStorageHandler;
+import com.Bluefix.Prodosia.DataType.Comments.SimpleCommentRequest;
 import com.Bluefix.Prodosia.DataType.Comments.TagRequest;
+import com.Bluefix.Prodosia.SQLite.SqlBuilder;
 import com.Bluefix.Prodosia.SQLite.SqlDatabase;
 
 import java.sql.PreparedStatement;
@@ -37,17 +39,17 @@ import java.util.ArrayList;
  *
  * `CommentExecution` uses this class to tag the items in the queue. This class merely handles the storage.
  */
-public class TagRequestStorage extends LocalStorageHandler<TagRequest>
+public class SimpleCommentRequestStorage extends LocalStorageHandler<SimpleCommentRequest>
 {
     //region Singleton and constructor
 
-    private static TagRequestStorage me;
+    private static SimpleCommentRequestStorage me;
 
-    public static TagRequestStorage handler()
+    public static SimpleCommentRequestStorage handler()
     {
         if (me == null)
         {
-            me = new TagRequestStorage();
+            me = new SimpleCommentRequestStorage();
 
             // start an underlying thread that handles the tagrequests.
             if (!CommentExecution.tagExecution().isAlive())
@@ -57,7 +59,7 @@ public class TagRequestStorage extends LocalStorageHandler<TagRequest>
         return me;
     }
 
-    private TagRequestStorage()
+    private SimpleCommentRequestStorage()
     {
         super(true);
     }
@@ -67,45 +69,12 @@ public class TagRequestStorage extends LocalStorageHandler<TagRequest>
     //region Local Storage Handler implementation
 
     /**
-     * Add an item to the collection.
-     * @param tagRequest The item to be added.
-     */
-    @Override
-    public void add(TagRequest tagRequest) throws Exception
-    {
-        // this method is overridden to check for items that can be merged together.
-
-        // if there is overlap with an already-existing tagrequest with the same imgur-id,
-        // merge the two.
-        ArrayList<TagRequest> requests = super.getAll();
-
-        int index = requests.indexOf(tagRequest);
-
-        // if there was a duplicate tag-request in the queue, merge it and delete the old one.
-        if (index >= 0)
-        {
-            TagRequest oldT = requests.get(index);
-
-            // merge-order is important, since the values from the new request are given priority
-            TagRequest merge = oldT.merge(tagRequest);
-
-            // remove the old item and add the new one.
-            super.remove(oldT);
-            super.add(merge);
-        }
-        else
-        {
-            super.add(tagRequest);
-        }
-    }
-
-    /**
      * Add a tag request to the queue. The class will automatically handle when this gets tagged.
      *
      * @param tagRequest
      */
     @Override
-    protected void addItem(TagRequest tagRequest) throws Exception
+    protected void addItem(SimpleCommentRequest tagRequest) throws Exception
     {
         dbAddTagrequest(tagRequest);
     }
@@ -116,7 +85,7 @@ public class TagRequestStorage extends LocalStorageHandler<TagRequest>
      * @param tagRequest
      */
     @Override
-    protected void removeItem(TagRequest tagRequest) throws Exception
+    protected void removeItem(SimpleCommentRequest tagRequest) throws Exception
     {
         dbRemoveTagrequest(tagRequest);
     }
@@ -127,7 +96,7 @@ public class TagRequestStorage extends LocalStorageHandler<TagRequest>
      * @return
      */
     @Override
-    protected ArrayList<TagRequest> getAllItems() throws Exception
+    protected ArrayList<SimpleCommentRequest> getAllItems() throws Exception
     {
         return dbGetTagrequests();
     }
@@ -136,42 +105,51 @@ public class TagRequestStorage extends LocalStorageHandler<TagRequest>
 
     //region Database Management
 
-    private synchronized static void dbAddTagrequest(TagRequest t) throws Exception
+    private synchronized static void dbAddTagrequest(SimpleCommentRequest t) throws Exception
     {
         if (t == null)
             return;
 
         String query =
-                "INSERT INTO TagQueue " +
-                "(imgurId, parentComment, taglists, rating, filters) " +
-                "VALUES (?,?,?,?,?);";
+                "INSERT INTO CommentQueue " +
+                "(imgurId, parentId, lines) " +
+                "VALUES (?,?,?);";
+
+        SqlBuilder builder = SqlBuilder.Builder();
+
+        for (String line : t.getComments())
+        {
+            PreparedStatement prep = SqlDatabase.getStatement(query);
+            prep.setString(1, t.getImgurId());
+            prep.setLong(2, t.getParent());
+            prep.setString(3, line);
+
+            builder = builder.execute(prep);
+        }
+
+        builder.commit();
+    }
+
+    private synchronized static void dbRemoveTagrequest(SimpleCommentRequest t) throws SQLException
+    {
+        String query =
+                "DELETE FROM CommentQueue " +
+                "WHERE imgurId = ? AND parentId = ? AND lines = ?;";
+
+        System.out.println("lines = " + t.dbParseComments());
 
         PreparedStatement prep = SqlDatabase.getStatement(query);
         prep.setString(1, t.getImgurId());
         prep.setLong(2, t.getParent());
-        prep.setString(3, t.getDbTaglists());
-        prep.setInt(4, t.getRating().getValue());
-        prep.setString(5, t.getFilters());
-
+        prep.setString(3, t.dbParseComments());
         SqlDatabase.execute(prep);
     }
 
-    private synchronized static void dbRemoveTagrequest(TagRequest t) throws SQLException
+    private synchronized static ArrayList<SimpleCommentRequest> dbGetTagrequests() throws Exception
     {
         String query =
-                "DELETE FROM TagQueue " +
-                "WHERE imgurId = ?;";
-
-        PreparedStatement prep = SqlDatabase.getStatement(query);
-        prep.setString(1, t.getImgurId());
-        SqlDatabase.execute(prep);
-    }
-
-    private synchronized static ArrayList<TagRequest> dbGetTagrequests() throws Exception
-    {
-        String query =
-                "SELECT imgurId, parentComment, taglists, rating, filters " +
-                "FROM TagQueue;";
+                "SELECT imgurId, parentId, lines " +
+                "FROM CommentQueue;";
 
         PreparedStatement prep = SqlDatabase.getStatement(query);
         ArrayList<ResultSet> result = SqlDatabase.query(prep);
@@ -180,17 +158,15 @@ public class TagRequestStorage extends LocalStorageHandler<TagRequest>
             throw new Exception("SqlDatabase exception: Expected result size did not match (was " + result.size() + ")");
 
         ResultSet rs = result.get(0);
-        ArrayList<TagRequest> output = new ArrayList<>();
+        ArrayList<SimpleCommentRequest> output = new ArrayList<>();
 
         while (rs.next())
         {
             String imgurId = rs.getString(1);
-            long parentComment = rs.getLong(2);
-            String taglists = rs.getString(3);
-            int rating = rs.getInt(4);
-            String filters = rs.getString(5);
+            long parentId = rs.getLong(2);
+            String comments = rs.getString(3);
 
-            output.add(new TagRequest(imgurId, parentComment, taglists, rating, filters));
+            output.add(SimpleCommentRequest.parse(imgurId, parentId, comments));
         }
 
         return output;
