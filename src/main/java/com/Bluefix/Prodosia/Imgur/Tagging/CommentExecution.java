@@ -57,6 +57,12 @@ public class CommentExecution extends Thread
      */
     private static final int SimultaneousTagRequest = 4;
 
+    /**
+     * The default delay in milliseconds how long it takes for the
+     * comment posts to reset.
+     */
+    private static final int DefaultCommentDelay = 60000;
+
 
     /**
      * The amount of comments that imgur allows per minute.
@@ -67,7 +73,7 @@ public class CommentExecution extends Thread
 
     private static CommentExecution me;
 
-    public static CommentExecution tagExecution()
+    public static CommentExecution handler()
     {
         if (me == null)
             me = new CommentExecution();
@@ -110,6 +116,8 @@ public class CommentExecution extends Thread
      */
     private int addItem(CommentRequest item) throws Exception
     {
+        Logger.logMessage("actions size (0) = " + actions.size());
+
         // if the item already existed, we will be replacing it.
         removeItem(item);
 
@@ -119,7 +127,18 @@ public class CommentExecution extends Thread
         // add the item to the list.
         actions.put(item, comments);
 
+        Logger.logMessage("actions size (1) = " + actions.size());
+
         return comments.size();
+    }
+
+    /**
+     * Retrieve whether the current queue is empty.
+     * @return true iff the queue is empty, false otherwise.
+     */
+    private boolean isEmptyQueue()
+    {
+        return this.actions.isEmpty();
     }
 
     //endregion
@@ -137,10 +156,24 @@ public class CommentExecution extends Thread
         // Thread runs continually until application shutdown.
         while (true)
         {
+            // default delay between comment posting is 1 full minute.
+            int delay = DefaultCommentDelay;
+
             try
             {
                 updateQueue();
-                postComments();
+
+                // if the queue is empty, don't post the comments and use a shorter
+                // delay.
+                if (isEmptyQueue())
+                {
+                    delay = 10000;
+                }
+                else
+                {
+                    postComments();
+                }
+
             } catch (Exception e)
             {
                 e.printStackTrace();
@@ -149,7 +182,7 @@ public class CommentExecution extends Thread
             {
                 try
                 {
-                    Thread.sleep(60000);
+                    Thread.sleep(delay);
                 } catch (InterruptedException e)
                 {
 
@@ -237,6 +270,10 @@ public class CommentExecution extends Thread
         // if an old tagRequest has changed, replace it.
         for (CommentRequest tr : actions.keySet())
         {
+            // skip the entry if it wasn't a tag request
+            if (!(tr instanceof TagRequest))
+                continue;
+
             // find the corresponding item in queueItems.
             int index = queueItems.indexOf(tr);
 
@@ -308,8 +345,6 @@ public class CommentExecution extends Thread
                     continue;
                 }
 
-
-
                 // post one of the strings of the currently collection and remove it
                 String comment = e.getValue().remove(0);
                 allEmpty = false;
@@ -346,30 +381,30 @@ public class CommentExecution extends Thread
      */
     private boolean findParent(CommentRequest cr) throws BaringoApiException, IOException, URISyntaxException
     {
-        if (!parentMap.containsKey(cr))
+        // return if the parent was already known.
+        if (parentMap.containsKey(cr))
+            return false;
+
+        // attempt to retrieve the parent comment.
+        Comment parentComment;
+        long pC = cr.getParent();
+
+        if (pC < 0)
         {
-            // if there was no parent comment, create one.
-            Comment parentComment;
-            long pC = cr.getParent();
-
-            if (pC < 0)
+            // if it pertains a tag request, create a new parent comment.
+            if (cr instanceof TagRequest)
             {
-                // if it pertains a tag request, create a new parent comment.
-                if (cr instanceof TagRequest)
-                {
-                    TagRequest tr = (TagRequest)cr;
+                TagRequest tr = (TagRequest) cr;
 
-                    parentComment = postParentComment(cr.getImgurId(), tr.getTaglists().iterator());
-                    parentMap.put(tr, parentComment);
-                }
+                parentComment = postParentComment(cr.getImgurId(), tr.getTaglists().iterator());
+                parentMap.put(tr, parentComment);
                 return true;
             }
-            else
-            {
-                // if the parent comment id was already known, retrieve its actual comment.
-                parentComment = ImgurManager.client().commentService().getComment(cr.getParent());
-                parentMap.put(cr, parentComment);
-            }
+        } else
+        {
+            // if the parent comment id was already known, retrieve its actual comment.
+            parentComment = ImgurManager.client().commentService().getComment(cr.getParent());
+            parentMap.put(cr, parentComment);
         }
 
         return false;
@@ -399,7 +434,6 @@ public class CommentExecution extends Thread
             // post the reply
             ImgurManager.client().commentService().addReply(parentComment, comment);
         }
-
     }
 
 

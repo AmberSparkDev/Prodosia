@@ -30,6 +30,7 @@ import com.Bluefix.Prodosia.DataType.Tracker.Tracker;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedList;
 
 /**
  * This class parses and redirects commands fed to it.
@@ -158,36 +159,61 @@ public class CommandHandler
         // If the command is either "help" or "list", execute separately.
         if ("help".equals(lCom))
         {
-            return executeHelp(fArguments);
+            try
+            {
+                return executeHelp(ci, fArguments);
+            } catch (Exception e)
+            {
+                e.printStackTrace();
+            }
         }
         else if ("list".equals(lCom))
         {
-            return executeList(fArguments);
+            try
+            {
+                return executeList(ci, fArguments);
+            } catch (Exception e)
+            {
+                e.printStackTrace();
+            }
         }
         else
         {
             // if we can find the command, execute it.
             ICommandFunc func = getFunc(lCom);
 
-            if (func == null)
+            try
             {
-                return commandNotFound(lCom);
+
+                if (func == null)
+                {
+                    return commandNotFound(ci, lCom);
+                } else
+                {
+                    // execute the command
+                    try
+                    {
+                        func.execute(ci, fArguments);
+                        return new CommandResult(lCom);
+                    } catch (Exception e)
+                    {
+                        try
+                        {
+                            return commandException(ci, lCom);
+                        } catch (Exception e1)
+                        {
+                            e1.printStackTrace();
+                        }
+                    }
+                }
             }
-            else
+            catch (Exception e)
             {
-                // execute the command
-                try
-                {
-                    CommandResult res = func.execute(ci, fArguments);
-                    res.setCommand(lCom);
-                    return res;
-                }
-                catch (Exception e)
-                {
-                    return commandException(lCom);
-                }
+                e.printStackTrace();
             }
         }
+
+        return null;
     }
 
     //endregion
@@ -201,7 +227,7 @@ public class CommandHandler
      * @param arguments The arguments provided with the help command.
      * @return The result object which contains the provided information as its message.
      */
-    private static CommandResult executeHelp(String[] arguments)
+    private static CommandResult executeHelp(CommandInformation ci, String[] arguments) throws Exception
     {
         // change the message depending on whether arguments were supplied.
         String message;
@@ -243,7 +269,12 @@ public class CommandHandler
             message = bMessage.toString();
         }
 
-        return new CommandResult(message, "help");
+        // output the message to the user.
+        LinkedList<String> msgLL = new LinkedList<>();
+        msgLL.add(message);
+        ci.reply(msgLL);
+
+        return new CommandResult("help");
     }
 
 
@@ -257,7 +288,7 @@ public class CommandHandler
      * @param arguments Any arguments pertaining to this command.
      * @return The result object which contains the commands listed as its message.
      */
-    private static CommandResult executeList(String[] arguments)
+    private static CommandResult executeList(CommandInformation ci, String[] arguments) throws Exception
     {
         // initialize the command list if it was null.
         if (commandList == null)
@@ -282,25 +313,40 @@ public class CommandHandler
             commandList = message.toString();
         }
 
-        return new CommandResult(commandList, "list");
+        // output the list to the user.
+        LinkedList<String> msgLL = new LinkedList<>();
+        msgLL.add(commandList);
+        ci.reply(msgLL);
+
+        return new CommandResult("list");
     }
 
     //endregion
 
     //region Helper text
 
-    private static CommandResult commandNotFound(String lCom)
+    private static CommandResult commandNotFound(CommandInformation ci, String lCom) throws Exception
     {
         String message = "Command \"" + lCom + "\" was not recognized!";
 
-        return new CommandResult(message, null);
+        // output the message to the user.
+        LinkedList<String> msgLL = new LinkedList<>();
+        msgLL.add(message);
+        ci.reply(msgLL);
+
+        return new CommandResult(null);
     }
 
-    private static CommandResult commandException(String command)
+    private static CommandResult commandException(CommandInformation ci, String command) throws Exception
     {
         String message = "Something went wrong during execution!";
 
-        return new CommandResult(message, command);
+        // output the message to the user.
+        LinkedList<String> msgLL = new LinkedList<>();
+        msgLL.add(message);
+        ci.reply(msgLL);
+
+        return new CommandResult(command);
     }
 
     private static String listInformation()

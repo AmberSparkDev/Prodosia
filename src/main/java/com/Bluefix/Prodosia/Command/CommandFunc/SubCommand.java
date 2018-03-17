@@ -23,15 +23,13 @@
 package com.Bluefix.Prodosia.Command.CommandFunc;
 
 import com.Bluefix.Prodosia.DataType.Command.CommandInformation;
-import com.Bluefix.Prodosia.DataType.Command.CommandResult;
-import com.Bluefix.Prodosia.DataType.Tracker.Tracker;
 
 public class SubCommand implements ICommandFunc
 {
     @Override
-    public CommandResult execute(CommandInformation ci, String[] arguments)
+    public void execute(CommandInformation ci, String[] arguments)
     {
-        return null;
+
     }
 
     @Override

@@ -358,7 +358,7 @@ public class CommentScannerExecution extends ImgurIntervalRunner
             // Let another class parse these comments.
             for (Comment c : newComments)
             {
-                CommandInformation ci = new ImgurCommandInformation(t);
+                CommandInformation ci = new ImgurCommandInformation(t, c);
 
                 CommandRecognition.executeEntry(CommandPrefix.Type.IMGUR, ci, c.getComment());
             }

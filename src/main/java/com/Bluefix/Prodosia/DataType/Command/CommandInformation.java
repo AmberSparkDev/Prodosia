@@ -24,6 +24,8 @@ package com.Bluefix.Prodosia.DataType.Command;
 
 import com.Bluefix.Prodosia.DataType.Tracker.Tracker;
 
+import java.util.LinkedList;
+
 /**
  * Information pertaining to Command Execution.
  */
@@ -51,7 +53,7 @@ public abstract class CommandInformation
      * Reply to the user with the following entries.
      * @param entries The entries to reply to the user to.
      */
-    protected abstract void reply(String[] entries);
+    public abstract void reply(LinkedList<String> entries) throws Exception;
 
     //endregion
 }

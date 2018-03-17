@@ -47,7 +47,7 @@ public class CommandHandlerTest
     public void execute()
     {
         CommandResult result = CommandHandler.execute(null, "list");
-        System.out.println(result.getMessage());
+        //System.out.println(result.getMessage());
 
         Assert.assertEquals("list", result.getCommand());
     }

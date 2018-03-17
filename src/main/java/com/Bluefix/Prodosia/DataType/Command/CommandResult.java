@@ -27,35 +27,21 @@ package com.Bluefix.Prodosia.DataType.Command;
  */
 public  class CommandResult
 {
-    private String message;
     private String command;
 
     /**
      * Create a new ExecutionResult object.
-     * @param message The message pertaining to the execution of the command.
      */
-    public CommandResult(String message)
+    public CommandResult()
     {
-        this.message = message;
     }
 
     /**
      * Create a new ExecutionResult object together with its command.
-     * @param message The message pertaining to the execution of the command.
      */
-    public CommandResult(String message, String command)
+    public CommandResult(String command)
     {
-        this.message = message;
         this.command = command;
-    }
-
-    /**
-     * Retrieve the message for the executed command.
-     * @return The message to be displayed to the user that issued the command.
-     */
-    public String getMessage()
-    {
-        return message;
     }
 
     /**

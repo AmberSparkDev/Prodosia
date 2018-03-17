@@ -50,8 +50,8 @@ public class TagRequestStorage extends LocalStorageHandler<TagRequest>
             me = new TagRequestStorage();
 
             // start an underlying thread that handles the tagrequests.
-            if (!CommentExecution.tagExecution().isAlive())
-                CommentExecution.tagExecution().start();
+            if (!CommentExecution.handler().isAlive())
+                CommentExecution.handler().start();
         }
 
         return me;

@@ -24,7 +24,6 @@ package com.Bluefix.Prodosia.Imgur.Tagging;
 
 import com.Bluefix.Prodosia.DataHandler.LocalStorageHandler;
 import com.Bluefix.Prodosia.DataType.Comments.SimpleCommentRequest;
-import com.Bluefix.Prodosia.DataType.Comments.TagRequest;
 import com.Bluefix.Prodosia.SQLite.SqlBuilder;
 import com.Bluefix.Prodosia.SQLite.SqlDatabase;
 
@@ -52,8 +51,8 @@ public class SimpleCommentRequestStorage extends LocalStorageHandler<SimpleComme
             me = new SimpleCommentRequestStorage();
 
             // start an underlying thread that handles the tagrequests.
-            if (!CommentExecution.tagExecution().isAlive())
-                CommentExecution.tagExecution().start();
+            if (!CommentExecution.handler().isAlive())
+                CommentExecution.handler().start();
         }
 
         return me;
@@ -135,8 +134,6 @@ public class SimpleCommentRequestStorage extends LocalStorageHandler<SimpleComme
         String query =
                 "DELETE FROM CommentQueue " +
                 "WHERE imgurId = ? AND parentId = ? AND lines = ?;";
-
-        System.out.println("lines = " + t.dbParseComments());
 
         PreparedStatement prep = SqlDatabase.getStatement(query);
         prep.setString(1, t.getImgurId());

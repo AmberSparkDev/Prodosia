@@ -23,8 +23,6 @@
 package com.Bluefix.Prodosia.Command.CommandFunc;
 
 import com.Bluefix.Prodosia.DataType.Command.CommandInformation;
-import com.Bluefix.Prodosia.DataType.Command.CommandResult;
-import com.Bluefix.Prodosia.DataType.Tracker.Tracker;
 
 public interface ICommandFunc
 {
@@ -34,7 +32,7 @@ public interface ICommandFunc
      * @param arguments The parameters for the command.
      * @return The response text for executing this command.
      */
-    CommandResult execute(CommandInformation ci, String[] arguments);
+    void execute(CommandInformation ci, String[] arguments);
 
 
     /**

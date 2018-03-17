@@ -292,8 +292,8 @@ public class ApplicationWindow
      */
     public void test(ActionEvent actionEvent) throws Exception
     {
-        //addStewTracker();
-        //addPrefix();
+        addStewTracker();
+        addPrefix();
 
 
 
