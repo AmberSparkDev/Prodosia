@@ -20,35 +20,53 @@
  * SOFTWARE.
  */
 
-package com.Bluefix.Prodosia.Command;
+package com.Bluefix.Prodosia.DataType.Comments;
 
-import com.Bluefix.Prodosia.DataType.Command.CommandResult;
+import com.github.kskelm.baringo.model.Comment;
+import com.github.kskelm.baringo.util.BaringoApiException;
+
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.util.LinkedList;
 
 /**
- * Class that can parse Imgur commands
+ * Request to post a comment.
  */
-public class ImgurCommandHandler implements ICommandHandler
+public interface ICommentRequest
 {
-
-    //region ICommandHandler implementation
+    /**
+     * Retrieve the imgur-id that should be replied to.
+     * @return
+     */
+    String getImgurId() throws BaringoApiException, IOException, URISyntaxException;
 
     /**
-     * Execute the command if the input consisted of a command. Ignore
-     * the input if not.
-     *
-     * @param input The input to be executed.
+     * Retrieve the parent-id that should be replied to. Return -1 to indicate there is no existing
+     * parent comment.
+     * @return
      */
-    @Override
-    public CommandResult execute(String input)
-    {
-        return null;
-    }
+    Comment getParent() throws BaringoApiException, IOException, URISyntaxException;
 
-    //endregion
-
-    //region Command logic
+    /**
+     * Retrieve all comments that should be executed by this tag request.
+     * @return
+     */
+    LinkedList<String> getComments() throws Exception;
 
 
+    /**
+     * Indicate whether the entry deep-equals the other request.
+     * @param cq
+     * @return
+     */
+    boolean deepEquals(ICommentRequest cq);
 
-    //endregion
+
+    /**
+     * Remove the item from the storage.
+     */
+    void remove() throws Exception;
+
+
+
 }

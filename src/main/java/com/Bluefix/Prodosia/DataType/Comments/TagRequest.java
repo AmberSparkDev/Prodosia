@@ -25,9 +25,14 @@ package com.Bluefix.Prodosia.DataType.Comments;
 import com.Bluefix.Prodosia.DataHandler.TaglistHandler;
 import com.Bluefix.Prodosia.DataType.Taglist.Rating;
 import com.Bluefix.Prodosia.DataType.Taglist.Taglist;
+import com.Bluefix.Prodosia.Imgur.ImgurApi.ImgurManager;
 import com.Bluefix.Prodosia.Imgur.Tagging.TagRequestComments;
 import com.Bluefix.Prodosia.Imgur.Tagging.TagRequestStorage;
+import com.github.kskelm.baringo.model.Comment;
+import com.github.kskelm.baringo.util.BaringoApiException;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Objects;
@@ -35,24 +40,27 @@ import java.util.Objects;
 /**
  * Simple struct for a tag request.
  */
-public class TagRequest implements CommentRequest
+public class TagRequest implements ICommentRequest
 {
     private String imgurId;
-    private long parentComment;
+    private Comment parentComment;
+    private long parentId;
     private HashSet<Taglist> taglists;
     private Rating rating;
     private String filters;
 
 
-    public TagRequest(String imgurId, long parentComment, HashSet<Taglist> taglists, Rating rating, String filters)
+    public TagRequest(String imgurId, Comment parentComment, HashSet<Taglist> taglists, Rating rating, String filters)
     {
-        if (imgurId == null || imgurId.trim().isEmpty())
-            throw new IllegalArgumentException("The imgur-id cannot be null or empty");
+        if ((imgurId == null || imgurId.trim().isEmpty()) &&
+            parentComment == null)
+            throw new IllegalArgumentException("The imgur-id and parentComment cannot be both empty. ");
 
         if (taglists == null || taglists.isEmpty())
             throw new IllegalArgumentException("The taglists supplied cannot be null or empty");
 
-        this.imgurId = imgurId.trim();
+        if (imgurId != null)
+            this.imgurId = imgurId.trim();
 
         this.parentComment = parentComment;
 
@@ -64,29 +72,31 @@ public class TagRequest implements CommentRequest
     /**
      * Create a new TagRequest object, loaded in from the database.
      * @param imgurId
-     * @param parentComment
+     * @param parentId
      * @param taglists
      * @param rating
      * @param filters
      */
-    public TagRequest(String imgurId, long parentComment, String taglists, int rating, String filters) throws Exception
+    public TagRequest(String imgurId, long parentId, String taglists, int rating, String filters) throws Exception
     {
-        if (imgurId == null || imgurId.trim().isEmpty())
-            throw new IllegalArgumentException("The imgur-id cannot be null or empty");
+        if ((imgurId == null || imgurId.trim().isEmpty()) &&
+                parentComment == null)
+            throw new IllegalArgumentException("The imgur-id and parentComment cannot be both empty. ");
 
         if (taglists == null || taglists.isEmpty())
             throw new IllegalArgumentException("The taglists supplied cannot be null or empty");
 
-        this.imgurId = imgurId.trim();
+        if (imgurId != null)
+            this.imgurId = imgurId.trim();
 
-        this.parentComment = parentComment;
+        this.parentId = parentId;
 
         this.taglists = new HashSet<>();
         String[] tlArr = taglists.split(";");
 
         for (String t : tlArr)
         {
-            this.taglists.add(TaglistHandler.getTaglist(Long.parseLong(t)));
+            this.taglists.add(TaglistHandler.getTaglistById(Long.parseLong(t)));
         }
 
         this.rating = Rating.parseValue(rating);
@@ -132,22 +142,36 @@ public class TagRequest implements CommentRequest
      * @return
      */
     @Override
-    public String getImgurId()
+    public String getImgurId() throws BaringoApiException, IOException, URISyntaxException
     {
+        // if the imgur id is null or empty, return it from the parent comment instead.
+        if (this.imgurId == null || this.imgurId.isEmpty())
+        {
+            return getParent().getImageId();
+        }
+
         return imgurId;
     }
 
 
 
     /**
-     * Retrieve the parent-id that should be replied to. Return -1 to indicate there is no existing
-     * parent comment.
+     * Retrieve the parent-id that should be replied to. Return null when
+     * no parent comment was available.
      *
      * @return
      */
     @Override
-    public long getParent()
+    public Comment getParent() throws BaringoApiException, IOException, URISyntaxException
     {
+        if (this.parentComment == null && this.parentId < 0)
+            return null;
+
+        if (this.parentComment == null)
+        {
+            this.parentComment = ImgurManager.client().commentService().getComment(this.parentId);
+        }
+
         return this.parentComment;
     }
 
@@ -169,7 +193,7 @@ public class TagRequest implements CommentRequest
      * @return
      */
     @Override
-    public boolean deepEquals(CommentRequest cq)
+    public boolean deepEquals(ICommentRequest cq)
     {
         if (this == cq) return true;
         if (cq == null || getClass() != cq.getClass()) return false;
@@ -218,9 +242,9 @@ public class TagRequest implements CommentRequest
      * @param o the TagRequest object to be merged.
      * @return A merged tag-request for the same imgur-id.
      */
-    public TagRequest merge(TagRequest o)
+    public TagRequest merge(TagRequest o) throws BaringoApiException, IOException, URISyntaxException
     {
-        if (!this.imgurId.equals(o.imgurId))
+        if (!this.getImgurId().equals(o.getImgurId()))
             throw new IllegalArgumentException("Merging is only supported for the same post");
 
         // default to the other rating
@@ -232,9 +256,9 @@ public class TagRequest implements CommentRequest
         mTag.addAll(o.taglists);
 
         // default to the other parentComment
-        long parentComment;
+        Comment parentComment;
 
-        if (o.parentComment > 0)
+        if (o.parentComment != null)
             parentComment = o.parentComment;
         else
             parentComment = this.parentComment;

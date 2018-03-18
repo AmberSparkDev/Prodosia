@@ -22,17 +22,12 @@
 
 package com.Bluefix.Prodosia.Imgur.Tagging;
 
-import com.Bluefix.Prodosia.DataHandler.TaglistHandler;
 import com.Bluefix.Prodosia.DataType.Comments.SimpleCommentRequest;
-import com.Bluefix.Prodosia.DataType.Comments.TagRequest;
-import com.Bluefix.Prodosia.DataType.Taglist.Rating;
-import com.Bluefix.Prodosia.DataType.Taglist.Taglist;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 
 import static org.junit.Assert.*;
 

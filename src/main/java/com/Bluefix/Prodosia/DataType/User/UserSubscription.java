@@ -59,7 +59,7 @@ public class UserSubscription
      */
     public UserSubscription(long taglistId, String ratings, String filters) throws Exception
     {
-        this.taglist = TaglistHandler.getTaglist(taglistId);
+        this.taglist = TaglistHandler.getTaglistById(taglistId);
 
         if (this.taglist == null)
             throw new IllegalArgumentException("The taglist-id was not recognized.");
@@ -85,6 +85,9 @@ public class UserSubscription
 
     public String getDbRating()
     {
+        if (this.ratings == null)
+            return "";
+
         StringBuilder s = new StringBuilder();
 
         for (Rating r : ratings)
@@ -118,15 +121,18 @@ public class UserSubscription
         // this check is only used if the taglist incorporates ratings at all.
         if (this.taglist.hasRatings())
         {
-            if (!this.ratings.contains(tr.getRating()))
+            if (this.ratings == null || !this.ratings.contains(tr.getRating()))
             {
                 return false;
             }
         }
 
         // finally check to see if any filters apply
-        if (this.filters.matches(tr.getFilters()))
+        if (this.filters != null && this.filters.matches(tr.getFilters()))
+        {
+
             return false;
+        }
 
         // since everything passed, this subscription is part of the tag request.
         return true;

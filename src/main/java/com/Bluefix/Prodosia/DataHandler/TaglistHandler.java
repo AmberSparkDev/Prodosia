@@ -164,7 +164,7 @@ public class TaglistHandler extends LocalStorageHandler<Taglist>
      * @param taglistId
      * @return
      */
-    public static synchronized Taglist getTaglist(long taglistId) throws Exception
+    public static synchronized Taglist getTaglistById(long taglistId) throws Exception
     {
         // TODO: if this methods is used frequently, it might be worth making a HashMap<long, Taglist>
         ArrayList<Taglist> taglists = handler().getAll();
@@ -177,6 +177,30 @@ public class TaglistHandler extends LocalStorageHandler<Taglist>
 
         return null;
     }
+
+    /**
+     * Retrieve a taglist with the specified abbreviation
+     * @param abbreviation The abbreviation of the taglist.
+     * @return The taglist if it existed, or null otherwise.
+     * @throws Exception
+     */
+    public static synchronized Taglist getTaglistByAbbreviation(String abbreviation) throws Exception
+    {
+        if (abbreviation == null || abbreviation.isEmpty())
+            return null;
+
+        // TODO: if this methods is used frequently, it might be worth making a HashMap<long, Taglist>
+        ArrayList<Taglist> taglists = handler().getAll();
+
+        for (Taglist tl : taglists)
+        {
+            if (abbreviation.equals(tl.getAbbreviation()))
+                return tl;
+        }
+
+        return null;
+    }
+
 
     //endregion
 

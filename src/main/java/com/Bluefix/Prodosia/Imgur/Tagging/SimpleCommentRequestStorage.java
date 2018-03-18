@@ -26,7 +26,10 @@ import com.Bluefix.Prodosia.DataHandler.LocalStorageHandler;
 import com.Bluefix.Prodosia.DataType.Comments.SimpleCommentRequest;
 import com.Bluefix.Prodosia.SQLite.SqlBuilder;
 import com.Bluefix.Prodosia.SQLite.SqlDatabase;
+import com.github.kskelm.baringo.util.BaringoApiException;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -120,7 +123,7 @@ public class SimpleCommentRequestStorage extends LocalStorageHandler<SimpleComme
         {
             PreparedStatement prep = SqlDatabase.getStatement(query);
             prep.setString(1, t.getImgurId());
-            prep.setLong(2, t.getParent());
+            prep.setLong(2, t.getParent().getId());
             prep.setString(3, line);
 
             builder = builder.execute(prep);
@@ -129,7 +132,7 @@ public class SimpleCommentRequestStorage extends LocalStorageHandler<SimpleComme
         builder.commit();
     }
 
-    private synchronized static void dbRemoveTagrequest(SimpleCommentRequest t) throws SQLException
+    private synchronized static void dbRemoveTagrequest(SimpleCommentRequest t) throws SQLException, BaringoApiException, IOException, URISyntaxException
     {
         String query =
                 "DELETE FROM CommentQueue " +
@@ -137,7 +140,7 @@ public class SimpleCommentRequestStorage extends LocalStorageHandler<SimpleComme
 
         PreparedStatement prep = SqlDatabase.getStatement(query);
         prep.setString(1, t.getImgurId());
-        prep.setLong(2, t.getParent());
+        prep.setLong(2, t.getParent().getId());
         prep.setString(3, t.dbParseComments());
         SqlDatabase.execute(prep);
     }

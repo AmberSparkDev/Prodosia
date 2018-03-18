@@ -65,7 +65,8 @@ public class CommandRecognition
             }
         } catch (Exception e)
         {
-            Logger.logMessage("CommandRecognition::parseComments -> " + e.getMessage(), Logger.Severity.ERROR);
+            e.printStackTrace();
+            Logger.logMessage("CommandRecognition::0parseComments -> " + e.getMessage(), Logger.Severity.ERROR);
             return;
         }
         // attempt to execute the entry
@@ -84,7 +85,8 @@ public class CommandRecognition
         }
         catch (Exception e)
         {
-            Logger.logMessage("CommandRecognition::parseComments -> " + e.getMessage(), Logger.Severity.ERROR);
+            e.printStackTrace();
+            Logger.logMessage("CommandRecognition::1parseComments -> " + e.getMessage(), Logger.Severity.ERROR);
         }
     }
 }

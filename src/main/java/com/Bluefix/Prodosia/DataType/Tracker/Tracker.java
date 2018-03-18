@@ -22,6 +22,8 @@
 
 package com.Bluefix.Prodosia.DataType.Tracker;
 
+import com.Bluefix.Prodosia.DataType.Taglist.Taglist;
+
 import java.util.Objects;
 
 /**
@@ -141,6 +143,20 @@ public class Tracker
         return Objects.hash(imgurId, discordId);
     }
 
+
+    //endregion
+
+    //region Permissions
+
+    /**
+     * Indicate whether this Tracker has permission to edit the specified taglist.
+     * @param t The taglist in question.
+     * @return True iff the tracker may alter the taglist, false otherwise.
+     */
+    public boolean hasPermission(Taglist t)
+    {
+        return this.permissions.hasPermission(t);
+    }
 
     //endregion
 }

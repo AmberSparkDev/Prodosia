@@ -98,21 +98,21 @@ public class CommandHandler
      * @param command The command to be executed.
      * @return
      */
-    public static CommandResult execute(CommandInformation ci, String command)
+    public static void execute(CommandInformation ci, String command)
     {
         String trimmed = command.trim();
 
         int firstSpace = trimmed.indexOf(' ');
 
         if (firstSpace < 0)
-            return execute(ci, trimmed, new String[]{});
+            execute(ci, trimmed, new String[]{});
         else
         {
             // split the command from the arguments and execute.
             String actualCommand = trimmed.substring(0, firstSpace);
             String arguments = trimmed.substring(firstSpace + 1);
 
-            return execute(ci, actualCommand, arguments);
+            execute(ci, actualCommand, arguments);
         }
     }
 
@@ -122,11 +122,37 @@ public class CommandHandler
      * @param arguments The arguments, separated by a space
      * @return The command result after execution.
      */
-    public static CommandResult execute(CommandInformation ci, String command, String arguments)
+    public static void execute(CommandInformation ci, String command, String arguments)
     {
-        String[] splitArguments = arguments.trim().split("\\s+");
+        // keep parts between quotes together.
+        String[] quoteSplit = arguments.trim().split("\"");
 
-        return execute(ci, command, splitArguments);
+        ArrayList<String> splitItems = new ArrayList<>();
+
+        boolean isQuote = arguments.startsWith("\"");
+
+        for (String s : quoteSplit)
+        {
+            // if this is a quote, paste the entire part with quotes.
+            if (isQuote)
+            {
+                splitItems.add("\"" + s + "\"");
+            }
+            else
+            {
+                // since it wasn't a quote, split by arguments.
+                String[] splitArguments = s.split("\\s+");
+
+                for (String sa : splitArguments)
+                {
+                    splitItems.add(sa);
+                }
+            }
+
+            isQuote = !isQuote;
+        }
+
+        execute(ci, command, splitItems.toArray(new String[0]));
     }
 
     /**
@@ -135,7 +161,7 @@ public class CommandHandler
      * @param arguments The arguments for the command.
      * @return The command result after execution.
      */
-    public static CommandResult execute(CommandInformation ci, String command, String[] arguments)
+    public static void execute(CommandInformation ci, String command, String[] arguments)
     {
         String lCom = command.toLowerCase();
 
@@ -161,62 +187,89 @@ public class CommandHandler
         {
             try
             {
-                return executeHelp(ci, fArguments);
+                executeHelp(ci, fArguments);
+                return;
             } catch (Exception e)
             {
                 e.printStackTrace();
             }
-        }
-        else if ("list".equals(lCom))
+        } else if ("list".equals(lCom))
         {
             try
             {
-                return executeList(ci, fArguments);
+                executeList(ci, fArguments);
+                return;
             } catch (Exception e)
             {
                 e.printStackTrace();
             }
-        }
-        else
+        } else
         {
             // if we can find the command, execute it.
             ICommandFunc func = getFunc(lCom);
 
+            if (func == null)
+            {
+                try
+                {
+                    commandNotFound(ci, lCom);
+                    return;
+                } catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+            } else
+            {
+                // Start a thread for execution
+                ThreadedFuncCall tfc = new ThreadedFuncCall(func, ci, fArguments);
+                tfc.start();
+            }
+        }
+    }
+
+    //endregion
+
+    /**
+     * Helper class to execute methods asynchronous.
+     */
+    private static class ThreadedFuncCall extends Thread
+    {
+        private ICommandFunc icf;
+        private CommandInformation ci;
+        private String[] arguments;
+
+
+        /**
+         * Start a new Threaded Function Call.
+         * @param icf
+         * @param ci
+         * @param arguments
+         */
+        public ThreadedFuncCall(ICommandFunc icf, CommandInformation ci, String[] arguments)
+        {
+            this.icf = icf;
+            this.ci = ci;
+            this.arguments = arguments;
+        }
+
+        /**
+         * Execute the function.
+         */
+        @Override
+        public void run()
+        {
             try
             {
-
-                if (func == null)
-                {
-                    return commandNotFound(ci, lCom);
-                } else
-                {
-                    // execute the command
-                    try
-                    {
-                        func.execute(ci, fArguments);
-                        return new CommandResult(lCom);
-                    } catch (Exception e)
-                    {
-                        try
-                        {
-                            return commandException(ci, lCom);
-                        } catch (Exception e1)
-                        {
-                            e1.printStackTrace();
-                        }
-                    }
-                }
+                icf.execute(ci, arguments);
             }
             catch (Exception e)
             {
                 e.printStackTrace();
             }
         }
-
-        return null;
     }
 
-    //endregion
+
 
     //region Custom commands
 
@@ -270,9 +323,7 @@ public class CommandHandler
         }
 
         // output the message to the user.
-        LinkedList<String> msgLL = new LinkedList<>();
-        msgLL.add(message);
-        ci.reply(msgLL);
+        ci.reply(message);
 
         return new CommandResult("help");
     }
@@ -314,9 +365,7 @@ public class CommandHandler
         }
 
         // output the list to the user.
-        LinkedList<String> msgLL = new LinkedList<>();
-        msgLL.add(commandList);
-        ci.reply(msgLL);
+        ci.reply(commandList);
 
         return new CommandResult("list");
     }
@@ -330,23 +379,9 @@ public class CommandHandler
         String message = "Command \"" + lCom + "\" was not recognized!";
 
         // output the message to the user.
-        LinkedList<String> msgLL = new LinkedList<>();
-        msgLL.add(message);
-        ci.reply(msgLL);
+        ci.reply(message);
 
         return new CommandResult(null);
-    }
-
-    private static CommandResult commandException(CommandInformation ci, String command) throws Exception
-    {
-        String message = "Something went wrong during execution!";
-
-        // output the message to the user.
-        LinkedList<String> msgLL = new LinkedList<>();
-        msgLL.add(message);
-        ci.reply(msgLL);
-
-        return new CommandResult(command);
     }
 
     private static String listInformation()

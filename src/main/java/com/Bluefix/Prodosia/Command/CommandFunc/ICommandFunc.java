@@ -32,7 +32,7 @@ public interface ICommandFunc
      * @param arguments The parameters for the command.
      * @return The response text for executing this command.
      */
-    void execute(CommandInformation ci, String[] arguments);
+    void execute(CommandInformation ci, String[] arguments) throws Exception;
 
 
     /**

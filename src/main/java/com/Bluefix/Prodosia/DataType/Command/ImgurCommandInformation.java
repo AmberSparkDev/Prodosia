@@ -23,7 +23,6 @@
 package com.Bluefix.Prodosia.DataType.Command;
 
 import com.Bluefix.Prodosia.DataType.Comments.SimpleCommentRequest;
-import com.Bluefix.Prodosia.DataType.Comments.TagRequest;
 import com.Bluefix.Prodosia.DataType.Tracker.Tracker;
 import com.Bluefix.Prodosia.Imgur.Tagging.SimpleCommentRequestStorage;
 import com.github.kskelm.baringo.model.Comment;
@@ -32,17 +31,11 @@ import java.util.LinkedList;
 
 public class ImgurCommandInformation extends CommandInformation
 {
-    /**
-     * The comment that requested this command.
-     */
-    private Comment comment;
-
-
     public ImgurCommandInformation(Tracker tracker, Comment comment)
     {
-        super(tracker);
-
-        this.comment = comment;
+        super();
+        super.setTracker(tracker);
+        super.setParentComment(comment);
     }
 
     /**
@@ -51,13 +44,17 @@ public class ImgurCommandInformation extends CommandInformation
      * @param entries The entries to reply to the user to.
      */
     @Override
-    public void reply(LinkedList<String> entries) throws Exception
+    public void reply(String... entries) throws Exception
     {
+        LinkedList<String> mEn = new LinkedList<>();
+
+        for (String s : entries)
+            mEn.add(s);
 
         SimpleCommentRequest scr = new SimpleCommentRequest(
-                        comment.getImageId(),
-                        comment.getId(),
-                        entries);
+                        super.getParentComment().getImageId(),
+                        super.getParentComment().getId(),
+                        mEn);
 
         SimpleCommentRequestStorage.handler().add(scr);
     }

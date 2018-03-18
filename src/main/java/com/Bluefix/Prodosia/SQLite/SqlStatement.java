@@ -79,7 +79,7 @@ public class SqlStatement
                         "filters text); ",
                 /* --- TagQueue --- */
                         "CREATE TABLE IF NOT EXISTS TagQueue (" +
-                        "imgurId text NOT NULL UNIQUE, " +
+                        "imgurId text UNIQUE, " +
                         "parentComment integer, " +
                         "taglists text, " +
                         "rating integer, " +

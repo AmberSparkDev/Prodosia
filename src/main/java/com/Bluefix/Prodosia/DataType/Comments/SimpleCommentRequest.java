@@ -22,16 +22,20 @@
 
 package com.Bluefix.Prodosia.DataType.Comments;
 
+import com.Bluefix.Prodosia.Imgur.ImgurApi.ImgurManager;
 import com.Bluefix.Prodosia.Imgur.Tagging.SimpleCommentRequestStorage;
+import com.github.kskelm.baringo.model.Comment;
+import com.github.kskelm.baringo.util.BaringoApiException;
 
-import java.util.Iterator;
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Objects;
 
-public class SimpleCommentRequest implements CommentRequest
+public class SimpleCommentRequest implements ICommentRequest
 {
     private String imgurId;
+    private Comment parent;
     private long parentId;
     private LinkedList<String> comments;
 
@@ -118,9 +122,17 @@ public class SimpleCommentRequest implements CommentRequest
      * @return
      */
     @Override
-    public long getParent()
+    public Comment getParent() throws BaringoApiException, IOException, URISyntaxException
     {
-        return this.parentId;
+        if (this.parentId < 0)
+            return null;
+
+        if (this.parent == null)
+        {
+            this.parent = ImgurManager.client().commentService().getComment(this.parentId);
+        }
+
+        return this.parent;
     }
 
     /**
@@ -141,7 +153,7 @@ public class SimpleCommentRequest implements CommentRequest
      * @return
      */
     @Override
-    public boolean deepEquals(CommentRequest cq)
+    public boolean deepEquals(ICommentRequest cq)
     {
         return this.equals(cq);
     }

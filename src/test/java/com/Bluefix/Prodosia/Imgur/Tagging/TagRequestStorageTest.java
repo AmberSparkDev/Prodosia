@@ -55,7 +55,7 @@ public class TagRequestStorageTest
         HashSet<Taglist> tlSet = new HashSet<>();
         tlSet.add(taglist);
 
-        this.request = new TagRequest("a", -1, tlSet, Rating.ALL, "filters");
+        this.request = new TagRequest("a", null, tlSet, Rating.ALL, "filters");
     }
 
     @After

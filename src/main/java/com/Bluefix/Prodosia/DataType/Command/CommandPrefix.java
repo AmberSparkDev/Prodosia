@@ -40,7 +40,8 @@ public class CommandPrefix
     public enum Type
     {
         IMGUR(0),
-        DISCORD(1);
+        DISCORD(1),
+        TEST(2);
 
         private int value;
 
@@ -62,6 +63,8 @@ public class CommandPrefix
                     return IMGUR;
                 case 1:
                     return DISCORD;
+                case 2:
+                    return TEST;
             }
 
             throw new IllegalArgumentException("The command prefix type was not recognized.");

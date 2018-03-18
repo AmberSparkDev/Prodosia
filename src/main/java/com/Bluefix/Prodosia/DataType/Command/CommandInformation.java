@@ -23,7 +23,12 @@
 package com.Bluefix.Prodosia.DataType.Command;
 
 import com.Bluefix.Prodosia.DataType.Tracker.Tracker;
+import com.Bluefix.Prodosia.Imgur.ImgurApi.ImgurManager;
+import com.github.kskelm.baringo.model.Comment;
+import com.github.kskelm.baringo.util.BaringoApiException;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.LinkedList;
 
 /**
@@ -36,15 +41,87 @@ public abstract class CommandInformation
      */
     private Tracker tracker;
 
+    /**
+     * The imgur id that pertains to the command.
+     */
+    private String imgurId;
 
-    public CommandInformation(Tracker tracker)
+    /**
+     * The parent-id that pertains to the command.
+     */
+    private long parentId;
+
+
+    private Comment parentComment;
+
+
+    //region builder
+
+    protected CommandInformation()
     {
-        this.tracker = tracker;
+
     }
+
+    public CommandInformation setTracker(Tracker t)
+    {
+        this.tracker = t;
+        return this;
+    }
+
+    public CommandInformation setImgurId(String imgurId)
+    {
+        this.imgurId = imgurId;
+        return this;
+    }
+
+    public CommandInformation setParentId(long parentId) throws BaringoApiException, IOException, URISyntaxException
+    {
+        this.parentId = parentId;
+
+        // retrieve the comment if necessary.
+        if (parentComment == null || parentComment.getId() != this.parentId)
+        {
+            this.parentComment =
+                    ImgurManager.client().commentService().getComment(this.parentId);
+        }
+
+        return this;
+    }
+
+    public CommandInformation setParentComment(Comment parentComment)
+    {
+        this.parentComment = parentComment;
+        this.parentId = this.parentComment.getId();
+
+        return this;
+    }
+
+
+
+    //endregion
+
+
+
+
 
     public Tracker getTracker()
     {
         return tracker;
+    }
+
+    public String getImgurId()
+    {
+        return imgurId;
+    }
+
+    public long getParentId()
+    {
+        return parentId;
+    }
+
+    public Comment getParentComment()
+    {
+        return parentComment;
     }
 
     //region actions
@@ -53,7 +130,7 @@ public abstract class CommandInformation
      * Reply to the user with the following entries.
      * @param entries The entries to reply to the user to.
      */
-    public abstract void reply(LinkedList<String> entries) throws Exception;
+    public abstract void reply(String... entries) throws Exception;
 
     //endregion
 }

@@ -23,7 +23,12 @@
 package com.Bluefix.Prodosia.DataType.User;
 
 import com.Bluefix.Prodosia.DataType.Comments.TagRequest;
+import com.Bluefix.Prodosia.Imgur.ImgurApi.ImgurManager;
+import com.github.kskelm.baringo.model.Account;
+import com.github.kskelm.baringo.util.BaringoApiException;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.*;
 
 public class User
@@ -43,6 +48,13 @@ public class User
 
     //region Constructor
 
+    /**
+     * Instantiate a new user where both the name and imgur-id are known.
+     * @param imgurName The imgur-name of the user.
+     * @param imgurId The imgur-id of the user.
+     * @param subscriptionData The subscription-data for the user.
+     * @throws Exception
+     */
     public User(String imgurName, long imgurId, Iterator<UserSubscription> subscriptionData) throws Exception
     {
         if (imgurName == null || imgurName.trim().isEmpty())
@@ -66,6 +78,35 @@ public class User
             this.subscriptions.put(us.getTaglist().getId(), us);
         }
     }
+
+
+    /**
+     * If the imgur id of the user is unknown, parse a new user.
+     *
+     * Will return `null` if the user could not be found.
+     * @param imgurName The imgur-name of the user.
+     * @param subscriptionData The subscription data of the user.
+     * @return
+     */
+    public static User retrieveUser(String imgurName, Iterator<UserSubscription> subscriptionData)
+    {
+        try
+        {
+            Account acc = ImgurManager.client().accountService().getAccount(imgurName);
+
+            if (acc == null)
+                return null;
+
+            return new User(imgurName, acc.getId(), subscriptionData);
+
+        }catch (Exception e)
+        {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+
 
     //endregion
 

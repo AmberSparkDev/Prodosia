@@ -25,7 +25,10 @@ package com.Bluefix.Prodosia.Imgur.Tagging;
 import com.Bluefix.Prodosia.DataHandler.LocalStorageHandler;
 import com.Bluefix.Prodosia.DataType.Comments.TagRequest;
 import com.Bluefix.Prodosia.SQLite.SqlDatabase;
+import com.github.kskelm.baringo.util.BaringoApiException;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -148,7 +151,7 @@ public class TagRequestStorage extends LocalStorageHandler<TagRequest>
 
         PreparedStatement prep = SqlDatabase.getStatement(query);
         prep.setString(1, t.getImgurId());
-        prep.setLong(2, t.getParent());
+        prep.setLong(2, t.getParent().getId());
         prep.setString(3, t.getDbTaglists());
         prep.setInt(4, t.getRating().getValue());
         prep.setString(5, t.getFilters());
@@ -156,7 +159,7 @@ public class TagRequestStorage extends LocalStorageHandler<TagRequest>
         SqlDatabase.execute(prep);
     }
 
-    private synchronized static void dbRemoveTagrequest(TagRequest t) throws SQLException
+    private synchronized static void dbRemoveTagrequest(TagRequest t) throws SQLException, BaringoApiException, IOException, URISyntaxException
     {
         String query =
                 "DELETE FROM TagQueue " +

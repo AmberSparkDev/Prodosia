@@ -20,14 +20,43 @@
  * SOFTWARE.
  */
 
-package com.Bluefix.Prodosia.Command;
+package com.Bluefix.Prodosia.DataType.User;
+
+import java.util.Iterator;
 
 /**
- * Class that can parse discord commands.
+ * Helper class for user filters.
  */
-public class DiscordCommandHandler
+public class Filter
 {
 
 
+    public static String getPatternForFilters(Iterator<String> filters)
+    {
+        // if there are no filter items, return an empty pattern.
+        if (!filters.hasNext())
+            return "";
+
+        StringBuilder sb = new StringBuilder();
+
+        // make the pattern case-insensitive.
+        sb.append("(?i)(");
+
+        // add all the separate filters.
+        while (filters.hasNext())
+        {
+            String f = filters.next();
+
+            sb.append(f + "|");
+        }
+
+        // remove the last latch
+        sb.setLength(sb.length()-1);
+
+        // close the pattern and return
+        sb.append(")");
+
+        return sb.toString();
+    }
 
 }

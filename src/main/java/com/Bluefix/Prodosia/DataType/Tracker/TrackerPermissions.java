@@ -26,7 +26,7 @@ import com.Bluefix.Prodosia.DataHandler.TaglistHandler;
 import com.Bluefix.Prodosia.DataType.Taglist.Taglist;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Objects;
 
 /**
@@ -62,7 +62,7 @@ public class TrackerPermissions
      * A list with taglists. These taglists indicate permissions for the tracker
      * to edit them.
      */
-    private ArrayList<Taglist> taglists;
+    private HashSet<Taglist> taglists;
 
     /**
      * The type of tracker.
@@ -78,7 +78,7 @@ public class TrackerPermissions
     public TrackerPermissions(TrackerType type, Taglist... taglists)
     {
         this.type = type;
-        this.taglists = new ArrayList<Taglist>();
+        this.taglists = new HashSet<Taglist>();
 
         for (Taglist t : taglists)
             this.taglists.add(t);
@@ -106,7 +106,7 @@ public class TrackerPermissions
         }
 
         String[] split = taglists.split(";");
-        this.taglists = new ArrayList<>();
+        this.taglists = new HashSet<>();
 
         for (String s : split)
         {
@@ -114,7 +114,7 @@ public class TrackerPermissions
             if (s == null || s.isEmpty())
                 continue;
 
-            this.taglists.add(TaglistHandler.getTaglist(Long.parseLong(s)));
+            this.taglists.add(TaglistHandler.getTaglistById(Long.parseLong(s)));
         }
     }
 
@@ -123,7 +123,7 @@ public class TrackerPermissions
 
     //region Getters
 
-    public ArrayList<Taglist> getTaglists()
+    public HashSet<Taglist> getTaglists()
     {
         return taglists;
     }
@@ -172,6 +172,25 @@ public class TrackerPermissions
         return Objects.hash(taglists, type);
     }
 
+
+    //endregion
+
+    //region Permission handling
+
+    /**
+     * Indicate whether this Tracker has permission to edit the specified taglist.
+     * @param taglist The taglist in question.
+     * @return True iff the tracker may alter the taglist, false otherwise.
+     */
+    public boolean hasPermission(Taglist taglist)
+    {
+        // if we are an admin, return true.
+        if (this.type == TrackerType.ADMIN)
+            return true;
+
+        // if we aren't an admin, check to see if the taglist is in our list.
+        return this.taglists.contains(taglist);
+    }
 
     //endregion
 
