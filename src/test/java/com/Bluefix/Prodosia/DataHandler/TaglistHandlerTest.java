@@ -61,7 +61,7 @@ public class TaglistHandlerTest
         if (taglists.contains(taglist))
             fail();
 
-        handler.add(taglist);
+        handler.set(taglist);
         taglists = handler.getAll();
 
         if (!taglists.contains(taglist))
@@ -86,7 +86,7 @@ public class TaglistHandlerTest
         if (taglists.contains(taglist))
             fail();
 
-        handler.add(taglist);
+        handler.set(taglist);
         taglists = handler.getAll();
 
         if (!taglists.contains(taglist))

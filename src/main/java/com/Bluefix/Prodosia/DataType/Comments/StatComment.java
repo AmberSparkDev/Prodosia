@@ -20,40 +20,15 @@
  * SOFTWARE.
  */
 
-package com.Bluefix.Prodosia.DataType.Command;
+package com.Bluefix.Prodosia.DataType.Comments;
 
 /**
- * Helper class that contains all necessary information after command execution.
+ * Helper class for comments.
  */
-public  class CommandResult
+public class StatComment
 {
-    private String command;
-
     /**
-     * Create a new ExecutionResult object.
+     * Maximum amount of characters that fit in a comment.
      */
-    public CommandResult()
-    {
-    }
-
-    /**
-     * Create a new ExecutionResult object together with its command.
-     */
-    public CommandResult(String command)
-    {
-        this.command = command;
-    }
-
-    /**
-     * @return The command issued by the user, or null if the command was not recognized.
-     */
-    public String getCommand()
-    {
-        return command;
-    }
-
-    public void setCommand(String command)
-    {
-        this.command = command;
-    }
+    public static final int MaxCommentLength = 140;
 }

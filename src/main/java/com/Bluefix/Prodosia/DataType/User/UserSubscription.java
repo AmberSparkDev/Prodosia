@@ -28,6 +28,7 @@ import com.Bluefix.Prodosia.DataType.Taglist.Rating;
 import com.Bluefix.Prodosia.DataType.Taglist.Taglist;
 
 import java.util.HashSet;
+import java.util.Objects;
 
 public class UserSubscription
 {
@@ -69,6 +70,9 @@ public class UserSubscription
         this.ratings = new HashSet<>();
         for (String s : split)
         {
+            if (s == null || s.isEmpty())
+                continue;
+
             this.ratings.add(Rating.parseValue(Integer.parseInt(s)));
         }
 
@@ -141,4 +145,19 @@ public class UserSubscription
     //endregion
 
 
+    @Override
+    public boolean equals(Object o)
+    {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        UserSubscription that = (UserSubscription) o;
+        return Objects.equals(taglist, that.taglist);
+    }
+
+    @Override
+    public int hashCode()
+    {
+
+        return Objects.hash(taglist);
+    }
 }

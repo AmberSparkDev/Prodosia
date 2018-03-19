@@ -22,10 +22,7 @@
 
 package com.Bluefix.Prodosia.Imgur.Tagging;
 
-import com.Bluefix.Prodosia.DataType.Comments.FeedbackRequest;
-import com.Bluefix.Prodosia.DataType.Comments.ICommentRequest;
-import com.Bluefix.Prodosia.DataType.Comments.SimpleCommentRequest;
-import com.Bluefix.Prodosia.DataType.Comments.TagRequest;
+import com.Bluefix.Prodosia.DataType.Comments.*;
 import com.Bluefix.Prodosia.DataType.Taglist.Taglist;
 import com.Bluefix.Prodosia.Imgur.ImgurApi.ImgurManager;
 import com.Bluefix.Prodosia.Logger.Logger;
@@ -526,8 +523,8 @@ public class CommentExecution extends Thread
         message.append(")");
 
         // trim the length of the comment if it exceeds the max length
-        if (message.length() > TagRequestComments.MaxCommentLength)
-            message.setLength(TagRequestComments.MaxCommentLength);
+        if (message.length() > StatComment.MaxCommentLength)
+            message.setLength(StatComment.MaxCommentLength);
 
         long comId = ImgurManager.client().commentService().addComment(imgurId, message.toString());
         return ImgurManager.client().commentService().getComment(comId);

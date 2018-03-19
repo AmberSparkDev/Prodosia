@@ -43,7 +43,7 @@ public class SimpleCommentRequestStorageTest
     public void setUp() throws Exception
     {
         this.handler = SimpleCommentRequestStorage.handler();
-        this.request = new SimpleCommentRequest(1, "five");
+        this.request = new SimpleCommentRequest(1301573497, "five");
     }
 
     @After
@@ -62,7 +62,7 @@ public class SimpleCommentRequestStorageTest
         if (requests.contains(request))
             fail();
 
-        handler.add(request);
+        handler.set(request);
         requests = handler.getAll();
 
         if (!requests.contains(request))
@@ -86,7 +86,7 @@ public class SimpleCommentRequestStorageTest
         if (requests.contains(request))
             fail();
 
-        handler.add(request);
+        handler.set(request);
         requests = handler.getAll();
 
         if (!requests.contains(request))

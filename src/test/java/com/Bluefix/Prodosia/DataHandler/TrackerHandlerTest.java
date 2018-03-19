@@ -73,7 +73,7 @@ public class TrackerHandlerTest
         if (trackers.contains(tracker))
             fail();
 
-        handler.add(tracker);
+        handler.set(tracker);
         trackers = handler.getAll();
 
         if (!trackers.contains(tracker))
@@ -98,7 +98,7 @@ public class TrackerHandlerTest
         if (trackers.contains(tracker))
             fail();
 
-        handler.add(tracker);
+        handler.set(tracker);
         trackers = handler.getAll();
 
         if (!trackers.contains(tracker))

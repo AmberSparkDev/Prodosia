@@ -39,6 +39,11 @@ import java.util.Objects;
 public class Tracker
 {
     //region Data Getters and Setters
+    /**
+     * The id in the database.
+     */
+    private long id;
+
     private String imgurName;
     private long imgurId;
 
@@ -90,6 +95,7 @@ public class Tracker
             long discordId,
             TrackerPermissions permissions)
     {
+        this.id = -1;
         this.imgurName = imgurName;
         this.imgurId = imgurId;
         this.discordName = discordName;
@@ -98,6 +104,16 @@ public class Tracker
         this.permissions = permissions;
     }
 
+    public Tracker(long id, String imgurName, long imgurId, String discordName, int discordTag, long discordId, TrackerPermissions permissions)
+    {
+        this.id = id;
+        this.imgurName = imgurName;
+        this.imgurId = imgurId;
+        this.discordName = discordName;
+        this.discordTag = discordTag;
+        this.discordId = discordId;
+        this.permissions = permissions;
+    }
 
     //endregion
 
@@ -115,6 +131,16 @@ public class Tracker
             return imgurName;
 
         return discordName;
+    }
+
+    public long getId()
+    {
+        return id;
+    }
+
+    public void setId(long id)
+    {
+        this.id = id;
     }
 
     //endregion

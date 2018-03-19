@@ -65,9 +65,9 @@ public class CommentDeletionStorage extends LocalStorageHandler<Long>
      * @param aLong
      */
     @Override
-    protected void addItem(Long aLong) throws Exception
+    protected Long setItem(Long aLong) throws Exception
     {
-        dbAddDeletion(aLong);
+        return dbSetDeletion(aLong);
     }
 
     /**
@@ -96,10 +96,14 @@ public class CommentDeletionStorage extends LocalStorageHandler<Long>
 
     //region Database management
 
-    private synchronized static void dbAddDeletion(Long d) throws SQLException
+    private synchronized static Long dbSetDeletion(Long d) throws Exception
     {
         if (d < 0)
-            return;
+            return d;
+
+        // if this value was contained in the database, we can skip it.
+        if (handler().getAll().contains(d))
+            return d;
 
         String query =
                 "INSERT INTO CommentDeletion " +
@@ -109,6 +113,8 @@ public class CommentDeletionStorage extends LocalStorageHandler<Long>
         prep.setLong(1, d);
 
         SqlDatabase.execute(prep);
+
+        return d;
     }
 
     private synchronized static void dbRemoveDeletion(Long d) throws SQLException

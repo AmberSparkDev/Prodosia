@@ -59,7 +59,7 @@ public class CommandPrefixStorageTest
     @After
     public void tearDown() throws Exception
     {
-        handler.add(oldPrefix);
+        handler.set(oldPrefix);
     }
 
 
@@ -73,7 +73,7 @@ public class CommandPrefixStorageTest
         if (prefixes.contains(tempPrefix))
             fail();
 
-        handler.add(tempPrefix);
+        handler.set(tempPrefix);
         prefixes = handler.getAll();
 
         if (!prefixes.contains(tempPrefix))
@@ -97,7 +97,7 @@ public class CommandPrefixStorageTest
         if (prefixes.contains(tempPrefix))
             fail();
 
-        handler.add(tempPrefix);
+        handler.set(tempPrefix);
         prefixes = handler.getAll();
 
         if (!prefixes.contains(tempPrefix))

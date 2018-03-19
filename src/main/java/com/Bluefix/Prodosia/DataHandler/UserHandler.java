@@ -72,9 +72,9 @@ public class UserHandler extends LocalStorageHandler<User>
      * @param user
      */
     @Override
-    protected void addItem(User user) throws Exception
+    protected User setItem(User user) throws Exception
     {
-        dbAddUser(user);
+        return dbSetUser(user);
     }
 
     /**
@@ -103,10 +103,16 @@ public class UserHandler extends LocalStorageHandler<User>
 
     //region Database management.
 
-    private synchronized static void dbAddUser(User u) throws Exception
+    private synchronized static User dbSetUser(User u) throws Exception
     {
+        // if there was no user, return null
         if (u == null)
-            return;
+            return null;
+
+        User oldUser = dbGetUser(u.getImgurId());
+
+        // if there was an old user, replace it with the new one.
+        dbRemoveUser(oldUser);
 
         // first insert the user with its data and retrieve its user id
         String query0 =
@@ -156,10 +162,15 @@ public class UserHandler extends LocalStorageHandler<User>
 
             SqlDatabase.execute(prep2);
         }
+
+        return oldUser;
     }
 
     private synchronized static void dbRemoveUser(User u) throws Exception
     {
+        if (u == null)
+            return;
+
         // first retrieve the user id
         long userIndex = getUserId(u);
 
@@ -177,6 +188,44 @@ public class UserHandler extends LocalStorageHandler<User>
         sb.execute(prep1);
 
         sb.commit();
+    }
+
+
+    /**
+     * Retrieve a user from the database based on its imgur id.
+     * @param imgurId
+     * @return
+     */
+    private synchronized static User dbGetUser(long imgurId) throws Exception
+    {
+        // select the specified user with its respective usersubscription data.
+        String query =
+                "SELECT U.id, " +
+                        "U.name, " +
+                        "U.imgurId, " +
+                        "US.taglistId, " +
+                        "US.ratings, " +
+                        "US.filters " +
+                "FROM User as U " +
+                "INNER JOIN UserSubscription as US ON U.id = US.userId " +
+                "WHERE U.imgurId = ?;";
+
+        PreparedStatement prep = SqlDatabase.getStatement(query);
+        prep.setLong(1, imgurId);
+        ArrayList<ResultSet> result = SqlDatabase.query(prep);
+
+        if (result.size() != 1)
+            throw new Exception("SqlDatabase exception: Expected result size did not match (was " + result.size() + ")");
+
+        ResultSet rs = result.get(0);
+
+        // parse the users and return
+        ArrayList<User> parsedUsers = parseUsers(rs);
+
+        if (parsedUsers.isEmpty())
+            return null;
+
+        return parsedUsers.get(0);
     }
 
     private synchronized static ArrayList<User> dbGetUsers() throws Exception
@@ -200,6 +249,11 @@ public class UserHandler extends LocalStorageHandler<User>
 
         ResultSet rs = result.get(0);
 
+        return parseUsers(rs);
+    }
+
+    private static ArrayList<User> parseUsers(ResultSet rs) throws Exception
+    {
         HashMap<Long, ArrayList<UserSubscription>> subMap = new HashMap<>();
         HashMap<Long, DbUserData> userMap = new HashMap<>();
 
@@ -257,6 +311,7 @@ public class UserHandler extends LocalStorageHandler<User>
 
         return finalList;
     }
+
 
     /**
      * Small struct to temporarily store user data while we are reading out the database.
@@ -317,6 +372,30 @@ public class UserHandler extends LocalStorageHandler<User>
             return -1;
 
         return rs.getLong(1);
+    }
+
+    //endregion
+
+
+    //region Helper
+
+    /**
+     * Returns the User with the corresponding imgur id, or null if it did not exist.
+     * @param imgurId The imgur id of the user.
+     * @return The corresponding user if it existed, otherwise null
+     * @throws Exception
+     */
+    public static User getUserByImgurId(long imgurId) throws Exception
+    {
+        ArrayList<User> users = handler().getAll();
+
+        for (User u : users)
+        {
+            if (u.getImgurId() == imgurId)
+                return u;
+        }
+
+        return null;
     }
 
     //endregion

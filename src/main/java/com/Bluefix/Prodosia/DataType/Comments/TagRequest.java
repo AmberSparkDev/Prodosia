@@ -175,6 +175,14 @@ public class TagRequest implements ICommentRequest
         return this.parentComment;
     }
 
+    public long getParentId()
+    {
+        if (this.parentComment != null)
+            return this.parentComment.getId();
+
+        return this.parentId;
+    }
+
     /**
      * Retrieve all comments that should be executed by this tag request.
      *
@@ -199,7 +207,7 @@ public class TagRequest implements ICommentRequest
         if (cq == null || getClass() != cq.getClass()) return false;
         TagRequest that = (TagRequest) cq;
         return Objects.equals(imgurId, that.imgurId) &&
-                Objects.equals(parentComment, that.parentComment) &&
+                Objects.equals(getParentId(), that.getParentId()) &&
                 Objects.equals(taglists, that.taglists) &&
                 rating == that.rating &&
                 Objects.equals(filters, that.filters);
@@ -218,13 +226,18 @@ public class TagRequest implements ICommentRequest
 
     //region Equals
 
-
     @Override
     public boolean equals(Object o)
     {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         TagRequest that = (TagRequest) o;
+
+        // for a valid parent id, return true if they are equal.
+        if (this.getParentId() == that.getParentId() && this.getParentId() >= 0)
+            return true;
+
+        // if the parent id wasn't specified, return the equality of the imgur id.
         return Objects.equals(imgurId, that.imgurId);
     }
 
@@ -232,8 +245,9 @@ public class TagRequest implements ICommentRequest
     public int hashCode()
     {
 
-        return Objects.hash(imgurId);
+        return Objects.hash(imgurId, parentId);
     }
+
 
     //endregion
 

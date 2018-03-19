@@ -24,6 +24,7 @@ package com.Bluefix.Prodosia.Imgur.Tagging;
 
 import com.Bluefix.Prodosia.Algorithm.Partition;
 import com.Bluefix.Prodosia.DataHandler.UserHandler;
+import com.Bluefix.Prodosia.DataType.Comments.StatComment;
 import com.Bluefix.Prodosia.DataType.Comments.TagRequest;
 import com.Bluefix.Prodosia.DataType.User.User;
 
@@ -35,10 +36,7 @@ import java.util.LinkedList;
  */
 public class TagRequestComments
 {
-    /**
-     * Maximum amount of characters that fit in a comment.
-     */
-    public static final int MaxCommentLength = 140;
+
 
 
     /**
@@ -64,7 +62,7 @@ public class TagRequestComments
 
         // partition the users
         // we use the max comment length + 1 because the last space can be omitted.
-        LinkedList<String> partitionResult = Partition.partitionEntries(tagEntries, MaxCommentLength + 1);
+        LinkedList<String> partitionResult = Partition.partitionEntries(tagEntries, StatComment.MaxCommentLength + 1);
 
         // trim the final space from every item.
         LinkedList<String> output = new LinkedList<>();

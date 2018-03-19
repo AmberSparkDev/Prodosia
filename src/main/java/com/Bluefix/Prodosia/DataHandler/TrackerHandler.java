@@ -30,6 +30,7 @@ import com.Bluefix.Prodosia.SQLite.SqlDatabase;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 
 /**
@@ -67,9 +68,9 @@ public class TrackerHandler extends LocalStorageHandler<Tracker>
     //region Local Storage Handler implementation
 
     @Override
-    protected void addItem(Tracker t) throws Exception
+    protected Tracker setItem(Tracker t) throws Exception
     {
-        dbAddTracker(t);
+        return dbSetTracker(t);
     }
 
     @Override
@@ -89,45 +90,84 @@ public class TrackerHandler extends LocalStorageHandler<Tracker>
 
     //region Database management
 
-    private synchronized static void dbAddTracker(Tracker t) throws Exception
+    private synchronized static Tracker dbSetTracker(Tracker t) throws Exception
     {
         if (t == null)
-            return;
+            return null;
+
+        // retrieve the old tracker
+        Tracker oldTracker = dbGetTracker(t.getImgurId(), t.getDiscordId());
+
+        // delete the old tracker to replace it.
+        dbRemoveTracker(oldTracker);
 
         // first insert the tracker
-        String query0 =
-                "INSERT INTO Tracker " +
-                "(imgurId, imgurName, discordId, discordName, discordTag) " +
-                "VALUES (?,?,?,?,?);";
+        String query0;
+
+        // if there was an old tracker, its id should be used.
+        if (oldTracker != null)
+        {
+            query0 =    "INSERT INTO Tracker " +
+                        "(id, imgurId, imgurName, discordId, discordName, discordTag) " +
+                        "VALUES (?,?,?,?,?,?);";
+        }
+        else
+        {
+            query0 =    "INSERT INTO Tracker " +
+                        "(imgurId, imgurName, discordId, discordName, discordTag) " +
+                        "VALUES (?,?,?,?,?);";
+        }
+
+
 
         PreparedStatement prep0 = SqlDatabase.getStatement(query0);
-        prep0.setLong(1, t.getImgurId());
-        prep0.setString(2, t.getImgurName());
-        prep0.setLong(3, t.getDiscordId());
-        prep0.setString(4, t.getDiscordName());
-        prep0.setInt(5, t.getDiscordTag());
+        int argCounter = 1;
+
+        if (oldTracker != null)
+            prep0.setLong(argCounter++, oldTracker.getId());
+
+        prep0.setLong(argCounter++, t.getImgurId());
+        prep0.setString(argCounter++, t.getImgurName());
+        prep0.setLong(argCounter++, t.getDiscordId());
+        prep0.setString(argCounter++, t.getDiscordName());
+        prep0.setInt(argCounter++, t.getDiscordTag());
 
         // retrieve the rowid of the freshly inserted tracker
-        String query1 = "SELECT last_insert_rowid()";
-        PreparedStatement prep1 = SqlDatabase.getStatement(query1);
+        long trackerIndex;
 
-        ArrayList<Object> result = SqlBuilder.Builder()
-                .execute(prep0)
-                .query(prep1)
-                .commit();
+        // if there was no old tracker, retrieve the index of the new tracker.
+        if (oldTracker == null)
+        {
+            String query1 = "SELECT last_insert_rowid()";
+            PreparedStatement prep1 = SqlDatabase.getStatement(query1);
 
-        if (result == null)
-            throw new Exception("SqlDatabase exception: query result was null");
+            ArrayList<Object> result = SqlBuilder.Builder()
+                    .execute(prep0)
+                    .query(prep1)
+                    .commit();
 
-        if (result.size() != 2)
-            throw new Exception("SqlDatabase exception: Expected result size did not match (was " + result.size() + ")");
+            if (result == null)
+                throw new Exception("SqlDatabase exception: query result was null");
 
-        ResultSet rs = (ResultSet)result.get(1);
+            if (result.size() != 2)
+                throw new Exception("SqlDatabase exception: Expected result size did not match (was " + result.size() + ")");
 
-        if (!rs.next())
-            throw new Exception("SqlDatabase exception: The database did not provide a row-id for the inserted tracker");
+            ResultSet rs = (ResultSet) result.get(1);
 
-        int trackerIndex = rs.getInt(1);
+            if (!rs.next())
+                throw new Exception("SqlDatabase exception: The database did not provide a row-id for the inserted tracker");
+
+            trackerIndex = rs.getLong(1);
+        }
+        else
+        {
+            SqlDatabase.execute(prep0);
+            trackerIndex = oldTracker.getId();
+        }
+
+
+        // update the tracker id accordingly.
+        t.setId(trackerIndex);
 
         // next, insert its permissions.
         String query2 =
@@ -141,10 +181,16 @@ public class TrackerHandler extends LocalStorageHandler<Tracker>
         prep2.setString(3, t.getPermissions().dbGetTaglists());
 
         SqlDatabase.execute(prep2);
+
+        return oldTracker;
     }
 
     private synchronized static void dbRemoveTracker(Tracker t) throws Exception
     {
+        // if the item did not exist, skip
+        if (t == null)
+            return;
+
         // first, retrieve the id for the tracker.
         String query0 =
                 "SELECT id " +
@@ -191,6 +237,41 @@ public class TrackerHandler extends LocalStorageHandler<Tracker>
                 .commit();
     }
 
+
+    private synchronized static Tracker dbGetTracker(long imgurId, long discordId) throws Exception
+    {
+        String query =
+                "SELECT " +
+                    "T.imgurId, " +
+                    "T.imgurName, " +
+                    "T.discordId, " +
+                    "T.discordName, " +
+                    "T.discordTag, " +
+                    "P.isAdmin, " +
+                    "P.taglists " +
+                "FROM Tracker as T " +
+                "INNER JOIN Permission as P ON T.id = P.trackerId " +
+                "WHERE T.imgurId = ? AND T.discordId = ?;";
+
+        PreparedStatement prep = SqlDatabase.getStatement(query);
+        prep.setLong(1, imgurId);
+        prep.setLong(2, discordId);
+        ArrayList<ResultSet> result = SqlDatabase.query(prep);
+
+        if (result.size() != 1)
+            throw new Exception("SqlDatabase exception: Expected result size did not match (was " + result.size() + ")");
+
+        ResultSet rs = result.get(0);
+
+        // parse the tracker and return
+        ArrayList<Tracker> parsedTrackers = parseTrackers(rs);
+
+        if (parsedTrackers.isEmpty())
+            return null;
+
+        return parsedTrackers.get(0);
+    }
+
     private synchronized static ArrayList<Tracker> dbGetTrackers() throws Exception
     {
         String query =
@@ -212,6 +293,12 @@ public class TrackerHandler extends LocalStorageHandler<Tracker>
             throw new Exception("SqlDatabase exception: Expected result size did not match (was " + result.size() + ")");
 
         ResultSet rs = result.get(0);
+
+        return parseTrackers(rs);
+    }
+
+    private static ArrayList<Tracker> parseTrackers(ResultSet rs) throws Exception
+    {
         ArrayList<Tracker> trackers = new ArrayList<>();
 
         while (rs.next())

@@ -47,7 +47,7 @@ public class UserHandlerTest
     public void setUp() throws Exception
     {
         taglist = new Taglist(-1,"my_abbreviation", "my_description", true);
-        TaglistHandler.handler().add(taglist);
+        TaglistHandler.handler().set(taglist);
 
         handler = UserHandler.handler();
 
@@ -82,7 +82,7 @@ public class UserHandlerTest
         if (users.contains(user))
             fail();
 
-        handler.add(user);
+        handler.set(user);
         users = handler.getAll();
 
         if (!users.contains(user))
@@ -107,7 +107,7 @@ public class UserHandlerTest
         if (users.contains(user))
             fail();
 
-        handler.add(user);
+        handler.set(user);
         users = handler.getAll();
 
         if (!users.contains(user))

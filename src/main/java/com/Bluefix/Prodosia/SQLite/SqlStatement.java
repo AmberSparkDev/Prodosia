@@ -74,6 +74,7 @@ public class SqlStatement
                 /* --- Archive --- */
                         "CREATE TABLE IF NOT EXISTS Archive (" +
                         "taglistId integer, " +
+                        "description text, " +
                         "channel integer, " +
                         "ratings text, " +
                         "filters text); ",

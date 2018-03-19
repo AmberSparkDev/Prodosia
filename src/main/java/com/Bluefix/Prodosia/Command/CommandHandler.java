@@ -24,13 +24,10 @@ package com.Bluefix.Prodosia.Command;
 
 import com.Bluefix.Prodosia.Command.CommandFunc.*;
 import com.Bluefix.Prodosia.DataType.Command.CommandInformation;
-import com.Bluefix.Prodosia.DataType.Command.CommandResult;
-import com.Bluefix.Prodosia.DataType.Tracker.Tracker;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.LinkedList;
 
 /**
  * This class parses and redirects commands fed to it.
@@ -188,7 +185,6 @@ public class CommandHandler
             try
             {
                 executeHelp(ci, fArguments);
-                return;
             } catch (Exception e)
             {
                 e.printStackTrace();
@@ -198,7 +194,6 @@ public class CommandHandler
             try
             {
                 executeList(ci, fArguments);
-                return;
             } catch (Exception e)
             {
                 e.printStackTrace();
@@ -213,7 +208,6 @@ public class CommandHandler
                 try
                 {
                     commandNotFound(ci, lCom);
-                    return;
                 } catch (Exception e)
                 {
                     e.printStackTrace();
@@ -245,7 +239,7 @@ public class CommandHandler
          * @param ci
          * @param arguments
          */
-        public ThreadedFuncCall(ICommandFunc icf, CommandInformation ci, String[] arguments)
+        private ThreadedFuncCall(ICommandFunc icf, CommandInformation ci, String[] arguments)
         {
             this.icf = icf;
             this.ci = ci;
@@ -280,7 +274,7 @@ public class CommandHandler
      * @param arguments The arguments provided with the help command.
      * @return The result object which contains the provided information as its message.
      */
-    private static CommandResult executeHelp(CommandInformation ci, String[] arguments) throws Exception
+    private static void executeHelp(CommandInformation ci, String[] arguments) throws Exception
     {
         // change the message depending on whether arguments were supplied.
         String message;
@@ -324,8 +318,6 @@ public class CommandHandler
 
         // output the message to the user.
         ci.reply(message);
-
-        return new CommandResult("help");
     }
 
 
@@ -339,7 +331,7 @@ public class CommandHandler
      * @param arguments Any arguments pertaining to this command.
      * @return The result object which contains the commands listed as its message.
      */
-    private static CommandResult executeList(CommandInformation ci, String[] arguments) throws Exception
+    private static void executeList(CommandInformation ci, String[] arguments) throws Exception
     {
         // initialize the command list if it was null.
         if (commandList == null)
@@ -366,22 +358,18 @@ public class CommandHandler
 
         // output the list to the user.
         ci.reply(commandList);
-
-        return new CommandResult("list");
     }
 
     //endregion
 
     //region Helper text
 
-    private static CommandResult commandNotFound(CommandInformation ci, String lCom) throws Exception
+    private static void commandNotFound(CommandInformation ci, String lCom) throws Exception
     {
         String message = "Command \"" + lCom + "\" was not recognized!";
 
         // output the message to the user.
         ci.reply(message);
-
-        return new CommandResult(null);
     }
 
     private static String listInformation()

@@ -20,43 +20,23 @@
  * SOFTWARE.
  */
 
-package com.Bluefix.Prodosia.Command;
+package com.Bluefix.Prodosia.Command.CommandFunc;
 
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Test;
 
-public class CommandHandlerTest
+import static org.junit.Assert.*;
+
+public class SubCommandTest
 {
 
     @Before
     public void setUp() throws Exception
     {
-
     }
 
     @After
     public void tearDown() throws Exception
     {
-
-    }
-
-    @Test
-    public void execute()
-    {
-        CommandHandler.execute(null, "list");
-        //System.out.println(result.getMessage());
-    }
-
-    @Test
-    public void execute1()
-    {
-
-    }
-
-    @Test
-    public void execute2()
-    {
-
     }
 }

@@ -26,6 +26,8 @@ import com.Bluefix.Prodosia.DataHandler.TaglistHandler;
 import com.Bluefix.Prodosia.DataType.Comments.TagRequest;
 import com.Bluefix.Prodosia.DataType.Taglist.Rating;
 import com.Bluefix.Prodosia.DataType.Taglist.Taglist;
+import com.Bluefix.Prodosia.Imgur.ImgurApi.ImgurManager;
+import com.github.kskelm.baringo.model.Comment;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -43,19 +45,24 @@ public class TagRequestStorageTest
     private Taglist taglist;
     private TagRequest request;
 
+    private static Comment parentComment;
+
 
     @Before
     public void setUp() throws Exception
     {
         taglist = new Taglist(-1,"my_abbreviation", "my_description", true);
-        TaglistHandler.handler().add(taglist);
+        TaglistHandler.handler().set(taglist);
 
         this.handler = TagRequestStorage.handler();
 
         HashSet<Taglist> tlSet = new HashSet<>();
         tlSet.add(taglist);
 
-        this.request = new TagRequest("a", null, tlSet, Rating.ALL, "filters");
+        if (parentComment == null)
+            parentComment = ImgurManager.client().commentService().getComment(1301573497);
+
+        this.request = new TagRequest(null, parentComment, tlSet, Rating.ALL, "filters");
     }
 
     @After
@@ -75,7 +82,7 @@ public class TagRequestStorageTest
         if (requests.contains(request))
             fail();
 
-        handler.add(request);
+        handler.set(request);
         requests = handler.getAll();
 
         if (!requests.contains(request))
@@ -100,7 +107,7 @@ public class TagRequestStorageTest
         if (requests.contains(request))
             fail();
 
-        handler.add(request);
+        handler.set(request);
         requests = handler.getAll();
 
         if (!requests.contains(request))
@@ -124,12 +131,12 @@ public class TagRequestStorageTest
         if (requests.contains(request))
             fail();
 
-        handler.add(request);
+        handler.set(request);
         requests = handler.getAll();
 
         Assert.assertEquals(size + 1, requests.size());
 
-        handler.add(request);
+        handler.set(request);
         requests = handler.getAll();
 
         Assert.assertEquals(size + 1, requests.size());
@@ -152,12 +159,12 @@ public class TagRequestStorageTest
         if (requests.contains(request))
             fail();
 
-        handler.add(request);
+        handler.set(request);
         requests = handler.getAll();
 
         Assert.assertEquals(size + 1, requests.size());
 
-        handler.add(request);
+        handler.set(request);
         requests = handler.getAll();
 
         Assert.assertEquals(size + 1, requests.size());

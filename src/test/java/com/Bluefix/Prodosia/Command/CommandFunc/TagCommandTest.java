@@ -85,14 +85,14 @@ public class TagCommandTest
                 CommandPrefix.Type.TEST,
                 CommandPrefix.parsePatternForItems(prefix));
 
-        CommandPrefixStorage.handler().add(cPrefix);
+        CommandPrefixStorage.handler().set(cPrefix);
 
 
         tlTest0 = new Taglist("test0", "test0 taglist", false);
         tlTest1 = new Taglist("test1", "test1 taglist", true);
 
-        TaglistHandler.handler().add(tlTest0);
-        TaglistHandler.handler().add(tlTest1);
+        TaglistHandler.handler().set(tlTest0);
+        TaglistHandler.handler().set(tlTest1);
 
         ArrayList<UserSubscription> sub0 = new ArrayList<>();
         ArrayList<UserSubscription> sub1 = new ArrayList<>();
@@ -127,9 +127,9 @@ public class TagCommandTest
         u1 = new User(uName1, u1Id, sub1.iterator());
         u2 = new User(uName2, u2Id, sub2.iterator());
 
-        UserHandler.handler().add(u0);
-        UserHandler.handler().add(u1);
-        UserHandler.handler().add(u2);
+        UserHandler.handler().set(u0);
+        UserHandler.handler().set(u1);
+        UserHandler.handler().set(u2);
 
 
         myTracker = TrackerHandler.getTrackerByImgurId(imgurId);

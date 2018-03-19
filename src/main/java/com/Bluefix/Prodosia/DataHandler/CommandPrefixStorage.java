@@ -61,9 +61,9 @@ public class CommandPrefixStorage extends LocalStorageHandler<CommandPrefix>
      * @param commandPrefix
      */
     @Override
-    protected void addItem(CommandPrefix commandPrefix) throws Exception
+    protected CommandPrefix setItem(CommandPrefix commandPrefix) throws Exception
     {
-        dbAddCPrefix(commandPrefix);
+        return dbSetCPrefix(commandPrefix);
     }
 
     /**
@@ -92,8 +92,18 @@ public class CommandPrefixStorage extends LocalStorageHandler<CommandPrefix>
 
     //region Database management
 
-    private static synchronized void dbAddCPrefix(CommandPrefix cp) throws SQLException
+    private static synchronized CommandPrefix dbSetCPrefix(CommandPrefix cp) throws Exception
     {
+        // skip if the command prefix is null
+        if (cp == null)
+            return null;
+
+        // retrieve the old prefix item.
+        CommandPrefix oldPrefix = dbGetCPrefix(cp.getType());
+
+        // remove the old prefix if it existed.
+        dbRemoveCPrefix(oldPrefix);
+
         String query =
                 "INSERT INTO CommandPrefix " +
                 "(type, regex) VALUES (?,?);";
@@ -103,10 +113,16 @@ public class CommandPrefixStorage extends LocalStorageHandler<CommandPrefix>
         prep.setString(2, cp.getRegex());
 
         SqlDatabase.execute(prep);
+
+        return oldPrefix;
     }
 
     private static synchronized void dbRemoveCPrefix(CommandPrefix cp) throws SQLException
     {
+        // skip if the command prefix is null
+        if (cp == null)
+            return;
+
         String query =
                 "DELETE FROM CommandPrefix " +
                 "WHERE type = ?;";
@@ -115,6 +131,31 @@ public class CommandPrefixStorage extends LocalStorageHandler<CommandPrefix>
         prep.setInt(1, cp.getType().getValue());
 
         SqlDatabase.execute(prep);
+    }
+
+    private static synchronized CommandPrefix dbGetCPrefix(CommandPrefix.Type type) throws Exception
+    {
+        String query =
+                "SELECT type, regex " +
+                "FROM CommandPrefix " +
+                "WHERE type = ?;";
+
+        PreparedStatement prep = SqlDatabase.getStatement(query);
+        prep.setInt(1, type.getValue());
+        ArrayList<ResultSet> result = SqlDatabase.query(prep);
+
+        if (result.size() != 1)
+            throw new Exception("SqlDatabase exception: Expected result size did not match (was " + result.size() + ")");
+
+        ResultSet rs = result.get(0);
+
+        // parse the query and return the result
+        ArrayList<CommandPrefix> parseResult = parsePrefixes(rs);
+
+        if (parseResult.isEmpty())
+            return null;
+
+        return parseResult.get(0);
     }
 
     private static synchronized ArrayList<CommandPrefix> dbGetCPrefixes() throws Exception
@@ -130,6 +171,12 @@ public class CommandPrefixStorage extends LocalStorageHandler<CommandPrefix>
             throw new Exception("SqlDatabase exception: Expected result size did not match (was " + result.size() + ")");
 
         ResultSet rs = result.get(0);
+
+        return parsePrefixes(rs);
+    }
+
+    private static ArrayList<CommandPrefix> parsePrefixes(ResultSet rs) throws SQLException
+    {
         ArrayList<CommandPrefix> output = new ArrayList<>();
 
         while (rs.next())
@@ -142,6 +189,7 @@ public class CommandPrefixStorage extends LocalStorageHandler<CommandPrefix>
 
         return output;
     }
+
 
     //endregion
 

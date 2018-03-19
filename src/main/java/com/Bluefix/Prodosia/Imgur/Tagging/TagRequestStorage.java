@@ -74,7 +74,7 @@ public class TagRequestStorage extends LocalStorageHandler<TagRequest>
      * @param tagRequest The item to be added.
      */
     @Override
-    public void add(TagRequest tagRequest) throws Exception
+    public void set(TagRequest tagRequest) throws Exception
     {
         // this method is overridden to check for items that can be merged together.
 
@@ -94,11 +94,11 @@ public class TagRequestStorage extends LocalStorageHandler<TagRequest>
 
             // remove the old item and add the new one.
             super.remove(oldT);
-            super.add(merge);
+            super.set(merge);
         }
         else
         {
-            super.add(tagRequest);
+            super.set(tagRequest);
         }
     }
 
@@ -108,9 +108,9 @@ public class TagRequestStorage extends LocalStorageHandler<TagRequest>
      * @param tagRequest
      */
     @Override
-    protected void addItem(TagRequest tagRequest) throws Exception
+    protected TagRequest setItem(TagRequest tagRequest) throws Exception
     {
-        dbAddTagrequest(tagRequest);
+        return dbSetTagrequest(tagRequest);
     }
 
     /**
@@ -139,10 +139,16 @@ public class TagRequestStorage extends LocalStorageHandler<TagRequest>
 
     //region Database Management
 
-    private synchronized static void dbAddTagrequest(TagRequest t) throws Exception
+    private synchronized static TagRequest dbSetTagrequest(TagRequest t) throws Exception
     {
         if (t == null)
-            return;
+            return null;
+
+        // retrieve the old tag request
+        TagRequest oldRequest = dbGetTagrequest(t.getImgurId(), t.getParentId());
+
+        // remove the old tag request to replace it with the new one.
+        dbRemoveTagrequest(oldRequest);
 
         String query =
                 "INSERT INTO TagQueue " +
@@ -157,17 +163,50 @@ public class TagRequestStorage extends LocalStorageHandler<TagRequest>
         prep.setString(5, t.getFilters());
 
         SqlDatabase.execute(prep);
+
+        return oldRequest;
     }
 
     private synchronized static void dbRemoveTagrequest(TagRequest t) throws SQLException, BaringoApiException, IOException, URISyntaxException
     {
+        // if the tag request is null, skip
+        if (t == null)
+            return;
+
         String query =
                 "DELETE FROM TagQueue " +
-                "WHERE imgurId = ?;";
+                "WHERE imgurId = ? AND parentComment = ?;";
 
         PreparedStatement prep = SqlDatabase.getStatement(query);
         prep.setString(1, t.getImgurId());
+        prep.setLong(2, t.getParentId());
         SqlDatabase.execute(prep);
+    }
+
+    private synchronized static TagRequest dbGetTagrequest(String imgurId, long parentId) throws Exception
+    {
+        String query =
+                "SELECT imgurId, parentComment, taglists, rating, filters " +
+                "FROM TagQueue " +
+                "WHERE imgurId = ? AND parentComment = ?;";
+
+        PreparedStatement prep = SqlDatabase.getStatement(query);
+        prep.setString(1, imgurId);
+        prep.setLong(2, parentId);
+        ArrayList<ResultSet> result = SqlDatabase.query(prep);
+
+        if (result.size() != 1)
+            throw new Exception("SqlDatabase exception: Expected result size did not match (was " + result.size() + ")");
+
+        ResultSet rs = result.get(0);
+
+        // parse the result and return
+        ArrayList<TagRequest> parsedRequests = parseTagrequests(rs);
+
+        if (parsedRequests.isEmpty())
+            return null;
+
+        return parsedRequests.get(0);
     }
 
     private synchronized static ArrayList<TagRequest> dbGetTagrequests() throws Exception
@@ -183,6 +222,12 @@ public class TagRequestStorage extends LocalStorageHandler<TagRequest>
             throw new Exception("SqlDatabase exception: Expected result size did not match (was " + result.size() + ")");
 
         ResultSet rs = result.get(0);
+
+        return parseTagrequests(rs);
+    }
+
+    private static ArrayList<TagRequest> parseTagrequests(ResultSet rs) throws Exception
+    {
         ArrayList<TagRequest> output = new ArrayList<>();
 
         while (rs.next())

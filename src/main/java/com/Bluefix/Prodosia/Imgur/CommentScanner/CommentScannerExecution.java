@@ -170,7 +170,7 @@ public class CommentScannerExecution extends ImgurIntervalRunner
             usedGet = true;
 
             // store the bookmark
-            CommentScannerStorage.handler().add(tb);
+            CommentScannerStorage.handler().set(tb);
         }
 
         // add a default queue item
@@ -454,7 +454,7 @@ public class CommentScannerExecution extends ImgurIntervalRunner
             newBookmark = null;
 
             //update the bookmark for the user.
-            CommentScannerStorage.handler().add(bookmark);
+            CommentScannerStorage.handler().set(bookmark);
         }
 
         public int getPage()

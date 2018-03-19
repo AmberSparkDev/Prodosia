@@ -55,7 +55,7 @@ public class CommentScannerStorageTest
 
         tracker = new Tracker("mashedstew", 1, null, -1, -1, perm);
 
-        TrackerHandler.handler().add(tracker);
+        TrackerHandler.handler().set(tracker);
 
         value = new TrackerBookmark(0, new Date(Long.MAX_VALUE), tracker);
 
@@ -78,7 +78,7 @@ public class CommentScannerStorageTest
         if (bookmarks.contains(value))
             fail();
 
-        handler.add(value);
+        handler.set(value);
         bookmarks = handler.getAll();
 
         if (!bookmarks.contains(value))
@@ -103,7 +103,7 @@ public class CommentScannerStorageTest
         if (bookmarks.contains(value))
             fail();
 
-        handler.add(value);
+        handler.set(value);
         bookmarks = handler.getAll();
 
         if (!bookmarks.contains(value))

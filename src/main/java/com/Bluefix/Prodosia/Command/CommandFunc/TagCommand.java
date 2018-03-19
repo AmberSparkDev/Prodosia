@@ -53,6 +53,12 @@ public class TagCommand implements ICommandFunc
     @Override
     public void execute(CommandInformation ci, String[] arguments) throws Exception
     {
+        // if there was no tracker data provided, do not execute the method.
+        if (ci.getTracker() == null)
+        {
+            throw new IllegalArgumentException("A tracker was not provided!");
+        }
+
         // parse the tag request and attempt to add it to the queue.
         parseTagRequest(ci, arguments);
     }
@@ -96,7 +102,7 @@ public class TagCommand implements ICommandFunc
         // loop through the remaining arguments and ascertain what they are.
         while (pointer < arguments.length)
         {
-            // retrieve the current argument and increment the pointer. 
+            // retrieve the current argument and increment the pointer.
             String curArg = arguments[pointer++].toLowerCase();
 
             // check if the current pointer is a rating
@@ -186,7 +192,7 @@ public class TagCommand implements ICommandFunc
             TagRequest tr =
                     new TagRequest(imgurId, ci.getParentComment(), taglists, rating, filterPattern);
 
-            TagRequestStorage.handler().add(tr);
+            TagRequestStorage.handler().set(tr);
         }
     }
 
@@ -229,7 +235,7 @@ public class TagCommand implements ICommandFunc
                 TagRequest tr =
                         new TagRequest(imgurId, pComment, taglists, rating, filters.toString());
 
-                TagRequestStorage.handler().add(tr);
+                TagRequestStorage.handler().set(tr);
             }
             catch (Exception e)
             {
@@ -330,14 +336,9 @@ public class TagCommand implements ICommandFunc
 
     //endregion
 
-
-
-
-
-
     @Override
     public String info()
     {
-        return "Not implemented.";
+        return "Please visit https://github.com/bboellaard/Prodosia/wiki/Tag-Command for information";
     }
 }

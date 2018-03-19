@@ -135,6 +135,15 @@ public class SimpleCommentRequest implements ICommentRequest
         return this.parent;
     }
 
+
+    public long getParentId()
+    {
+        if (this.parent != null)
+            return this.parent.getId();
+
+        return this.parentId;
+    }
+
     /**
      * Retrieve all comments that should be executed by this tag request.
      *

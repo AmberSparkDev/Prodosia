@@ -59,7 +59,7 @@ public class CommentDeletionStorageTest
         if (deletions.contains(value))
             fail();
 
-        handler.add(value);
+        handler.set(value);
         deletions = handler.getAll();
 
         if (!deletions.contains(value))
@@ -84,7 +84,7 @@ public class CommentDeletionStorageTest
         if (deletions.contains(value))
             fail();
 
-        handler.add(value);
+        handler.set(value);
         deletions = handler.getAll();
 
         if (!deletions.contains(value))

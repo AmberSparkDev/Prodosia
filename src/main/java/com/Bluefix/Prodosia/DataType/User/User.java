@@ -22,6 +22,7 @@
 
 package com.Bluefix.Prodosia.DataType.User;
 
+import com.Bluefix.Prodosia.DataHandler.UserHandler;
 import com.Bluefix.Prodosia.DataType.Comments.TagRequest;
 import com.Bluefix.Prodosia.Imgur.ImgurApi.ImgurManager;
 import com.github.kskelm.baringo.model.Account;
@@ -88,7 +89,7 @@ public class User
      * @param subscriptionData The subscription data of the user.
      * @return
      */
-    public static User retrieveUser(String imgurName, Iterator<UserSubscription> subscriptionData)
+    public static User retrieveUser(String imgurName, Iterator<UserSubscription> subscriptionData) throws Exception
     {
         try
         {
@@ -99,9 +100,9 @@ public class User
 
             return new User(imgurName, acc.getId(), subscriptionData);
 
-        }catch (Exception e)
+        } catch (BaringoApiException e)
         {
-            e.printStackTrace();
+            // the user probably didn't exist. simply return null.
             return null;
         }
     }
@@ -180,6 +181,60 @@ public class User
 
         // since none of our subscriptions matched the tag request, return false
         return false;
+    }
+
+    //endregion
+
+    //region Storage
+
+    /**
+     * Store this user object to the database. Merge it with the existing user if necessary.
+     */
+    public void store() throws Exception
+    {
+        User other = UserHandler.getUserByImgurId(this.imgurId);
+
+        if (other == null)
+        {
+            UserHandler.handler().set(this);
+        }
+        else
+        {
+            // if there was already a subscription for us in the system, merge and replace.
+            User merged = merge(other);
+
+            UserHandler.handler().remove(other);
+            UserHandler.handler().set(merged);
+        }
+    }
+
+    private User merge(User u) throws Exception
+    {
+        if (u == null)
+            return null;
+
+        if (u.getImgurId() != this.imgurId)
+            throw new IllegalArgumentException("This is an illegal merge.");
+
+        HashSet<UserSubscription> us = new HashSet<>();
+
+        // replace all user-subscriptions from the old user with the ones from the current user.
+        for (UserSubscription myUs : u.getSubscriptions())
+        {
+            // only add the old item if there wasn't a newer version.
+            if (!this.subscriptions.containsValue(myUs))
+            {
+                us.add(myUs);
+            }
+        }
+
+        for (UserSubscription myUs : this.subscriptions.values())
+        {
+            us.add(myUs);
+        }
+
+        return new User(this.imgurName, this.imgurId, us.iterator());
+
     }
 
     //endregion

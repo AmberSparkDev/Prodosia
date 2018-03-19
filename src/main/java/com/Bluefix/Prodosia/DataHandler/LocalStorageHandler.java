@@ -83,32 +83,30 @@ public abstract class LocalStorageHandler <T>
     //region Data handling
 
 
-    /**
-     * Add an item to the collection.
-     * @param t The item to be added.
-     */
-    public void add(T t) throws Exception
+    public void set(T t) throws Exception
     {
         // if t did not exist, skip this phase.
         if (t == null)
             return;
 
-        // remove the old item before storing the new one.
-        remove(t);
+        // set the item and retrieve the old item.
+        T oldItem = setItem(t);
 
-        // if the local storage is used, add the item to the data.
+        // if the local storage is used, replace the item.
         if (useLocalStorage)
         {
             // initialize the local storage if necessary.
             if (data == null)
+            {
                 data = getAllItems();
-
-            // add it to the list.
-            data.add(t);
+            }
+            else
+            {
+                // update
+                data.remove(oldItem);
+                data.add(t);
+            }
         }
-
-        // add the new item to the storage.
-        addItem(t);
     }
 
 
@@ -133,15 +131,18 @@ public abstract class LocalStorageHandler <T>
 
     /**
      * Update the old item, replacing it with the new one.
-     * @param oldT The old item, to be deleted.
-     * @param newT The new item that will replace the old item.
+     * @param oldT The old item to be replaced.
+     * @param newT The new replacement item.
+     * @throws Exception
      */
     public void update(T oldT, T newT) throws Exception
     {
-        // remove the old item and add the new one.
         remove(oldT);
-        add(newT);
+        set(newT);
     }
+
+
+
 
     /**
      * Retrieve all items from the list.
@@ -169,16 +170,18 @@ public abstract class LocalStorageHandler <T>
     //region Abstract methods
 
     /**
-     * Retrieve the prepared statements necessary for adding an item.
-     * @param t
-     */
-    protected abstract void addItem(T t) throws Exception;
-
-    /**
      * Remove an item from the storage.
      * @param t
      */
     protected abstract void removeItem(T t) throws Exception;
+
+    /**
+     * Set the item, replacing the existing item if applicable.
+     * @param t
+     * @return The old item that was replaced, or null if no item had to be replaced.
+     * @throws Exception
+     */
+    protected abstract T setItem(T t) throws Exception;
 
     /**
      * Retrieve all items from the storage in no particular order.

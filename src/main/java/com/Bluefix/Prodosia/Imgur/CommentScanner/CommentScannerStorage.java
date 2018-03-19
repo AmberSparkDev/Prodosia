@@ -64,9 +64,9 @@ public class CommentScannerStorage extends LocalStorageHandler<TrackerBookmark>
      * @param trackerBookmark
      */
     @Override
-    protected void addItem(TrackerBookmark trackerBookmark) throws Exception
+    protected TrackerBookmark setItem(TrackerBookmark trackerBookmark) throws Exception
     {
-        dbAddBookmark(trackerBookmark);
+        return dbSetBookmark(trackerBookmark);
     }
 
     /**
@@ -95,10 +95,16 @@ public class CommentScannerStorage extends LocalStorageHandler<TrackerBookmark>
 
     //region Database management
 
-    private synchronized static void dbAddBookmark(TrackerBookmark tb) throws SQLException
+    private synchronized static TrackerBookmark dbSetBookmark(TrackerBookmark tb) throws Exception
     {
         if (tb == null)
-            return;
+            return null;
+
+        // retrieve the old tracker bookmark
+        TrackerBookmark oldBookmark = dbGetBookmark(tb.getTracker().getImgurId());
+
+        // remove the old bookmark and replace it.
+        dbRemoveBookmark(oldBookmark);
 
         String query =
                 "INSERT INTO CommentScanner " +
@@ -111,10 +117,15 @@ public class CommentScannerStorage extends LocalStorageHandler<TrackerBookmark>
         prep.setLong(3, tb.getLastCommentTime().getTime());
 
         SqlDatabase.execute(prep);
+
+        return oldBookmark;
     }
 
     private synchronized static void dbRemoveBookmark(TrackerBookmark tb) throws SQLException
     {
+        if (tb == null)
+            return;
+
         String query =
                 "DELETE FROM CommentScanner " +
                 "WHERE imgurId = ?;";
@@ -123,6 +134,31 @@ public class CommentScannerStorage extends LocalStorageHandler<TrackerBookmark>
         prep.setLong(1, tb.getTracker().getImgurId());
 
         SqlDatabase.execute(prep);
+    }
+
+    private synchronized static TrackerBookmark dbGetBookmark(long imgurId) throws Exception
+    {
+        String query =
+                "SELECT imgurId, lastCommentId, lastCommentTime " +
+                "FROM CommentScanner " +
+                "WHERE imgurId = ?;";
+
+        PreparedStatement prep = SqlDatabase.getStatement(query);
+        prep.setLong(1, imgurId);
+        ArrayList<ResultSet> result = SqlDatabase.query(prep);
+
+        if (result.size() != 1)
+            throw new Exception("SqlDatabase exception: Expected result size did not match (was " + result.size() + ")");
+
+        ResultSet rs = result.get(0);
+
+        // parse result and return
+        ArrayList<TrackerBookmark> parsedResult = parseBookmarks(rs);
+
+        if (parsedResult.isEmpty())
+            return null;
+
+        return parsedResult.get(0);
     }
 
     private synchronized static ArrayList<TrackerBookmark> dbGetBookmarks() throws Exception
@@ -138,6 +174,12 @@ public class CommentScannerStorage extends LocalStorageHandler<TrackerBookmark>
             throw new Exception("SqlDatabase exception: Expected result size did not match (was " + result.size() + ")");
 
         ResultSet rs = result.get(0);
+
+        return parseBookmarks(rs);
+    }
+
+    private static ArrayList<TrackerBookmark> parseBookmarks(ResultSet rs) throws Exception
+    {
         ArrayList<TrackerBookmark> output = new ArrayList<>();
 
         while (rs.next())
@@ -152,7 +194,6 @@ public class CommentScannerStorage extends LocalStorageHandler<TrackerBookmark>
         }
 
         return output;
-
     }
 
     //endregion

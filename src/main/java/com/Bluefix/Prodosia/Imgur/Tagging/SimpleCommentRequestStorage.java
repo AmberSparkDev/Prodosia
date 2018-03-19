@@ -76,9 +76,9 @@ public class SimpleCommentRequestStorage extends LocalStorageHandler<SimpleComme
      * @param tagRequest
      */
     @Override
-    protected void addItem(SimpleCommentRequest tagRequest) throws Exception
+    protected SimpleCommentRequest setItem(SimpleCommentRequest tagRequest) throws Exception
     {
-        dbAddTagrequest(tagRequest);
+        return dbSetCommentRequest(tagRequest);
     }
 
     /**
@@ -89,7 +89,7 @@ public class SimpleCommentRequestStorage extends LocalStorageHandler<SimpleComme
     @Override
     protected void removeItem(SimpleCommentRequest tagRequest) throws Exception
     {
-        dbRemoveTagrequest(tagRequest);
+        dbRemoveCommentRequest(tagRequest);
     }
 
     /**
@@ -100,17 +100,23 @@ public class SimpleCommentRequestStorage extends LocalStorageHandler<SimpleComme
     @Override
     protected ArrayList<SimpleCommentRequest> getAllItems() throws Exception
     {
-        return dbGetTagrequests();
+        return dbGetCommentRequests();
     }
 
     //endregion
 
     //region Database Management
 
-    private synchronized static void dbAddTagrequest(SimpleCommentRequest t) throws Exception
+    private synchronized static SimpleCommentRequest dbSetCommentRequest(SimpleCommentRequest t) throws Exception
     {
         if (t == null)
-            return;
+            return null;
+
+        // retrieve the old comment request.
+        SimpleCommentRequest oldRequest = dbGetCommentRequest(t.getImgurId(), t.getParentId());
+
+        // remove the old request
+        dbRemoveCommentRequest(oldRequest);
 
         String query =
                 "INSERT INTO CommentQueue " +
@@ -130,10 +136,16 @@ public class SimpleCommentRequestStorage extends LocalStorageHandler<SimpleComme
         }
 
         builder.commit();
+
+        return oldRequest;
     }
 
-    private synchronized static void dbRemoveTagrequest(SimpleCommentRequest t) throws SQLException, BaringoApiException, IOException, URISyntaxException
+    private synchronized static void dbRemoveCommentRequest(SimpleCommentRequest t) throws SQLException, BaringoApiException, IOException, URISyntaxException
     {
+        // if the request is null, skip
+        if (t == null)
+            return;
+
         String query =
                 "DELETE FROM CommentQueue " +
                 "WHERE imgurId = ? AND parentId = ? AND lines = ?;";
@@ -145,7 +157,34 @@ public class SimpleCommentRequestStorage extends LocalStorageHandler<SimpleComme
         SqlDatabase.execute(prep);
     }
 
-    private synchronized static ArrayList<SimpleCommentRequest> dbGetTagrequests() throws Exception
+    private synchronized static SimpleCommentRequest dbGetCommentRequest(String imgurId, long parentId) throws Exception
+    {
+        String query =
+                "SELECT imgurId, parentId, lines " +
+                "FROM CommentQueue " +
+                "WHERE imgurId = ? AND parentId = ?;";
+
+        PreparedStatement prep = SqlDatabase.getStatement(query);
+        prep.setString(1, imgurId);
+        prep.setLong(2, parentId);
+        ArrayList<ResultSet> result = SqlDatabase.query(prep);
+
+        if (result.size() != 1)
+            throw new Exception("SqlDatabase exception: Expected result size did not match (was " + result.size() + ")");
+
+        ResultSet rs = result.get(0);
+
+        // parse the result and return.
+        ArrayList<SimpleCommentRequest> parsedResult = parseCommentRequests(rs);
+
+        if (parsedResult.isEmpty())
+            return null;
+
+        return parsedResult.get(0);
+    }
+
+
+    private synchronized static ArrayList<SimpleCommentRequest> dbGetCommentRequests() throws Exception
     {
         String query =
                 "SELECT imgurId, parentId, lines " +
@@ -158,6 +197,12 @@ public class SimpleCommentRequestStorage extends LocalStorageHandler<SimpleComme
             throw new Exception("SqlDatabase exception: Expected result size did not match (was " + result.size() + ")");
 
         ResultSet rs = result.get(0);
+
+        return parseCommentRequests(rs);
+    }
+
+    private static ArrayList<SimpleCommentRequest> parseCommentRequests(ResultSet rs) throws SQLException
+    {
         ArrayList<SimpleCommentRequest> output = new ArrayList<>();
 
         while (rs.next())

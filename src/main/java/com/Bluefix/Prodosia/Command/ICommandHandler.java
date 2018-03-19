@@ -22,8 +22,6 @@
 
 package com.Bluefix.Prodosia.Command;
 
-import com.Bluefix.Prodosia.DataType.Command.CommandResult;
-
 /**
  *
  */
@@ -34,5 +32,5 @@ public interface ICommandHandler
      * the input if not.
      * @param input The input to be executed.
      */
-    public CommandResult execute(String input);
+    public void execute(String input);
 }

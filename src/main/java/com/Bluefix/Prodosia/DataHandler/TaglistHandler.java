@@ -63,9 +63,9 @@ public class TaglistHandler extends LocalStorageHandler<Taglist>
      * @param t
      */
     @Override
-    protected void addItem(Taglist t) throws Exception
+    protected Taglist setItem(Taglist t) throws Exception
     {
-        dbAddTaglist(t);
+        return dbSetTaglist(t);
     }
 
     /**
@@ -94,27 +94,57 @@ public class TaglistHandler extends LocalStorageHandler<Taglist>
 
     //region Database management
 
-    private synchronized static void dbAddTaglist(Taglist t) throws SQLException
+    private synchronized static Taglist dbSetTaglist(Taglist t) throws Exception
     {
         if (t == null)
-            return;
+            return null;
+
+        // retrieve the old taglist
+        Taglist oldTaglist = dbGetTaglist(t.getAbbreviation());
+
+        // remove the old taglist to replace it.
+        dbRemoveTaglist(oldTaglist);
 
         // insert the tracker into the database.
-        String query =
-                "INSERT INTO Taglist " +
-                "(abbreviation, description, hasRatings) " +
-                "VALUES (?,?, ?);";
+        // if this replaces a taglist, use the old taglist id.
+        String query;
+        if (oldTaglist == null)
+        {
+            query = "INSERT INTO Taglist " +
+                    "(abbreviation, description, hasRatings) " +
+                    "VALUES (?,?,?);";
+        }
+        else
+        {
+            query = "INSERT INTO Taglist " +
+                    "(id, abbreviation, description, hasRatings) " +
+                    "VALUES (?, ?,?,?);";
+        }
 
+        // set the arguments
         PreparedStatement prep = SqlDatabase.getStatement(query);
-        prep.setString(1, t.getAbbreviation());
-        prep.setString(2, t.getDescription());
-        prep.setBoolean(3, t.hasRatings());
+        int argCounter = 1;
+
+        if (oldTaglist != null)
+        {
+            prep.setLong(argCounter++, oldTaglist.getId());
+        }
+
+        prep.setString(argCounter++, t.getAbbreviation());
+        prep.setString(argCounter++, t.getDescription());
+        prep.setBoolean(argCounter++, t.hasRatings());
 
         SqlDatabase.execute(prep);
+
+        return oldTaglist;
     }
 
     private synchronized static void dbRemoveTaglist(Taglist t) throws SQLException
     {
+        // skip if the taglist was null
+        if (t == null)
+            return;
+
         // if the abbreviation fits, remove the taglist.
         String query =
                 "DELETE FROM Taglist " +
@@ -139,6 +169,37 @@ public class TaglistHandler extends LocalStorageHandler<Taglist>
             throw new Exception("SqlDatabase exception: Expected result size did not match (was " + result.size() + ")");
 
         ResultSet rs = result.get(0);
+
+        return parseTaglists(rs);
+    }
+
+    private synchronized static Taglist dbGetTaglist(String abbreviation) throws Exception
+    {
+        String query =
+                "SELECT id, abbreviation, description, hasRatings " +
+                "FROM Taglist " +
+                "WHERE abbreviation = ?;";
+
+        PreparedStatement prep = SqlDatabase.getStatement(query);
+        prep.setString(1, abbreviation);
+        ArrayList<ResultSet> result = SqlDatabase.query(prep);
+
+        if (result.size() != 1)
+            throw new Exception("SqlDatabase exception: Expected result size did not match (was " + result.size() + ")");
+
+        ResultSet rs = result.get(0);
+
+        // parse the result and return
+        ArrayList<Taglist> parseResult = parseTaglists(rs);
+
+        if (parseResult.isEmpty())
+            return null;
+
+        return parseResult.get(0);
+    }
+
+    private static ArrayList<Taglist> parseTaglists(ResultSet rs) throws SQLException
+    {
         ArrayList<Taglist> taglists = new ArrayList<>();
 
         while (rs.next())
@@ -189,16 +250,7 @@ public class TaglistHandler extends LocalStorageHandler<Taglist>
         if (abbreviation == null || abbreviation.isEmpty())
             return null;
 
-        // TODO: if this methods is used frequently, it might be worth making a HashMap<long, Taglist>
-        ArrayList<Taglist> taglists = handler().getAll();
-
-        for (Taglist tl : taglists)
-        {
-            if (abbreviation.equals(tl.getAbbreviation()))
-                return tl;
-        }
-
-        return null;
+        return dbGetTaglist(abbreviation);
     }
 
 

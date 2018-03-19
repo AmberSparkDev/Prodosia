@@ -317,7 +317,7 @@ public class ApplicationWindow
                 .setPermissions(new TrackerPermissions(TrackerPermissions.TrackerType.ADMIN))
                 .build();
 
-        TrackerHandler.handler().add(myTracker);
+        TrackerHandler.handler().set(myTracker);
 
         Logger.logMessage("mashedstew successfully added as tracker.");
     }
@@ -329,7 +329,7 @@ public class ApplicationWindow
         CommandPrefix prefix = new CommandPrefix(CommandPrefix.Type.IMGUR,
                 regex);
 
-        CommandPrefixStorage.handler().add(prefix);
+        CommandPrefixStorage.handler().set(prefix);
 
         Logger.logMessage("`@mashedstew ` prefix successfully added.");
     }
@@ -339,8 +339,8 @@ public class ApplicationWindow
         Taglist newTl0 = new Taglist("test0", "test0 taglist", false);
         Taglist newTl1 = new Taglist("test1", "test1 taglist", true);
 
-        TaglistHandler.handler().add(newTl0);
-        TaglistHandler.handler().add(newTl1);
+        TaglistHandler.handler().set(newTl0);
+        TaglistHandler.handler().set(newTl1);
 
         ArrayList<UserSubscription> sub0 = new ArrayList<>();
         ArrayList<UserSubscription> sub1 = new ArrayList<>();
@@ -378,9 +378,9 @@ public class ApplicationWindow
         User u1 = new User(uName1, u1Id, sub1.iterator());
         User u2 = new User(uName2, u2Id, sub2.iterator());
 
-        UserHandler.handler().add(u0);
-        UserHandler.handler().add(u1);
-        UserHandler.handler().add(u2);
+        UserHandler.handler().set(u0);
+        UserHandler.handler().set(u1);
+        UserHandler.handler().set(u2);
 
         Logger.logMessage("simple user base successfully added.");
 
