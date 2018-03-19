@@ -73,7 +73,7 @@ public class SubCommand implements ICommandFunc
         }
 
         int pointer = 1;
-        LinkedList<UserSubscription> subData = new LinkedList<>();
+        HashSet<UserSubscription> subData = new HashSet<>();
 
         Taglist curTaglist = null;
         HashSet<Rating> curRatings = null;
@@ -164,7 +164,7 @@ public class SubCommand implements ICommandFunc
         }
 
         // attempt to add the user.
-        User u = User.retrieveUser(username, subData.iterator());
+        User u = User.retrieveUser(username, subData);
 
         if (u == null)
         {

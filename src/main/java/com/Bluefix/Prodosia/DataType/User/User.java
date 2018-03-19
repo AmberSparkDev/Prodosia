@@ -24,6 +24,7 @@ package com.Bluefix.Prodosia.DataType.User;
 
 import com.Bluefix.Prodosia.DataHandler.UserHandler;
 import com.Bluefix.Prodosia.DataType.Comments.TagRequest;
+import com.Bluefix.Prodosia.DataType.Taglist.Taglist;
 import com.Bluefix.Prodosia.Imgur.ImgurApi.ImgurManager;
 import com.github.kskelm.baringo.model.Account;
 import com.github.kskelm.baringo.util.BaringoApiException;
@@ -56,7 +57,7 @@ public class User
      * @param subscriptionData The subscription-data for the user.
      * @throws Exception
      */
-    public User(String imgurName, long imgurId, Iterator<UserSubscription> subscriptionData) throws Exception
+    public User(String imgurName, long imgurId, HashSet<UserSubscription> subscriptionData) throws Exception
     {
         if (imgurName == null || imgurName.trim().isEmpty())
             throw new IllegalArgumentException("The imgur name was empty");
@@ -72,10 +73,8 @@ public class User
         this.imgurId = imgurId;
         this.subscriptions = new HashMap<>();
 
-        while (subscriptionData.hasNext())
+        for (UserSubscription us : subscriptionData)
         {
-            UserSubscription us = subscriptionData.next();
-
             this.subscriptions.put(us.getTaglist().getId(), us);
         }
     }
@@ -89,7 +88,7 @@ public class User
      * @param subscriptionData The subscription data of the user.
      * @return
      */
-    public static User retrieveUser(String imgurName, Iterator<UserSubscription> subscriptionData) throws Exception
+    public static User retrieveUser(String imgurName, HashSet<UserSubscription> subscriptionData) throws Exception
     {
         try
         {
@@ -197,7 +196,6 @@ public class User
         if (other == null)
         {
             UserHandler.handler().set(this);
-            System.out.println("##0 User was stored ##");
         }
         else
         {
@@ -206,7 +204,6 @@ public class User
 
             UserHandler.handler().remove(other);
             UserHandler.handler().set(merged);
-            System.out.println("##1 User was stored ##");
         }
     }
 
@@ -235,8 +232,44 @@ public class User
             us.add(myUs);
         }
 
-        return new User(this.imgurName, this.imgurId, us.iterator());
+        return new User(this.imgurName, this.imgurId, us);
 
+    }
+
+    //endregion
+
+    //region Unsubscription
+
+    /**
+     * Unsubscribe the user from the specified taglists.
+     * @param taglists
+     * @return The taglists that were unsubscribed from.
+     */
+    public Iterable<String> unsubscribe(HashSet<Taglist> taglists) throws Exception
+    {
+        HashSet<UserSubscription> remaining = new HashSet<>();
+        LinkedList<String> unsubscribed = new LinkedList<>();
+
+        for (UserSubscription us : subscriptions.values())
+        {
+            if (!taglists.contains(us.getTaglist()))
+                remaining.add(us);
+            else
+                unsubscribed.add(us.getTaglist().getAbbreviation());
+        }
+
+        // replace the item or delete the user if no taglists were remaining.
+        if (remaining.isEmpty())
+        {
+            UserHandler.handler().remove(this);
+        }
+        else
+        {
+            UserHandler.handler().update(this,
+                    new User(this.imgurName, this.imgurId, remaining));
+        }
+
+        return unsubscribed;
     }
 
     //endregion

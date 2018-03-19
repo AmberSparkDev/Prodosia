@@ -51,7 +51,7 @@ public class UserHandlerTest
 
         handler = UserHandler.handler();
 
-        ArrayList<UserSubscription> subData = new ArrayList<>();
+        HashSet<UserSubscription> subData = new HashSet<>();
 
         HashSet<Rating> ratings = new HashSet<>();
         ratings.add(Rating.EXPLICIT);
@@ -62,7 +62,7 @@ public class UserHandlerTest
 
 
 
-        user = new User("4a70ab7a-7966-4c44-93b4-49770b74813d", 1, subData.iterator());
+        user = new User("4a70ab7a-7966-4c44-93b4-49770b74813d", 1, subData);
     }
 
     @After

@@ -46,12 +46,11 @@ import org.junit.Test;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
 import java.util.HashSet;
 
 import static org.junit.Assert.*;
 
-public class SubCommandTest
+public class UnsubCommandTest
 {
     private String prefix;
     private CommandPrefix cPrefix;
@@ -80,7 +79,6 @@ public class SubCommandTest
     private long u0Id;
     private long u1Id;
     private long u2Id;
-
 
     @Before
     public void setUp() throws Exception
@@ -156,15 +154,21 @@ public class SubCommandTest
         UserHandler.handler().remove(u2);
     }
 
+
+    /**
+     * Complete deletion
+     * @throws Exception
+     */
     @Test
     public void test0() throws Exception
     {
-        String command = prefix + "sub mashedstew test0";
+        String command = prefix + "unsub mashedstew";
 
-        UserHandler.handler().remove(u0);
+
+        UserHandler.handler().set(u0);
 
         User u = UserHandler.getUserByImgurId(u0Id);
-        Assert.assertEquals(null, u);
+        Assert.assertEquals(u0, u);
 
         executeCommand(command, parentId);
 
@@ -174,61 +178,31 @@ public class SubCommandTest
 
         u = UserHandler.getUserByImgurId(u0Id);
 
-        Assert.assertNotEquals(null, u);
-
-        UserSubscription us = u.getSubscription(tlTest0.getId());
-        Assert.assertNotEquals(null, us);
-        Assert.assertEquals(tlTest0, us.getTaglist());
-        Assert.assertEquals("", us.getFilters());
+        Assert.assertEquals(null, u);
     }
+
 
     @Test
     public void test1() throws Exception
     {
-        String command = prefix + "sub mashedstew test1";
+        String command = prefix + "unsub mashedstew test0";
 
-        UserHandler.handler().remove(u0);
+        UserHandler.handler().set(u0);
 
         User u = UserHandler.getUserByImgurId(u0Id);
-        Assert.assertEquals(null, u);
+        Assert.assertEquals(u0, u);
+        Assert.assertEquals(2, u.getSubscriptions().size());
 
         executeCommand(command, parentId);
 
         // the command is threaded so it's assumed to take a short while before the
         // subscription actually comes through
         Thread.sleep(1000);
-
-        u = UserHandler.getUserByImgurId(u0Id);
-
-        Assert.assertEquals(null, u);
-    }
-
-    @Test
-    public void test2() throws Exception
-    {
-        String command = prefix + "sub mashedstew test1 s";
-
-        UserHandler.handler().remove(u0);
-
-        User u = UserHandler.getUserByImgurId(u0Id);
-        Assert.assertEquals(null, u);
-
-        executeCommand(command, parentId);
-
-        // the command is threaded so it's assumed to take a short while before the
-        // subscription actually comes through
-        Thread.sleep(1000);
-
-        ArrayList<User> allUsers = UserHandler.handler().getAll();
 
         u = UserHandler.getUserByImgurId(u0Id);
 
         Assert.assertNotEquals(null, u);
-
-        UserSubscription us = u.getSubscription(tlTest1.getId());
-        Assert.assertNotEquals(null, us);
-        Assert.assertEquals(tlTest1, us.getTaglist());
-        Assert.assertEquals("", us.getFilters());
+        Assert.assertEquals(1, u.getSubscriptions().size());
     }
 
 
@@ -245,6 +219,15 @@ public class SubCommandTest
 
         CommandRecognition.executeEntry(CommandPrefix.Type.TEST, ci, command);
     }
+
+
+
+
+
+
+
+
+
 
 
 

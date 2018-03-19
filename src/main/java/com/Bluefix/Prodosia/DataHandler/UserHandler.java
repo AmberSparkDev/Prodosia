@@ -254,7 +254,7 @@ public class UserHandler extends LocalStorageHandler<User>
 
     private static ArrayList<User> parseUsers(ResultSet rs) throws Exception
     {
-        HashMap<Long, ArrayList<UserSubscription>> subMap = new HashMap<>();
+        HashMap<Long, HashSet<UserSubscription>> subMap = new HashMap<>();
         HashMap<Long, DbUserData> userMap = new HashMap<>();
 
         // parse all available users and their respective subscriptions.
@@ -272,12 +272,12 @@ public class UserHandler extends LocalStorageHandler<User>
             }
 
             // retrieve the Arraylist for the usersubscription if it existed.
-            ArrayList<UserSubscription> arrSub = subMap.get(userId);
+            HashSet<UserSubscription> arrSub = subMap.get(userId);
 
             // if it did not exist, create one and add it to the map.
             if (arrSub == null)
             {
-                arrSub = new ArrayList<>();
+                arrSub = new HashSet<>();
                 subMap.put(userId, arrSub);
             }
 
@@ -297,7 +297,7 @@ public class UserHandler extends LocalStorageHandler<User>
         {
             // get the user data and subscription data and join them.
             DbUserData ud = userMap.get(key);
-            ArrayList<UserSubscription> aus = subMap.get(key);
+            HashSet<UserSubscription> aus = subMap.get(key);
 
             if (ud == null || aus == null)
             {
@@ -306,7 +306,7 @@ public class UserHandler extends LocalStorageHandler<User>
                 continue;
             }
 
-            finalList.add(new User(ud.imgurName, ud.imgurId, aus.iterator()));
+            finalList.add(new User(ud.imgurName, ud.imgurId, aus));
         }
 
         return finalList;
@@ -392,6 +392,19 @@ public class UserHandler extends LocalStorageHandler<User>
         for (User u : users)
         {
             if (u.getImgurId() == imgurId)
+                return u;
+        }
+
+        return null;
+    }
+
+    public static User getUserByImgurName(String name) throws Exception
+    {
+        ArrayList<User> users = handler().getAll();
+
+        for (User u : users)
+        {
+            if (u.getImgurName().equals(name))
                 return u;
         }
 

@@ -342,9 +342,9 @@ public class ApplicationWindow
         TaglistHandler.handler().set(newTl0);
         TaglistHandler.handler().set(newTl1);
 
-        ArrayList<UserSubscription> sub0 = new ArrayList<>();
-        ArrayList<UserSubscription> sub1 = new ArrayList<>();
-        ArrayList<UserSubscription> sub2 = new ArrayList<>();
+        HashSet<UserSubscription> sub0 = new HashSet<>();
+        HashSet<UserSubscription> sub1 = new HashSet<>();
+        HashSet<UserSubscription> sub2 = new HashSet<>();
 
         HashSet<Rating> ratings = new HashSet<>();
         ratings.add(Rating.SAFE);
@@ -374,9 +374,9 @@ public class ApplicationWindow
         long u1Id = 58590281;
         long u2Id = 13920225;
 
-        User u0 = new User(uName0, u0Id, sub0.iterator());
-        User u1 = new User(uName1, u1Id, sub1.iterator());
-        User u2 = new User(uName2, u2Id, sub2.iterator());
+        User u0 = new User(uName0, u0Id, sub0);
+        User u1 = new User(uName1, u1Id, sub1);
+        User u2 = new User(uName2, u2Id, sub2);
 
         UserHandler.handler().set(u0);
         UserHandler.handler().set(u1);

@@ -22,19 +22,184 @@
 
 package com.Bluefix.Prodosia.Command.CommandFunc;
 
+import com.Bluefix.Prodosia.DataHandler.TaglistHandler;
+import com.Bluefix.Prodosia.DataHandler.UserHandler;
 import com.Bluefix.Prodosia.DataType.Command.CommandInformation;
+import com.Bluefix.Prodosia.DataType.Taglist.Taglist;
+import com.Bluefix.Prodosia.DataType.Tracker.Tracker;
+import com.Bluefix.Prodosia.DataType.Tracker.TrackerPermissions;
+import com.Bluefix.Prodosia.DataType.User.User;
+
+import javax.activation.CommandInfo;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
 
 public class UnsubCommand implements ICommandFunc
 {
     @Override
-    public void execute(CommandInformation ci, String[] arguments)
+    public void execute(CommandInformation ci, String[] arguments) throws Exception
     {
+        // if there was no tracker data provided, do not execute the method
+        if (ci.getTracker() == null)
+            throw new IllegalArgumentException("A tracker was not provided!");
 
+        // check if the command could be valid.
+        if (arguments == null || arguments.length < 1)
+        {
+            msgUsernameNotProvided(ci);
+            return;
+        }
+
+        // check if the user was part of the system.
+        User u = UserHandler.getUserByImgurName(arguments[0]);
+
+        if (u == null)
+        {
+            msgUserNotFound(ci);
+            return;
+        }
+
+        // retrieve all taglists for the arguments.
+        Iterator<Taglist> taglists =
+                getTaglistsForArguments(ci.getTracker(), arguments).iterator();
+
+        // if no taglists were supplied, notify the user.
+        if (!taglists.hasNext())
+        {
+            if (arguments.length == 1)
+            {
+                msgNoTaglistsSetup(ci);
+            }
+            else
+            {
+                msgNoTaglistsRecognized(ci);
+            }
+            return;
+        }
+
+        // next, filter out all taglists that the user did not have permission to.
+        HashSet<Taglist> allowedLists = new HashSet<>();
+
+        while (taglists.hasNext())
+        {
+            Taglist cur = taglists.next();
+
+            if (ci.getTracker().getPermissions().hasPermission(cur))
+                allowedLists.add(cur);
+        }
+
+        if (allowedLists.isEmpty())
+        {
+            msgTaglistsNotAllowed(ci);
+            return;
+        }
+
+        // unsubscribe the user from all specified taglists. If these are all taglists
+        // the user had, the user should be deleted.
+        Iterable<String> unsubscription = u.unsubscribe(allowedLists);
+        Iterator<String> itUnsub = unsubscription.iterator();
+
+
+        if (!itUnsub.hasNext())
+        {
+            msgNoTaglistIntersection(ci);
+            return;
+        }
+
+        msgSuccess(ci, u.getImgurName(), itUnsub);
     }
+
+    private Iterable<Taglist> getTaglistsForArguments(Tracker t, String[] arguments) throws Exception
+    {
+        // ignore the first argument since that is the username.
+
+        // if no further arguments were supplied, remove the user from all taglists.
+        if (arguments.length == 1)
+        {
+            return TaglistHandler.handler().getAll();
+        }
+        else
+        {
+            LinkedList<Taglist> lists = new LinkedList<>();
+
+            for (int i = 1; i < arguments.length; i++)
+            {
+                Taglist tl = TaglistHandler.getTaglistByAbbreviation(arguments[i]);
+
+                if (tl != null)
+                    lists.add(tl);
+            }
+
+            return lists;
+        }
+    }
+
+    //region Messages
+
+    private static void msgUsernameNotProvided(CommandInformation ci) throws Exception
+    {
+        String message = "Error! No username was given.";
+
+        ci.reply(message);
+    }
+
+    private static void msgUserNotFound(CommandInformation ci) throws Exception
+    {
+        String message = "Error! The user was not found in any taglist.";
+
+        ci.reply(message);
+    }
+
+    private static void msgNoTaglistsSetup(CommandInformation ci) throws Exception
+    {
+        String message = "Error! The bot does not have any taglists set up yet.";
+
+        ci.reply(message);
+    }
+
+    private static void msgNoTaglistsRecognized(CommandInformation ci) throws Exception
+    {
+        String message = "Error! None of the provided taglists were recognized.";
+
+        ci.reply(message);
+    }
+
+    private static void msgTaglistsNotAllowed(CommandInformation ci) throws Exception
+    {
+        String message = "Error! The user was not allowed to unsubscribe from these taglists.";
+
+        ci.reply(message);
+    }
+
+    private static void msgNoTaglistIntersection(CommandInformation ci) throws Exception
+    {
+        String message = "Notice: The user was not part of any of these taglists.";
+
+        ci.reply(message);
+    }
+
+    private static void msgSuccess(CommandInformation ci, String username, Iterator<String> taglists) throws Exception
+    {
+        StringBuilder sb =
+                new StringBuilder("Successfully unsubscribed user \"" + username + "\" from taglists (");
+
+        while (taglists.hasNext())
+        {
+            sb.append(taglists.next() + ", ");
+        }
+
+        sb.setLength(sb.length()-2);
+        sb.append(").");
+
+        ci.reply(sb.toString());
+    }
+
+    //endregion
 
     @Override
     public String info()
     {
-        return null;
+        return "Please visit https://github.com/bboellaard/Prodosia/wiki/Unsubscription-Command for information";
     }
 }
