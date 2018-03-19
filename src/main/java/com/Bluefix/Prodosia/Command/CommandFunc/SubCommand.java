@@ -40,14 +40,11 @@ public class SubCommand implements ICommandFunc
     @Override
     public void execute(CommandInformation ci, String[] arguments) throws Exception
     {
-        System.out.println("#0");
-
         // if there was no tracker data provided, do not execute the method.
         if (ci.getTracker() == null)
         {
             throw new IllegalArgumentException("A tracker was not provided!");
         }
-        System.out.println("#0");
 
         // first see if the arguments could contain the data.
         if (arguments == null || arguments.length == 0)
@@ -55,26 +52,26 @@ public class SubCommand implements ICommandFunc
             msgUsernameNotProvided(ci);
             return;
         }
-        System.out.println("#0");
+
         if (arguments.length == 1)
         {
             msgNoUserSubscriptions(ci);
             return;
         }
-        System.out.println("#0");
+
         // first, parse the user-name
         String username = arguments[0];
         // trim the `@` if it was provided.
         if (username.startsWith("@"))
             username = username.replaceFirst("@", "").trim();
-        System.out.println("#0");
+
         // if the resulting username is invalid, let the tracker know
         if (username.isEmpty())
         {
             msgUsernameNotProvided(ci);
             return;
         }
-        System.out.println("#0");
+
         int pointer = 1;
         LinkedList<UserSubscription> subData = new LinkedList<>();
 
@@ -90,10 +87,10 @@ public class SubCommand implements ICommandFunc
         {
             // get the current argument and increment the pointer.
             String curArg = arguments[pointer++].toLowerCase();
-            System.out.println("#0");
+
             // attempt to parse the current argument as a taglist.
             Taglist tmpTl = TaglistHandler.getTaglistByAbbreviation(curArg);
-            System.out.println("#0");
+
             // if the tracker has no permissions for this taglist, simply ignore it.
             if (!ci.getTracker().hasPermission(tmpTl))
             {
@@ -101,7 +98,7 @@ public class SubCommand implements ICommandFunc
                 curTaglist = null;
                 continue;
             }
-            System.out.println("#0");
+
             // if a new taglist is provided, switch data and store the old taglist.
             if (tmpTl != null)
             {
@@ -118,12 +115,13 @@ public class SubCommand implements ICommandFunc
                 curTaglist = tmpTl;
                 curRatings = new HashSet<>();
                 filters = new HashSet<>();
+                continue;
             }
-            System.out.println("#0");
+
             // if no taglist was recognized, ignore this argument.
             if (curTaglist == null)
                 continue;
-            System.out.println("#0");
+
             // check to see if the arguments was a rating
             if ("s".equals(curArg))
             {
@@ -140,13 +138,13 @@ public class SubCommand implements ICommandFunc
                 filters.add(curArg);
             }
         }
-        System.out.println("#0");
+
         // finally, parse the last known usersubscription
         UserSubscription us = parseUserSubscription(curTaglist, curRatings, filters);
-        System.out.println("#0");
+
         if (us != null)
             subData.add(us);
-        System.out.println("#0");
+
         // if no subscription data was provided, notify the user.
         if (subData.isEmpty())
         {
@@ -164,16 +162,16 @@ public class SubCommand implements ICommandFunc
 
             return;
         }
-        System.out.println("#0");
+
         // attempt to add the user.
         User u = User.retrieveUser(username, subData.iterator());
-        System.out.println("#0");
+
         if (u == null)
         {
             msgCheckUser(ci, username);
             return;
         }
-        System.out.println("#0");
+
         // store the user
         u.store();
 

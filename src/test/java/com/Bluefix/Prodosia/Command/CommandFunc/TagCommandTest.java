@@ -74,6 +74,7 @@ public class TagCommandTest
 
     private static final long imgurId = 33641050;
     private Tracker myTracker;
+    private static final long parentId = 1301573497;
 
 
     @Before
@@ -163,9 +164,7 @@ public class TagCommandTest
     @Test
     public void testTagWithRatingList() throws Exception
     {
-        String command = cPrefix + "tag test1 s";
-
-        long parentId = 1301573497;
+        String command = prefix + "tag test1 s";
 
         executeCommand(command, parentId);
     }
@@ -175,6 +174,8 @@ public class TagCommandTest
     private void executeCommand(String command, long parentId) throws BaringoApiException, IOException, URISyntaxException
     {
         Comment comment = ImgurManager.client().commentService().getComment(parentId);
+
+        //TODO: for a proper test I should mock CommandInformation and check if the reply method is properly called.
 
         CommandInformation ci =
                 new ImgurCommandInformation(myTracker, comment);

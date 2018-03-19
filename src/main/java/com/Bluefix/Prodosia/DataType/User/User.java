@@ -197,6 +197,7 @@ public class User
         if (other == null)
         {
             UserHandler.handler().set(this);
+            System.out.println("##0 User was stored ##");
         }
         else
         {
@@ -205,6 +206,7 @@ public class User
 
             UserHandler.handler().remove(other);
             UserHandler.handler().set(merged);
+            System.out.println("##1 User was stored ##");
         }
     }
 
