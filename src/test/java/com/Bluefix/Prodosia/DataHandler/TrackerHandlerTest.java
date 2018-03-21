@@ -50,8 +50,8 @@ public class TrackerHandlerTest
                 "imgurname",
                 1,
                 "discordname",
-                1234,
-                2,
+                "1234",
+                "",
                 perm);
 
 

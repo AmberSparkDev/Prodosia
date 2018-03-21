@@ -128,9 +128,9 @@ public class TrackerHandler extends LocalStorageHandler<Tracker>
 
         prep0.setLong(argCounter++, t.getImgurId());
         prep0.setString(argCounter++, t.getImgurName());
-        prep0.setLong(argCounter++, t.getDiscordId());
+        prep0.setString(argCounter++, t.getDiscordId());
         prep0.setString(argCounter++, t.getDiscordName());
-        prep0.setInt(argCounter++, t.getDiscordTag());
+        prep0.setString(argCounter++, t.getDiscordTag());
 
         // retrieve the rowid of the freshly inserted tracker
         long trackerIndex;
@@ -200,7 +200,7 @@ public class TrackerHandler extends LocalStorageHandler<Tracker>
 
         PreparedStatement prep0 = SqlDatabase.getStatement(query0);
         prep0.setLong(1, t.getImgurId());
-        prep0.setLong(2, t.getDiscordId());
+        prep0.setString(2, t.getDiscordId());
 
         ArrayList<ResultSet> result = SqlDatabase.query(prep0);
 
@@ -238,7 +238,7 @@ public class TrackerHandler extends LocalStorageHandler<Tracker>
     }
 
 
-    private synchronized static Tracker dbGetTracker(long imgurId, long discordId) throws Exception
+    private synchronized static Tracker dbGetTracker(long imgurId, String discordId) throws Exception
     {
         String query =
                 "SELECT " +
@@ -255,7 +255,7 @@ public class TrackerHandler extends LocalStorageHandler<Tracker>
 
         PreparedStatement prep = SqlDatabase.getStatement(query);
         prep.setLong(1, imgurId);
-        prep.setLong(2, discordId);
+        prep.setString(2, discordId);
         ArrayList<ResultSet> result = SqlDatabase.query(prep);
 
         if (result.size() != 1)
@@ -305,9 +305,9 @@ public class TrackerHandler extends LocalStorageHandler<Tracker>
         {
             long imgurId = rs.getLong(1);
             String imgurName = rs.getString(2);
-            long discordId = rs.getLong(3);
+            String discordId = rs.getString(3);
             String discordName = rs.getString(4);
-            int discordTag = rs.getInt(5);
+            String discordTag = rs.getString(5);
             int permType = rs.getInt(6);
             String permTaglists = rs.getString(7);
 
@@ -342,6 +342,31 @@ public class TrackerHandler extends LocalStorageHandler<Tracker>
         for (Tracker t : trackers)
         {
             if (t.getImgurId() == imgurId)
+                return t;
+        }
+
+        return null;
+    }
+
+
+    /**
+     * Retrieve the tracker associated with the given discord id.
+     *
+     * Will return null if no tracker like that existed.
+     * @param discordId The discord id of the user.
+     * @return The tracker that corresponds with the discordId, or null otherwise.
+     */
+    public static Tracker getTrackerByDiscordId(String discordId) throws Exception
+    {
+        // return null on invalid imgur id.
+        if (discordId == null || discordId.trim().isEmpty())
+            return null;
+
+        ArrayList<Tracker> trackers = handler().getAll();
+
+        for (Tracker t : trackers)
+        {
+            if (t.getDiscordId().equals(discordId.trim()));
                 return t;
         }
 

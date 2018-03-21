@@ -22,23 +22,26 @@
 
 package com.Bluefix.Prodosia.DataType.Command;
 
-import com.Bluefix.Prodosia.DataType.Comments.SimpleCommentRequest;
-import com.Bluefix.Prodosia.DataType.Comments.StatComment;
 import com.Bluefix.Prodosia.DataType.Tracker.Tracker;
-import com.Bluefix.Prodosia.Imgur.Tagging.SimpleCommentRequestStorage;
-import com.github.kskelm.baringo.model.Comment;
-import com.sun.javafx.image.BytePixelSetter;
+import com.Bluefix.Prodosia.Discord.StatDiscord;
+import net.dv8tion.jda.core.entities.Message;
 
 import java.util.LinkedList;
 
-public class ImgurCommandInformation extends CommandInformation
+public class DiscordCommandInformation extends CommandInformation
 {
-    public ImgurCommandInformation(Tracker tracker, Comment comment)
+    private Message message;
+
+    public DiscordCommandInformation(Tracker t, Message message)
     {
         super();
-        super.setTracker(tracker);
-        super.setParentComment(comment);
+        super.setTracker(t);
+
+        this.message = message;
     }
+
+
+
 
     /**
      * Reply to the user with the following entries.
@@ -48,15 +51,11 @@ public class ImgurCommandInformation extends CommandInformation
     @Override
     public void reply(String... entries) throws Exception
     {
+        LinkedList<String> replies = ReplyHelper.prepareReply(entries, StatDiscord.MaximumMessageSize, false);
 
-
-        LinkedList<String> mEn = ReplyHelper.prepareReply(entries, StatComment.MaxCommentLength, true);
-
-        SimpleCommentRequest scr = new SimpleCommentRequest(
-                        super.getParentComment().getImageId(),
-                        super.getParentComment().getId(),
-                        mEn);
-
-        SimpleCommentRequestStorage.handler().set(scr);
+        for (String r : replies)
+        {
+            message.getChannel().sendMessage(r);
+        }
     }
 }

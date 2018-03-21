@@ -46,9 +46,9 @@ public class SqlStatement
                         "id integer PRIMARY KEY, " +
                         "imgurId integer, " +
                         "imgurName text, " +
-                        "discordId integer, " +
+                        "discordId text, " +
                         "discordName text, " +
-                        "discordTag integer); ",
+                        "discordTag text); ",
                 /* --- Permission --- */
                         "CREATE TABLE IF NOT EXISTS Permission (" +
                         "trackerId integer PRIMARY KEY, " +

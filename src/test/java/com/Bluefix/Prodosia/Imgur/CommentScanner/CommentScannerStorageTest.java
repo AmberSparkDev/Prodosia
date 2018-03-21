@@ -53,7 +53,7 @@ public class CommentScannerStorageTest
         // create a new Tracker
         TrackerPermissions perm = new TrackerPermissions(TrackerPermissions.TrackerType.ADMIN);
 
-        tracker = new Tracker("mashedstew", 1, null, -1, -1, perm);
+        tracker = new Tracker("mashedstew", 1, null, "0000", "", perm);
 
         TrackerHandler.handler().set(tracker);
 

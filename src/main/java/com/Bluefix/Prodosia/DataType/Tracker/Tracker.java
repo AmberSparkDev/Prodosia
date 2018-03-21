@@ -48,8 +48,8 @@ public class Tracker
     private long imgurId;
 
     private String discordName;
-    private int discordTag;
-    private long discordId;
+    private String discordTag;
+    private String discordId;
 
     private TrackerPermissions permissions;
 
@@ -68,12 +68,12 @@ public class Tracker
         return discordName;
     }
 
-    public int getDiscordTag()
+    public String getDiscordTag()
     {
         return discordTag;
     }
 
-    public long getDiscordId()
+    public String getDiscordId()
     {
         return discordId;
     }
@@ -91,8 +91,8 @@ public class Tracker
             String imgurName,
             long imgurId,
             String discordName,
-            int discordTag,
-            long discordId,
+            String discordTag,
+            String discordId,
             TrackerPermissions permissions)
     {
         this.id = -1;
@@ -104,7 +104,7 @@ public class Tracker
         this.permissions = permissions;
     }
 
-    public Tracker(long id, String imgurName, long imgurId, String discordName, int discordTag, long discordId, TrackerPermissions permissions)
+    public Tracker(long id, String imgurName, long imgurId, String discordName, String discordTag, String discordId, TrackerPermissions permissions)
     {
         this.id = id;
         this.imgurName = imgurName;

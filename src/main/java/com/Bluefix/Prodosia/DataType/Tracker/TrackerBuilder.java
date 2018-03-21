@@ -23,12 +23,17 @@
 package com.Bluefix.Prodosia.DataType.Tracker;
 
 
+import com.Bluefix.Prodosia.Discord.DiscordManager;
 import com.Bluefix.Prodosia.Imgur.ImgurApi.ImgurManager;
 import com.github.kskelm.baringo.model.Account;
 import com.github.kskelm.baringo.util.BaringoApiException;
+import net.dv8tion.jda.core.entities.User;
 
+import javax.security.auth.login.LoginException;
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * A tracker-builder to create tracker objects.
@@ -42,8 +47,8 @@ public class TrackerBuilder
     private String imgurName;
     private long imgurId;
     private String discordName;
-    private int discordTag;
-    private long discordId;
+    private String discordTag;
+    private String discordId;
     private TrackerPermissions trackerPermissions;
 
     public TrackerBuilder()
@@ -92,19 +97,15 @@ public class TrackerBuilder
         return this;
     }
 
-    public TrackerBuilder setDiscordId(long discordId)
+    public TrackerBuilder setDiscordId(String discordId) throws LoginException, IOException
     {
         // TODO: obtain discord data from id
         this.discordId = discordId;
 
-        return this;
-    }
+        User u = DiscordManager.manager().getUserById(discordId);
 
-    public TrackerBuilder setDiscordInfo(String discordName, int discordTag)
-    {
-        // TODO: obtain discord id from data
-        this.discordName = discordName;
-        this.discordTag = discordTag;
+        this.discordName = u.getName();
+        this.discordTag = u.getDiscriminator();
 
         return this;
     }

@@ -139,7 +139,7 @@ public class SubCommandTest
 
 
         TrackerPermissions perm = new TrackerPermissions(TrackerPermissions.TrackerType.ADMIN);
-        myTracker = new Tracker(uName0, u0Id, null, -1, -1, perm);
+        myTracker = new Tracker(uName0, u0Id, null, "0000", "", perm);
         TrackerHandler.handler().set(myTracker);
     }
 

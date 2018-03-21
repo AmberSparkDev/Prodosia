@@ -23,8 +23,8 @@
 package com.Bluefix.Prodosia.GUI.Tracker;
 
 import com.Bluefix.Prodosia.DataHandler.TrackerHandler;
-import com.Bluefix.Prodosia.DataType.DataBuilder.TrackerBuilder;
 import com.Bluefix.Prodosia.DataType.Tracker.Tracker;
+import com.Bluefix.Prodosia.DataType.Tracker.TrackerBuilder;
 import com.Bluefix.Prodosia.Exception.ExceptionHelper;
 import com.Bluefix.Prodosia.GUI.Helpers.DataFieldStorage;
 import com.Bluefix.Prodosia.GUI.Helpers.EditableWindowPane;
@@ -34,8 +34,6 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
-
-import java.sql.SQLException;
 
 public class EditTrackerWindow extends EditableWindowPane
 {
@@ -398,7 +396,7 @@ public class EditTrackerWindow extends EditableWindowPane
 
 
 
-        TrackerBuilder builder = TrackerBuilder.getBuilder();
+        TrackerBuilder builder = TrackerBuilder.builder();
 
 
 

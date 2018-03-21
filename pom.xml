@@ -20,6 +20,14 @@
         </plugins>
     </build>
 
+    <repositories>
+        <repository>
+            <id>jcenter</id>
+            <name>jcenter-bintray</name>
+            <url>http://jcenter.bintray.com</url>
+        </repository>
+    </repositories>
+
 
     <dependencies>
 
@@ -49,11 +57,11 @@
             <version>2.7.5</version>
         </dependency>
 
+
         <dependency>
             <groupId>net.dv8tion</groupId>
             <artifactId>JDA</artifactId>
-            <version>3.5.0_332</version>
-            <type>pom</type>
+            <version>3.5.1_351</version>
         </dependency>
 
         <!-- https://mvnrepository.com/artifact/org.xerial/sqlite-jdbc -->
