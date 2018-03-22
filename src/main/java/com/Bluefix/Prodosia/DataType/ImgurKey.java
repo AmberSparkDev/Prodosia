@@ -22,6 +22,8 @@
 
 package com.Bluefix.Prodosia.DataType;
 
+import java.util.Objects;
+
 /**
  * Immutable data class for an imgur key.
  */
@@ -68,5 +70,23 @@ public class ImgurKey
     public String getCallback()
     {
         return callback;
+    }
+
+    @Override
+    public boolean equals(Object o)
+    {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ImgurKey imgurKey = (ImgurKey) o;
+        return Objects.equals(clientId, imgurKey.clientId) &&
+                Objects.equals(clientSecret, imgurKey.clientSecret) &&
+                Objects.equals(callback, imgurKey.callback);
+    }
+
+    @Override
+    public int hashCode()
+    {
+
+        return Objects.hash(clientId, clientSecret, callback);
     }
 }

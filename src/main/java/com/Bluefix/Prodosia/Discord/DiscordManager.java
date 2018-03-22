@@ -23,6 +23,7 @@
 package com.Bluefix.Prodosia.Discord;
 
 import com.Bluefix.Prodosia.Command.CommandRecognition;
+import com.Bluefix.Prodosia.DataHandler.CommandPrefixStorage;
 import com.Bluefix.Prodosia.DataHandler.TrackerHandler;
 import com.Bluefix.Prodosia.DataType.Command.CommandInformation;
 import com.Bluefix.Prodosia.DataType.Command.CommandPrefix;
@@ -34,6 +35,7 @@ import net.dv8tion.jda.core.AccountType;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.JDABuilder;
 import net.dv8tion.jda.core.entities.Message;
+import net.dv8tion.jda.core.entities.User;
 import net.dv8tion.jda.core.events.Event;
 import net.dv8tion.jda.core.events.ReadyEvent;
 import net.dv8tion.jda.core.events.message.MessageReceivedEvent;
@@ -42,6 +44,7 @@ import net.dv8tion.jda.core.hooks.ListenerAdapter;
 
 import javax.security.auth.login.LoginException;
 import java.io.IOException;
+import java.util.LinkedList;
 
 public class DiscordManager
 {
@@ -56,15 +59,20 @@ public class DiscordManager
      * @return
      * @throws LoginException
      */
-    public synchronized static JDA manager() throws LoginException, IOException
+    public synchronized static JDA manager() throws Exception
     {
         if (me == null)
+        {
             me = createJDA();
+
+            // update the command prefix
+            setupPrefix(me.getSelfUser());
+        }
 
         return me;
     }
 
-    private static JDA createJDA() throws LoginException, IOException
+    private static JDA createJDA() throws Exception
     {
         // retrieve the stored token
         String discordToken = KeyStorage.getDiscordToken();
@@ -82,6 +90,59 @@ public class DiscordManager
         jda.addEventListener(new MessageListener());
 
         return jda;
+    }
+
+    private static void setupPrefix(User user) throws Exception
+    {
+        CommandPrefix cp = CommandPrefixStorage.getPrefixForType(CommandPrefix.Type.DISCORD);
+
+        // if there was no existing command-prefix, parse a new one and return.
+        if (cp == null)
+        {
+            CommandPrefixStorage.handler().set(parseNewCommandPrefix(user));
+            return;
+        }
+
+        // attempt to replace the current commandprefix.
+        LinkedList<String> items = new LinkedList<>();
+
+        try
+        {
+            LinkedList<String> entries = CommandPrefix.parseitemsFromPattern(cp.getRegex());
+
+            String[] newEntries = new String[entries.size()];
+
+            // copy all items, but replace the first one with our mention.
+            int counter = 0;
+
+            for (String s : entries)
+            {
+                if (counter == 0)
+                    newEntries[counter++] = user.getAsMention();
+                else
+                    newEntries[counter++] = s;
+            }
+
+            String pattern = CommandPrefix.parsePatternForItems(newEntries);
+            CommandPrefix newPrefix = new CommandPrefix(CommandPrefix.Type.DISCORD, pattern);
+
+            CommandPrefixStorage.handler().update(cp, newPrefix);
+
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+
+            // in case of failure, use the default command-prefix.
+            CommandPrefixStorage.handler().set(parseNewCommandPrefix(user));
+            return;
+        }
+    }
+
+    private static CommandPrefix parseNewCommandPrefix(User user)
+    {
+        String pattern = CommandPrefix.parsePatternForItems(user.getAsMention());
+        return new CommandPrefix(CommandPrefix.Type.DISCORD, pattern);
     }
 
     //endregion
@@ -110,12 +171,15 @@ public class DiscordManager
     /**
      * Update the Discord Manager to use a different token.
      */
-    public static void update() throws LoginException, IOException
+    public static void update() throws Exception
     {
         if (me != null)
             me.shutdown();
 
         me = createJDA();
+
+        // update the command prefix
+        setupPrefix(me.getSelfUser());
     }
 
     //endregion
@@ -131,6 +195,8 @@ public class DiscordManager
         @Override
         public void onMessageReceived(MessageReceivedEvent event)
         {
+            System.out.println("#### Discord Message ####\n" + event.getMessage().getContentDisplay()+ "\n\n#### ####");
+
             // --- Trackers ---
             // Attempt to retrieve the tracker that parsed this message.
             try
@@ -177,7 +243,7 @@ public class DiscordManager
         {
             if (event instanceof ReadyEvent)
             {
-                Logger.logMessage("Discord API successfully initialized.");
+                System.out.println("Discord API successfully initialized.");
             }
         }
     }

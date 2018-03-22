@@ -25,6 +25,7 @@ package com.Bluefix.Prodosia.Imgur.ImgurApi;
 
 import com.Bluefix.Prodosia.Authorization.ImgurAuthorization;
 import com.Bluefix.Prodosia.DataType.ImgurKey;
+import com.Bluefix.Prodosia.Module.ModuleManager;
 import com.Bluefix.Prodosia.Storage.KeyStorage;
 import com.github.kskelm.baringo.BaringoClient;
 import com.github.kskelm.baringo.util.BaringoApiException;
@@ -63,6 +64,9 @@ public class ImgurManager
             // determines when the user is prompted, so it can be done on startup.
             if (client != null)
                 ImgurAuthorization.authorize(client, new URI(KeyStorage.getImgurKey().getCallback()));
+
+            // start the imgur dependencies
+            ModuleManager.startImgurDependencies();
         }
 
         return client;
@@ -115,6 +119,8 @@ public class ImgurManager
      */
     public static void update() throws IOException, URISyntaxException, BaringoApiException
     {
+        boolean clientWasInitialized = client != null;
+
         ImgurKey key = KeyStorage.getImgurKey();
 
         client = createClient(key);
@@ -125,6 +131,10 @@ public class ImgurManager
         // determines when the user is prompted, so it can be done on startup.
         if (client != null)
             ImgurAuthorization.authorize(client, new URI(KeyStorage.getImgurKey().getCallback()));
+
+        // if the client itself wasn't initialized yet, start the imgur dependencies.
+        if (!clientWasInitialized)
+            ModuleManager.startImgurDependencies();
     }
 
     //endregion

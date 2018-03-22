@@ -1,8 +1,10 @@
 # private files
 private data.txt
 database.db
+database.db-journal
 keys.txt
 cookie.txt
+
 
 # Created by https://www.gitignore.io/api/intellij
 

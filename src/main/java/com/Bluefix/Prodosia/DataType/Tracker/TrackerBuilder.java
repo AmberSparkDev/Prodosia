@@ -97,7 +97,7 @@ public class TrackerBuilder
         return this;
     }
 
-    public TrackerBuilder setDiscordId(String discordId) throws LoginException, IOException
+    public TrackerBuilder setDiscordId(String discordId) throws Exception
     {
         // TODO: obtain discord data from id
         this.discordId = discordId;

@@ -49,17 +49,22 @@ public class ModuleManager
 
     private ModuleManager()
     {
-
+        imgurDependenciesStarted = false;
     }
 
     //endregion
 
 
-    /**
-     * Start execution of the application modules.
-     */
-    public static void start()
+    private boolean imgurDependenciesStarted;
+
+    public static synchronized void startImgurDependencies()
     {
+        // if these entries were already started, skip this phase.
+        if (handler().imgurDependenciesStarted)
+            return;
+
+        handler().imgurDependenciesStarted = true;
+
         // initialize all the module values
         handler().commentScannerExecution = CommentScannerExecution.handler();
         handler().commentDeletionExecution = CommentDeletionExecution.handler();
@@ -67,7 +72,7 @@ public class ModuleManager
 
         // start the modules
         handler().commentScannerExecution.start();
-        //handler().commentDeletionExecution.start();
+        handler().commentDeletionExecution.start();
         handler().commentExecution.start();
     }
 

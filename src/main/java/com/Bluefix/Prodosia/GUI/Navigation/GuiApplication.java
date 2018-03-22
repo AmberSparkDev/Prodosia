@@ -22,6 +22,8 @@
 
 package com.Bluefix.Prodosia.GUI.Navigation;
 
+import com.Bluefix.Prodosia.Discord.DiscordManager;
+import com.Bluefix.Prodosia.Imgur.ImgurApi.ImgurManager;
 import com.Bluefix.Prodosia.Storage.KeyStorage;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -102,6 +104,12 @@ public class GuiApplication extends Application
         }
         else
         {
+            // start the imgur manager.
+            ImgurManager.client();
+
+            // start the discord manager.
+            DiscordManager.manager();
+
             VistaNavigator.loadVista(VistaNavigator.AppStage.MAIN_MENU);
         }
 

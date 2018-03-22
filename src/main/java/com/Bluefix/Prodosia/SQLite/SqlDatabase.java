@@ -51,7 +51,7 @@ public class SqlDatabase
 
     private static SqlDatabase myDatabase;
 
-    public static SqlDatabase Database()
+    public static synchronized SqlDatabase Database()
     {
         if (myDatabase == null)
         {
@@ -91,9 +91,17 @@ public class SqlDatabase
     /**
      * Generate the database from the latest design.
      */
-    private void createDatabase()
+    private void createDatabase() throws SQLException
     {
+        // create the database and set the Version.
+        String[] tableQueries = SqlStatement.createDatabaseStatement();
 
+        for (String q : tableQueries)
+        {
+            myDatabase.conn.prepareStatement(q).execute();
+        }
+
+        SqlDatabaseHelper.setVersion(DatabaseVersion, CreatedBy);
     }
 
 
@@ -108,16 +116,7 @@ public class SqlDatabase
             // check if the 'Info' table exists.
             if (!SqlDatabaseHelper.tableExists( "Info"))
             {
-                // create the database and set the Version.
-                String[] tableQueries = SqlStatement.createDatabaseStatement();
-
-                for (String q : tableQueries)
-                {
-                    myDatabase.conn.prepareStatement(q).execute();
-                }
-
-                SqlDatabaseHelper.setVersion( DatabaseVersion, CreatedBy);
-
+                createDatabase();
                 return;
             }
 

@@ -223,11 +223,11 @@ public class ApiKeysWindow
                     acceptImgurKey.getClientId(),
                     acceptImgurKey.getClientSecret(),
                     acceptImgurKey.getCallback());
+
+            ImgurManager.update();
         }
 
         KeyStorage.setDiscordToken(acceptDiscordToken);
-
-        ImgurManager.update();
         DiscordManager.update();
     }
 

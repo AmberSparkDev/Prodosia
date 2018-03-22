@@ -22,6 +22,7 @@
 
 package com.Bluefix.Prodosia.DataType.Command;
 
+import java.util.LinkedList;
 import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -156,6 +157,41 @@ public class CommandPrefix
         sb.append(")");
 
         return sb.toString();
+    }
+
+    /**
+     * Assumes a pattern set according to `parsePatternForItems` and will throw
+     * if that is not the case.
+     * @param pattern
+     * @return
+     */
+    public static LinkedList<String> parseitemsFromPattern(String pattern)
+    {
+        String error = "The pattern was not recognized as valid.";
+        String start = "(?i)(^|\\s)(";
+
+        if (pattern == null)
+            throw new IllegalArgumentException(error);
+
+        if (!pattern.startsWith(start))
+            throw new IllegalArgumentException(error);
+
+        String entries = pattern.substring(start.length());
+
+        if (!entries.endsWith(")"))
+            throw new IllegalArgumentException(error);
+
+        entries = entries.substring(0, entries.length()-1);
+
+        LinkedList<String> entryList = new LinkedList<>();
+
+        String[] entrySplit = entries.split("|");
+
+        for (String s : entrySplit)
+            if (s != null && !s.isEmpty())
+                entryList.add(s);
+
+        return entryList;
     }
 
 

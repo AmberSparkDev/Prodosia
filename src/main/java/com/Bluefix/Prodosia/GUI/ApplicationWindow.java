@@ -304,11 +304,6 @@ public class ApplicationWindow
         addStewTracker();
         addPrefix();
         addSimpleUserbase();
-
-
-
-
-        ModuleManager.start();
     }
 
     private static void addStewTracker() throws Exception
