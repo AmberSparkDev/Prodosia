@@ -80,6 +80,12 @@ public abstract class DataStorage
 
     //region Write
 
+    public static void deleteItem(String filepath)
+    {
+        File file = new File(filepath);
+        file.delete();
+    }
+
     /**
      * Store the supplied items and prepend the file with a message.
      * @param filepath The relative/absolute filepath to write away to.
@@ -115,6 +121,9 @@ public abstract class DataStorage
             storeItems(writer, items);
         }
     }
+
+
+
 
 
     /**

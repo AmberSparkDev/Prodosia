@@ -71,7 +71,8 @@ public class ApplicationWindow
     private void gotoApiKeys()
     {
         // set `ApiKeysWindow` as active window.
-        VistaNavigator.loadVista(VistaNavigator.AppStage.API_KEYS);
+        ApiKeysWindow akw = VistaNavigator.loadVista(VistaNavigator.AppStage.API_KEYS);
+        akw.initialize();
     }
 
     private void initializeStatusWindow()

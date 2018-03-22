@@ -56,7 +56,7 @@ public class DiscordManager
      * @return
      * @throws LoginException
      */
-    public static JDA manager() throws LoginException, IOException
+    public synchronized static JDA manager() throws LoginException, IOException
     {
         if (me == null)
             me = createJDA();
@@ -74,13 +74,52 @@ public class DiscordManager
             return null;
 
 
-        return new JDABuilder(AccountType.BOT)
+        JDA jda = new JDABuilder(AccountType.BOT)
                 .setToken(discordToken)
                 .addEventListener(new ReadyListener())
                 .buildAsync();
+
+        jda.addEventListener(new MessageListener());
+
+        return jda;
     }
 
     //endregion
+
+    //region Sanitation check
+
+    /**
+     * This method will check whether the discord token is valid, but it will not refresh the token of the
+     * current manager.
+     * @param discordToken
+     * @return
+     */
+    public static boolean discordTokenIsValid(String discordToken) throws Exception
+    {
+        // attempt to create a new JDA object with the specified discord token.
+        JDA jda = new JDABuilder(AccountType.BOT)
+                .setToken(discordToken)
+                .buildBlocking();
+
+        if (jda != null)
+            return true;
+
+        throw new Exception("The JDA object could not be initialized.");
+    }
+
+    /**
+     * Update the Discord Manager to use a different token.
+     */
+    public static void update() throws LoginException, IOException
+    {
+        if (me != null)
+            me.shutdown();
+
+        me = createJDA();
+    }
+
+    //endregion
+
 
     //region Event Listener
 

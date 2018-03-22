@@ -149,9 +149,6 @@ public class KeyStorage
      */
     public static void setDiscordToken(String token) throws IOException
     {
-        if (token == null || token.isEmpty())
-            throw new IllegalArgumentException("The discord token should not be null or empty");
-
         keyStorage().discordToken = token;
         writeStorage();
     }
@@ -230,7 +227,9 @@ public class KeyStorage
         items.add(new DataStorage.Item(Identifier.ImgurClientId.toString(), ks.imgurKey.getClientId()));
         items.add(new DataStorage.Item(Identifier.ImgurClientSecret.toString(), ks.imgurKey.getClientSecret()));
         items.add(new DataStorage.Item(Identifier.ImgurCallback.toString(), ks.imgurKey.getCallback()));
-        items.add(new DataStorage.Item(Identifier.DiscordToken.toString(), ks.discordToken));
+
+        if (ks.discordToken != null && !ks.discordToken.isEmpty())
+            items.add(new DataStorage.Item(Identifier.DiscordToken.toString(), ks.discordToken));
 
         DataStorage.storeItems(getFilepath(), items, storageMessage());
     }
@@ -239,7 +238,8 @@ public class KeyStorage
     {
         return
                 "This document will contain any API keys known to the system.\n" +
-                "Unless you know what you are doing, please don't tamper with this file.\n\n";
+                "Unless you know what you are doing, please don't tamper with this file.\n" +
+                "When sharing the application with others, remove this file to keep the credentials secret.\n\n";
     }
 
     //endregion

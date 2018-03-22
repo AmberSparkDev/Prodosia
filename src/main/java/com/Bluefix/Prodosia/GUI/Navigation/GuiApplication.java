@@ -22,6 +22,7 @@
 
 package com.Bluefix.Prodosia.GUI.Navigation;
 
+import com.Bluefix.Prodosia.Storage.KeyStorage;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
@@ -91,12 +92,20 @@ public class GuiApplication extends Application
             GuiApplication.cssSheet = getClass().getResource("/com/Bluefix/Prodosia/GUI/stylesheet.css").toExternalForm();
         }
         scene.getStylesheets().add(cssSheet);
-
         primaryStage.setScene(scene);
-
         VistaNavigator.setVistaHolder(loader.getController());
 
-        VistaNavigator.loadVista(VistaNavigator.AppStage.MAIN_MENU);
+        // if the imgur key was not setup, first go to the API keys window.
+        if (KeyStorage.getImgurKey() == null)
+        {
+            VistaNavigator.loadVista(VistaNavigator.AppStage.API_KEYS);
+        }
+        else
+        {
+            VistaNavigator.loadVista(VistaNavigator.AppStage.MAIN_MENU);
+        }
+
+
 
         primaryStage.show();
     }

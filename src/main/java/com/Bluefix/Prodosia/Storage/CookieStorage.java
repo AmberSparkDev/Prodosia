@@ -69,6 +69,13 @@ public abstract class CookieStorage
      */
     public static void setRefreshToken(String token) throws IOException
     {
+        // if the refresh token was null, delete the cookie file.
+        if (token == null)
+        {
+            DataStorage.deleteItem(getFilePath());
+            return;
+        }
+
         ArrayList<DataStorage.Item> items = new ArrayList<>();
         items.add(new DataStorage.Item(tokenName, token));
 

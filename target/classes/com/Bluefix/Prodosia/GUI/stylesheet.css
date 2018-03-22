@@ -50,6 +50,26 @@
     -fx-font-size: 9pt;
 }
 
+#invalidClientId
+{
+    -fx-base: #ff6961;
+}
+
+#invalidClientSecret
+{
+    -fx-base: #ff6961;
+}
+
+#invalidCallback
+{
+    -fx-base: #ff6961;
+}
+
+#invalidDiscordToken
+{
+    -fx-base: #ff6961;
+}
+
 
 
 
