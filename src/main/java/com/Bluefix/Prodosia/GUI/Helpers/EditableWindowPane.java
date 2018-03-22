@@ -23,6 +23,7 @@
 package com.Bluefix.Prodosia.GUI.Helpers;
 
 import com.Bluefix.Prodosia.Exception.ExceptionHelper;
+import com.Bluefix.Prodosia.GUI.ApplicationWindow;
 import com.Bluefix.Prodosia.GUI.Navigation.VistaNavigator;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
@@ -78,20 +79,24 @@ public abstract class EditableWindowPane
      * Depending on the state of the window, either go back to view mode or
      * go back to the main application.
      */
-    protected void button_Cancel_Back()
+    protected void button_Cancel_Back() throws Exception
     {
+        ApplicationWindow aw;
+
         switch (curState)
         {
 
             case VIEW:
-                VistaNavigator.loadVista(VistaNavigator.AppStage.MAIN_MENU);
+                aw = VistaNavigator.loadVista(VistaNavigator.AppStage.MAIN_MENU);
+                aw.update();
                 break;
 
             case EDIT:
                 if (isCreating())
                 {
                     // if there was no active tracker and there was no valid information, go back to main menu.
-                    VistaNavigator.loadVista(VistaNavigator.AppStage.MAIN_MENU);
+                    aw = VistaNavigator.loadVista(VistaNavigator.AppStage.MAIN_MENU);
+                    aw.update();
                 }
                 else
                 {
@@ -118,12 +123,16 @@ public abstract class EditableWindowPane
             case EDIT:
                 try
                 {
-                    saveItem();
+                    boolean success = saveItem();
+
+                    // if saving the item was successful, change to view mode.
+                    if (success)
+                        setState(WindowState.VIEW);
+
                 } catch (Exception e)
                 {
                     ExceptionHelper.showWarning(e);
                 }
-                setState(WindowState.VIEW);
                 break;
         }
     }
@@ -142,7 +151,7 @@ public abstract class EditableWindowPane
         }
     }
 
-    protected void button_ConfirmDelete()
+    protected void button_ConfirmDelete() throws Exception
     {
         try
         {
@@ -151,7 +160,8 @@ public abstract class EditableWindowPane
         {
             ExceptionHelper.showWarning(e);
         }
-        VistaNavigator.loadVista(VistaNavigator.AppStage.MAIN_MENU);
+        ApplicationWindow aw = VistaNavigator.loadVista(VistaNavigator.AppStage.MAIN_MENU);
+        aw.update();
     }
 
     //endregion
@@ -199,8 +209,9 @@ public abstract class EditableWindowPane
 
     /**
      * Store the current data.
+     * @return true if the item was successfully saved, false otherwise
      */
-    protected abstract void saveItem() throws Exception;
+    protected abstract boolean saveItem() throws Exception;
 
     //endregion
 

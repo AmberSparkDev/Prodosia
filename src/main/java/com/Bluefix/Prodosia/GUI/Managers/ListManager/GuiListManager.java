@@ -121,4 +121,12 @@ public abstract class GuiListManager<T extends Labeled>
             }
         }
     }
+
+    /**
+     * Update the list manager by re-initializing its components.
+     */
+    public void update() throws Exception
+    {
+        fill();
+    }
 }

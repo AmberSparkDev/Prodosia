@@ -213,7 +213,7 @@ public class CommentScannerExecution extends ImgurIntervalRunner
      * @return The amount of GET requests that were executed
      * @throws Exception
      */
-    private int refreshQueue(int allowedRequests) throws Exception
+    private synchronized int refreshQueue(int allowedRequests) throws Exception
     {
         int usedRequests = 0;
 
@@ -242,6 +242,12 @@ public class CommentScannerExecution extends ImgurIntervalRunner
         // if any trackers weren't part of the queue, add them.
         for (Tracker t : trackers)
         {
+            // if the tracker has no imgur id, skip it.
+            if (    t.getImgurName() == null ||
+                    t.getImgurName().trim().isEmpty() ||
+                    t.getImgurId() < 0)
+                continue;
+
             Set<Long> iSet = trackerMap.keySet();
 
             if (!iSet.contains(t.getImgurId()))

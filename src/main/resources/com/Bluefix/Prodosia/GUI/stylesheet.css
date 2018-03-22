@@ -50,6 +50,9 @@
     -fx-font-size: 9pt;
 }
 
+
+/* Api keys window */
+
 #invalidClientId
 {
     -fx-base: #ff6961;
@@ -70,6 +73,21 @@
     -fx-base: #ff6961;
 }
 
+
+
+
+
+/* Tracker window */
+
+#twInvalidImgurId
+{
+    -fx-base: #ff6961;
+}
+
+#twInvalidDiscordId
+{
+    -fx-base: #ff6961;
+}
 
 
 

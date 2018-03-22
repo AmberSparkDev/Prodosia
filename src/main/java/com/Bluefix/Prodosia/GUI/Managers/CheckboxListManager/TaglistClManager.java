@@ -24,9 +24,14 @@ package com.Bluefix.Prodosia.GUI.Managers.CheckboxListManager;
 
 import com.Bluefix.Prodosia.DataHandler.TaglistHandler;
 import com.Bluefix.Prodosia.DataType.Taglist.Taglist;
+import com.Bluefix.Prodosia.DataType.Taglist.TaglistComparator;
+import com.Bluefix.Prodosia.DataType.Tracker.TrackerPermissions;
+import javafx.scene.control.CheckBox;
 import javafx.scene.layout.Pane;
 
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
 
 public class TaglistClManager extends GuiCheckboxListManager
 {
@@ -50,6 +55,9 @@ public class TaglistClManager extends GuiCheckboxListManager
         if (taglists == null || taglists.size() <= 0)
             return null;
 
+        // first sort the items alphabetically
+        taglists.sort(new TaglistComparator());
+
         String[] out = new String[taglists.size()];
 
         for (int i = 0; i < taglists.size(); i++)
@@ -58,5 +66,33 @@ public class TaglistClManager extends GuiCheckboxListManager
         }
 
         return out;
+    }
+
+
+    /**
+     * This method will select any entries in the list that correspond with the taglists in the hashset.
+     * @param taglists
+     */
+    public void applyTaglists(HashSet<Taglist> taglists)
+    {
+        if (super.items == null)
+            return;
+
+        for (CheckBox  cb : super.items)
+        {
+            cb.setSelected(false);
+
+            boolean found = false;
+            Iterator<Taglist> tIt = taglists.iterator();
+
+            while (tIt.hasNext() && !found)
+            {
+                if (tIt.next().getAbbreviation().equals(cb.getText()))
+                {
+                    cb.setSelected(true);
+                    found = true;
+                }
+            }
+        }
     }
 }

@@ -55,7 +55,7 @@ public class EditTaglistWindow extends EditableWindowPane
 
 
 
-    public void btn_CancelBack(ActionEvent actionEvent)
+    public void btn_CancelBack(ActionEvent actionEvent) throws Exception
     {
         super.button_Cancel_Back();
     }
@@ -82,7 +82,7 @@ public class EditTaglistWindow extends EditableWindowPane
         super.button_Delete();
     }
 
-    public void btn_confirmDelete(ActionEvent actionEvent)
+    public void btn_confirmDelete(ActionEvent actionEvent) throws Exception
     {
         super.button_ConfirmDelete();
     }
@@ -212,9 +212,9 @@ public class EditTaglistWindow extends EditableWindowPane
     }
 
     @Override
-    protected void saveItem()
+    protected boolean saveItem()
     {
-
+        return true;
     }
 
     //endregion

@@ -22,18 +22,34 @@
 
 package com.Bluefix.Prodosia.GUI.Tracker;
 
+import com.Bluefix.Prodosia.DataHandler.TaglistHandler;
 import com.Bluefix.Prodosia.DataHandler.TrackerHandler;
+import com.Bluefix.Prodosia.DataType.Taglist.Taglist;
 import com.Bluefix.Prodosia.DataType.Tracker.Tracker;
 import com.Bluefix.Prodosia.DataType.Tracker.TrackerBuilder;
+import com.Bluefix.Prodosia.DataType.Tracker.TrackerPermissions;
+import com.Bluefix.Prodosia.Discord.DiscordManager;
 import com.Bluefix.Prodosia.Exception.ExceptionHelper;
 import com.Bluefix.Prodosia.GUI.Helpers.DataFieldStorage;
 import com.Bluefix.Prodosia.GUI.Helpers.EditableWindowPane;
 import com.Bluefix.Prodosia.GUI.Managers.CheckboxListManager.TaglistClManager;
 import com.Bluefix.Prodosia.GUI.Navigation.GuiApplication;
+import com.Bluefix.Prodosia.Imgur.ImgurApi.ImgurManager;
+import com.github.kskelm.baringo.model.Account;
+import com.github.kskelm.baringo.util.BaringoApiException;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
+import net.dv8tion.jda.core.entities.User;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.net.URISyntaxException;
+import java.util.HashSet;
 
 public class EditTrackerWindow extends EditableWindowPane
 {
@@ -63,10 +79,10 @@ public class EditTrackerWindow extends EditableWindowPane
     @FXML public Button button_edit;
     @FXML public Button button_delete;
     @FXML public Button button_checkImgurName;
+    @FXML public Button button_checkDiscordTag;
 
 
-
-    public void btn_CancelBack(ActionEvent actionEvent)
+    public void btn_CancelBack(ActionEvent actionEvent) throws Exception
     {
         super.button_Cancel_Back();
     }
@@ -93,7 +109,7 @@ public class EditTrackerWindow extends EditableWindowPane
         super.button_Delete();
     }
 
-    public void btn_confirmDelete(ActionEvent actionEvent)
+    public void btn_confirmDelete(ActionEvent actionEvent) throws Exception
     {
         super.button_ConfirmDelete();
     }
@@ -125,6 +141,7 @@ public class EditTrackerWindow extends EditableWindowPane
                 button_back.setText("Back");
                 button_edit.setText("Edit");
                 button_checkImgurName.setDisable(true);
+                button_checkDiscordTag.setDisable(true);
                 button_back.setDisable(false);
                 button_edit.setDisable(false);
 
@@ -139,8 +156,8 @@ public class EditTrackerWindow extends EditableWindowPane
                 lbl_navigation.setText("Edit Tracker");
 
                 txt_imgurName.setDisable(false);
-                txt_discordName.setDisable(false);
-                txt_discordTag.setDisable(false);
+                txt_discordName.setDisable(true);
+                txt_discordTag.setDisable(true);
                 txt_discordId.setDisable(false);
 
                 lbl_deleteConfirmation.setVisible(false);
@@ -150,6 +167,7 @@ public class EditTrackerWindow extends EditableWindowPane
                 button_back.setText("Cancel");
                 button_edit.setText("Save");
                 button_checkImgurName.setDisable(false);
+                button_checkDiscordTag.setDisable(false);
                 button_back.setDisable(false);
                 button_edit.setDisable(false);
 
@@ -177,6 +195,9 @@ public class EditTrackerWindow extends EditableWindowPane
 
     private Tracker curTracker;
 
+    /**
+     * Clear all the data from the textfields.
+     */
     private void clearData()
     {
         txt_imgurName.setText("");
@@ -186,6 +207,9 @@ public class EditTrackerWindow extends EditableWindowPane
         txt_discordId.setText("");
 
         initializePermissions();
+
+        previousImgurName = "";
+        previousDiscordId = "";
     }
 
     /**
@@ -211,19 +235,22 @@ public class EditTrackerWindow extends EditableWindowPane
         clearData();
 
         // if imgur-credentials exist, set them up.
-        if (tracker.getImgurName() != null)
+        if (tracker.getImgurName() != null && !tracker.getImgurName().isEmpty())
         {
             txt_imgurName.setText(tracker.getImgurName());
             lbl_imgurId.setText("" + tracker.getImgurId());
         }
 
         // if discord-credentials exist, set them up.
-        if (tracker.getDiscordName() != null)
+        if (tracker.getDiscordId() != null && !tracker.getDiscordId().isEmpty())
         {
             txt_discordName.setText(tracker.getDiscordName());
-            txt_discordTag.setText("" + tracker.getDiscordTag());
-            txt_discordId.setText("" + tracker.getDiscordId());
+            txt_discordTag.setText(tracker.getDiscordTag());
+            txt_discordId.setText(tracker.getDiscordId());
         }
+
+        // setup the permissions
+        displayPermissions();
 
         // clear the update data to prevent the window from updating itself.
         clearUpdate();
@@ -279,7 +306,7 @@ public class EditTrackerWindow extends EditableWindowPane
     }
 
     @Override
-    protected void saveItem() throws Exception
+    protected boolean saveItem() throws Exception
     {
         // parse the tracker from the fields.
         Tracker newTracker = parseTracker();
@@ -288,7 +315,12 @@ public class EditTrackerWindow extends EditableWindowPane
         {
             TrackerHandler.handler().update(curTracker, newTracker);
             curTracker = newTracker;
+
+            return true;
         }
+
+        // if the parsed tracker was null, it was invalid and saving failed.
+        return false;
     }
 
     //endregion
@@ -301,73 +333,135 @@ public class EditTrackerWindow extends EditableWindowPane
      */
     private void clearUpdate()
     {
-        clearImgurUpdate();
-        clearDiscordUpdate();
+        previousImgurName = txt_imgurName.getText().trim();
+        previousDiscordId = txt_discordId.getText().trim();
     }
 
+    /**
+     * Reset the previous stored value and prepare for data update.
+     */
     private void clearImgurUpdate()
     {
-        previousImgurName = txt_imgurName.getText();
+        previousImgurName = txt_imgurName.getText().trim();
+        txt_imgurName.setId("");
+        lbl_imgurId.setText("");
     }
 
+    /**
+     * Reset the previous stored value and prepare for data update.
+     */
     private void clearDiscordUpdate()
     {
-        previousDiscordName = txt_discordName.getText();
-        previousDiscordTag = txt_discordTag.getText();
-        previousDiscordId = txt_discordId.getText();
+        previousDiscordId = txt_discordId.getText().trim();
+        txt_discordId.setId("");
+        txt_discordName.setText("");
+        txt_discordTag.setText("");
     }
 
     private String previousImgurName = null;
-    private String previousDiscordName = null;
-    private String previousDiscordTag = null;
     private String previousDiscordId = null;
 
-    private synchronized void updateImgurData()
+    @FXML
+    private synchronized void updateImgurData(ActionEvent event)
     {
         if (txt_imgurName.getText().equals(previousImgurName))
             return;
 
-        // TODO: set the imgur-id dependent on the imgur name.
+        clearImgurUpdate();
 
-
+        // if there was an imgur username, refresh it.
+        if (!txt_imgurName.getText().trim().isEmpty())
+            setImgurId();
     }
+
+    /**
+     * Check the imgur name and see if it existed.
+     */
+    public void setImgurId()
+    {
+        try
+        {
+            Account acc = ImgurManager.client().accountService().getAccount(previousImgurName);
+
+            if (acc == null)
+            {
+                invalidImgurName();
+            }
+            else
+            {
+                lbl_imgurId.setText(String.valueOf(acc.getId()));
+                txt_imgurName.setId("");
+            }
+
+        } catch (BaringoApiException e)
+        {
+            invalidImgurName();
+        } catch (IOException e)
+        {
+            exceptionAlert(e);
+        } catch (URISyntaxException e)
+        {
+            exceptionAlert(e);
+        }
+    }
+
+    /**
+     * Indicate to the user that the imgur name is invalid.
+     */
+    private void invalidImgurName()
+    {
+        lbl_imgurId.setText("");
+        txt_imgurName.setId("twInvalidImgurId");
+    }
+
 
     /**
      * Update the discord data fields. Will only update if one of the fields was invalidated.
      * Will update according to the fields that were changed, giving priority to the id.
      */
-    private synchronized void updateDiscordData()
+    @FXML
+    private synchronized void updateDiscordData(ActionEvent event)
     {
         // if none of the items were changed, return.
-        boolean compId = txt_discordId.getText().equals(previousDiscordId);
-        boolean compName = txt_discordName.getText().equals(previousDiscordName);
-        boolean compTag = txt_discordTag.getText().equals(previousDiscordTag);
-
-        if (compId && compName && compTag)
+        if (txt_discordId.getText().equals(previousDiscordId))
             return;
 
         // update the data.
         clearDiscordUpdate();
 
-        // TODO: set the discord-data based on the last item that was edited.
-        if (!compId)
+        // if there was a discord-id at all, refresh it.
+        if (!txt_discordId.getText().trim().isEmpty())
+            setDiscordData();
+    }
+
+    private void setDiscordData()
+    {
+        try
         {
-            updateDiscordDataById();
-        }
-        else if (!compName || !compTag)
+            User u = DiscordManager.manager().getUserById(previousDiscordId);
+
+            if (u == null)
+            {
+                invalidDiscordId();
+            }
+            else
+            {
+                txt_discordName.setText(u.getName());
+                txt_discordTag.setText(u.getDiscriminator());
+                txt_discordId.setId("");
+            }
+
+        } catch (Exception e)
         {
-            updateDiscordDataByName();
+            invalidDiscordId();
         }
     }
 
-    private void updateDiscordDataById()
+    private void invalidDiscordId()
     {
-        // TODO: Implement update based on id.
-    }
-
-    private void updateDiscordDataByName()
-    {
-        // TODO: implement update based on name & tag.
+        txt_discordName.setText("");
+        txt_discordTag.setText("");
+        txt_discordId.setId("twInvalidDiscordId");
     }
 
 
@@ -383,24 +477,61 @@ public class EditTrackerWindow extends EditableWindowPane
     private Tracker parseTracker()
     {
         // TODO: update the api data if necessary.
-        updateImgurData();
-        updateDiscordData();
+        updateImgurData(null);
+        updateDiscordData(null);
 
         DataValidation valImg = validateImgurData();
         DataValidation valDis = validateDiscordData();
 
+        // if the data was empty for both, issue a warning.
+        if (valImg == DataValidation.MISSING && valDis == DataValidation.MISSING)
+        {
+            alertUser("There was no Tracker data. Please give a valid imgur id and/or discord id to continue.");
+            return null;
+        }
+
         // if either of the data was erroneous, warn the user.
+        else if (valImg == DataValidation.ERRONEOUS)
+        {
+            alertUser("The imgur name was detected to be invalid. Check whether the name is correct or remove it to continue.");
+            return null;
+        }
+        else if (valDis == DataValidation.ERRONEOUS)
+        {
+            alertUser("The discord id was detected to be invalid. Check whether the id is correct or remove it to continue.");
+            return null;
+        }
+
+        // parse the permissions, then retrieve all the discord / imgur data.
+        TrackerPermissions perm = parsePermissions();
+
+        String imgurName = "";
+        long imgurId = -1;
+        String discordName = "";
+        String discordTag = "";
+        String discordId = "";
+
+        if (valImg == DataValidation.VALIDATED)
+        {
+            imgurName = txt_imgurName.getText();
+            imgurId = Long.parseLong(lbl_imgurId.getText());
+        }
+
+        if (valDis == DataValidation.VALIDATED)
+        {
+            discordName = txt_discordName.getText();
+            discordTag = txt_discordTag.getText();
+            discordId = txt_discordId.getText();
+        }
 
 
-
-
-
-
-        TrackerBuilder builder = TrackerBuilder.builder();
-
-
-
-        return null;
+        return new Tracker(
+                imgurName,
+                imgurId,
+                discordName,
+                discordTag,
+                discordId,
+                perm);
     }
 
     private DataValidation validateImgurData()
@@ -424,9 +555,29 @@ public class EditTrackerWindow extends EditableWindowPane
 
     private DataValidation validateDiscordData()
     {
+        if (txt_discordName.getText().isEmpty() || txt_discordTag.getText().isEmpty())
+        {
+            // if no discord id was specified, this is normal behavior.
+            if (txt_discordId.getText().trim().isEmpty())
+            {
+                return DataValidation.MISSING;
+            }
+            else
+            {
+                // since there was a discord id but no associated name / tag, it is erroneous.
+                return DataValidation.ERRONEOUS;
+            }
+        }
+
         // TODO: determine whether the data is valid.
-        return DataValidation.MISSING;
+        return DataValidation.VALIDATED;
     }
+
+
+
+
+
+
 
 
 
@@ -461,6 +612,41 @@ public class EditTrackerWindow extends EditableWindowPane
         alert.showAndWait();
     }
 
+    private void exceptionAlert(Exception ex)
+    {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("Something went wrong!");
+        alert.setHeaderText("Exception!");
+        alert.setContentText(ex.getMessage());
+
+        // Create expandable Exception.
+        StringWriter sw = new StringWriter();
+        PrintWriter pw = new PrintWriter(sw);
+        ex.printStackTrace(pw);
+        String exceptionText = sw.toString();
+
+        Label label = new Label("The exception stacktrace was:");
+
+        TextArea textArea = new TextArea(exceptionText);
+        textArea.setEditable(false);
+        textArea.setWrapText(true);
+
+        textArea.setMaxWidth(Double.MAX_VALUE);
+        textArea.setMaxHeight(Double.MAX_VALUE);
+        GridPane.setVgrow(textArea, Priority.ALWAYS);
+        GridPane.setHgrow(textArea, Priority.ALWAYS);
+
+        GridPane expContent = new GridPane();
+        expContent.setMaxWidth(Double.MAX_VALUE);
+        expContent.add(label, 0, 0);
+        expContent.add(textArea, 0, 1);
+
+        // Set expandable Exception into the dialog pane.
+        alert.getDialogPane().setExpandableContent(expContent);
+
+        alert.showAndWait();
+    }
+
     //endregion
 
 
@@ -473,6 +659,9 @@ public class EditTrackerWindow extends EditableWindowPane
 
     private TaglistClManager taglistClManager;
 
+    /**
+     * Initialize the permissions with a clean array.
+     */
     private void initializePermissions()
     {
         perm_filter.setText("");
@@ -492,6 +681,31 @@ public class EditTrackerWindow extends EditableWindowPane
                 adminCheckboxSelection());
     }
 
+
+    /**
+     * Display the permissions that correspond to the currently selected tagger.
+     */
+    private void displayPermissions()
+    {
+        if (curTracker == null)
+            return;
+
+        TrackerPermissions tp = curTracker.getPermissions();
+
+        // if the user is an admin, he gets permissions to everything by default.
+        if (tp.getType() == TrackerPermissions.TrackerType.ADMIN)
+        {
+            perm_chkAdmin.setSelected(true);
+            adminCheckboxSelection();
+        }
+
+        // if the user has individual permissions to taglists, select them.
+        taglistClManager.applyTaglists(tp.getTaglists());
+    }
+
+    /**
+     * Handle the checkbox selection when the user selects "admin".
+     */
     private void adminCheckboxSelection()
     {
         if (perm_chkAdmin.isSelected())
@@ -504,6 +718,40 @@ public class EditTrackerWindow extends EditableWindowPane
             perm_filter.setDisable(false);
             perm_scrollpane.setDisable(false);
         }
+    }
+
+
+    /**
+     * Parse the permissions that have been selected by the user.
+     * @return
+     */
+    private TrackerPermissions parsePermissions()
+    {
+        HashSet<Taglist> tl = new HashSet<>();
+        TrackerPermissions.TrackerType type;
+
+        if (perm_chkAdmin.isSelected())
+            type = TrackerPermissions.TrackerType.ADMIN;
+        else
+            type = TrackerPermissions.TrackerType.TRACKER;
+
+
+        for (String s : taglistClManager.getSelectedItems())
+        {
+            try
+            {
+                Taglist t = TaglistHandler.getTaglistByAbbreviation(s);
+
+                if (t != null)
+                    tl.add(t);
+
+            } catch (Exception e)
+            {
+                e.printStackTrace();
+            }
+        }
+
+        return new TrackerPermissions(type, tl.toArray(new Taglist[0]));
     }
 
 

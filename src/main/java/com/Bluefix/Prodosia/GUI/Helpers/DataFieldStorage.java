@@ -56,7 +56,10 @@ public class DataFieldStorage
 
         for (String field : fields)
         {
-            data[counter++] = new String(field);
+            if (field == null)
+                data[counter++] = "";
+            else
+                data[counter++] = field;
         }
 
         return new DataFieldStorage(data);

@@ -127,7 +127,7 @@ public class Tracker
      */
     public String getName()
     {
-        if (imgurName != null)
+        if (imgurName != null && !imgurName.trim().isEmpty())
             return imgurName;
 
         return discordName;

@@ -58,6 +58,9 @@ public abstract class GuiCheckboxListManager extends GuiListManager<CheckBox>
     {
         ArrayList<String> out = new ArrayList<>();
 
+        if (super.items == null)
+            return new String[0];
+
         for (CheckBox cb : super.items)
         {
             if (cb.isSelected())

@@ -283,8 +283,17 @@ public class ApplicationWindow
         {
             listManagers[2].filter(newVal);
         });
+    }
 
-
+    /**
+     * Update the components now that we changed data somewhere else.
+     */
+    public void update() throws Exception
+    {
+        for (GuiListManager glm : listManagers)
+        {
+            glm.update();
+        }
     }
 
 

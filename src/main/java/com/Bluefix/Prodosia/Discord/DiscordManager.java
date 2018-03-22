@@ -64,9 +64,6 @@ public class DiscordManager
         if (me == null)
         {
             me = createJDA();
-
-            // update the command prefix
-            setupPrefix(me.getSelfUser());
         }
 
         return me;
@@ -92,7 +89,7 @@ public class DiscordManager
         return jda;
     }
 
-    private static void setupPrefix(User user) throws Exception
+    private static synchronized void setupPrefix(User user) throws Exception
     {
         CommandPrefix cp = CommandPrefixStorage.getPrefixForType(CommandPrefix.Type.DISCORD);
 
@@ -179,7 +176,8 @@ public class DiscordManager
         me = createJDA();
 
         // update the command prefix
-        setupPrefix(me.getSelfUser());
+        // this will automatically be done after the JDA object finishes initialization.
+        //setupPrefix(me.getSelfUser());
     }
 
     //endregion
@@ -243,6 +241,14 @@ public class DiscordManager
         {
             if (event instanceof ReadyEvent)
             {
+                // update the command prefix
+                try
+                {
+                    setupPrefix(me.getSelfUser());
+                } catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
                 System.out.println("Discord API successfully initialized.");
             }
         }
