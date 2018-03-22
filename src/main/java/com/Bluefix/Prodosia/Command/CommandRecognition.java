@@ -84,7 +84,7 @@ public class CommandRecognition
 
         }
         catch (Exception e)
-        {
+        {System.out.println("8");
             e.printStackTrace();
             Logger.logMessage("CommandRecognition::1parseComments -> " + e.getMessage(), Logger.Severity.ERROR);
         }

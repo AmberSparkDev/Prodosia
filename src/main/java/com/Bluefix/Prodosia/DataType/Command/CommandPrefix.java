@@ -185,7 +185,7 @@ public class CommandPrefix
 
         LinkedList<String> entryList = new LinkedList<>();
 
-        String[] entrySplit = entries.split("|");
+        String[] entrySplit = entries.split("\\|");
 
         for (String s : entrySplit)
             if (s != null && !s.isEmpty())

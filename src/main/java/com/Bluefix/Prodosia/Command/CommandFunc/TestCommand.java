@@ -29,7 +29,7 @@ public class TestCommand implements ICommandFunc
     @Override
     public void execute(CommandInformation ci, String[] arguments)
     {
-        System.out.println("Test command test executed by " + ci.getTracker().getImgurName());
+        System.out.println("Test command test executed");
 
         System.out.println("### Arguments:");
         for (String s : arguments)

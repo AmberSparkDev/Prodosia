@@ -124,7 +124,6 @@ public class DiscordManager
             CommandPrefix newPrefix = new CommandPrefix(CommandPrefix.Type.DISCORD, pattern);
 
             CommandPrefixStorage.handler().update(cp, newPrefix);
-
         }
         catch (Exception e)
         {
@@ -139,6 +138,7 @@ public class DiscordManager
     private static CommandPrefix parseNewCommandPrefix(User user)
     {
         String pattern = CommandPrefix.parsePatternForItems(user.getAsMention());
+
         return new CommandPrefix(CommandPrefix.Type.DISCORD, pattern);
     }
 
@@ -193,7 +193,7 @@ public class DiscordManager
         @Override
         public void onMessageReceived(MessageReceivedEvent event)
         {
-            System.out.println("#### Discord Message ####\n" + event.getMessage().getContentDisplay()+ "\n\n#### ####");
+            System.out.println("#### Discord Message ####\n" + event.getMessage().getContentRaw()+ "\n\n#### ####");
 
             // --- Trackers ---
             // Attempt to retrieve the tracker that parsed this message.
@@ -216,7 +216,7 @@ public class DiscordManager
 
             CommandInformation ci = new DiscordCommandInformation(t, event);
 
-            CommandRecognition.executeEntry(CommandPrefix.Type.DISCORD, ci, event.getContentDisplay());
+            CommandRecognition.executeEntry(CommandPrefix.Type.DISCORD, ci, event.getContentRaw());
         }
     }
 
