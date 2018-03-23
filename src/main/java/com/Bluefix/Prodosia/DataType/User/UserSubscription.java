@@ -107,6 +107,20 @@ public class UserSubscription
         return filters;
     }
 
+    /**
+     * Return whether the specified user has the selected rating.
+     * @param r the rating to check for.
+     * @return True iff the user is part of this rating, false otherwise.
+     */
+    public boolean hasRating(Rating r)
+    {
+        // if the specified taglist does not incorporate ratings, return true always.
+        if (!this.taglist.hasRatings())
+            return true;
+
+        return this.ratings.contains(r);
+    }
+
 
     //region Tag Request
 

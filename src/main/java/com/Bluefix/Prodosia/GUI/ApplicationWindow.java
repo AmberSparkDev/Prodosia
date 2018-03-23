@@ -174,10 +174,10 @@ public class ApplicationWindow
     @FXML private VBox users_overview;
 
     @FXML
-    private void addUser(ActionEvent actionEvent)
+    private void addUser(ActionEvent actionEvent) throws Exception
     {
         EditUserWindow controller = VistaNavigator.loadVista(VistaNavigator.AppStage.USER_EDIT);
-        controller.initialize();
+        controller.init(null);
     }
 
     //endregion

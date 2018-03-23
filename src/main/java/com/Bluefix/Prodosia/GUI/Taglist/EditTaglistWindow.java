@@ -30,6 +30,8 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 
+import java.util.ArrayList;
+
 public class EditTaglistWindow extends EditableWindowPane
 {
     //region Constructor
@@ -204,11 +206,11 @@ public class EditTaglistWindow extends EditableWindowPane
     @Override
     protected void restoreFields(DataFieldStorage storage)
     {
-        String[] fields = storage.retrieve();
+        ArrayList<String> fields = storage.retrieve();
 
-        tf_abbreviation.setText(fields[0]);
-        ta_description.setText(fields[1]);
-        chk_ratings.setSelected("1".equals(fields[2]));
+        tf_abbreviation.setText(fields.get(0));
+        ta_description.setText(fields.get(1));
+        chk_ratings.setSelected("1".equals(fields.get(2)));
     }
 
     //endregion

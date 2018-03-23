@@ -72,7 +72,14 @@ public class UserListManager extends GuiListManager<Button>
             button.setOnAction(event ->
             {
                 EditUserWindow controller = VistaNavigator.loadVista(VistaNavigator.AppStage.USER_EDIT);
-                controller.initialize(u);
+
+                try
+                {
+                    controller.init(u);
+                } catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
             });
 
             buttons[i] = button;

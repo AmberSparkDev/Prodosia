@@ -94,7 +94,7 @@ public abstract class GuiListManager<T extends Labeled>
         if (this.items == null)
             return;
 
-        Pattern pat = Pattern.compile(".*" + regexp + ".*");
+        Pattern pat = Pattern.compile("(?i).*" + regexp + ".*");
 
 
         for (T t : items)

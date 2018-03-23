@@ -49,6 +49,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.HashSet;
 
 public class EditTrackerWindow extends EditableWindowPane
@@ -278,13 +279,13 @@ public class EditTrackerWindow extends EditableWindowPane
     protected void restoreFields(DataFieldStorage storage)
     {
 
-        String[] fields = storage.retrieve();
+        ArrayList<String> fields = storage.retrieve();
 
-        txt_imgurName.setText(fields[0]);
-        lbl_imgurId.setText(fields[1]);
-        txt_discordName.setText(fields[2]);
-        txt_discordTag.setText(fields[3]);
-        txt_discordId.setText(fields[4]);
+        txt_imgurName.setText(fields.get(0));
+        lbl_imgurId.setText(fields.get(1));
+        txt_discordName.setText(fields.get(2));
+        txt_discordTag.setText(fields.get(3));
+        txt_discordId.setText(fields.get(4));
     }
 
     //endregion

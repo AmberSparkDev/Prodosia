@@ -22,6 +22,8 @@
 
 package com.Bluefix.Prodosia.GUI.Helpers;
 
+import java.util.ArrayList;
+
 /**
  * Helper class that takes a variable amount of strings and
  * stores them in the proper order. These can be retrieve at a later date.
@@ -30,14 +32,14 @@ package com.Bluefix.Prodosia.GUI.Helpers;
  *
  * In order to create a DataFieldStorage object, call its static `store` method.
  */
-public class DataFieldStorage
+public class DataFieldStorage <T>
 {
-    private String[] data;
+    private ArrayList<T> data;
 
     /**
      * Private constructor
      */
-    private DataFieldStorage(String[] data)
+    private DataFieldStorage(ArrayList<T> data)
     {
         this.data = data;
     }
@@ -48,18 +50,13 @@ public class DataFieldStorage
      * @param fields The fields to be stored.
      * @return A new DataFieldStorage object.
      */
-    public static DataFieldStorage store(String... fields)
+    public static <T> DataFieldStorage store(T... fields)
     {
-        String[] data = new String[fields.length];
+        ArrayList<T> data = new ArrayList<>();
 
-        int counter = 0;
-
-        for (String field : fields)
+        for (T field : fields)
         {
-            if (field == null)
-                data[counter++] = "";
-            else
-                data[counter++] = field;
+            data.add(field);
         }
 
         return new DataFieldStorage(data);
@@ -69,7 +66,7 @@ public class DataFieldStorage
      * Retrieve the stored fields.
      * @return The fields that were stored in this DataFieldStorage object.
      */
-    public String[] retrieve()
+    public ArrayList<T> retrieve()
     {
         return data;
     }
