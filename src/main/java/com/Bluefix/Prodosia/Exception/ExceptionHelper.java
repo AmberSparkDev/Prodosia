@@ -39,7 +39,7 @@ public class ExceptionHelper
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle("Exception");
         alert.setHeaderText("An exception occurred!");
-        alert.setContentText("Could not find file blabla.txt!");
+        alert.setContentText(ex.getMessage());
 
         // Create expandable Exception.
         StringWriter sw = new StringWriter();

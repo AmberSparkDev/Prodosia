@@ -89,6 +89,13 @@
     -fx-base: #ff6961;
 }
 
+/* Taglist window */
+
+#tlwInvalidAbbreviation
+{
+    -fx-base: #ff6961;
+}
+
 
 
 

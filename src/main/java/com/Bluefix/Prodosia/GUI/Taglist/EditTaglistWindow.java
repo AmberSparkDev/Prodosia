@@ -22,13 +22,13 @@
 
 package com.Bluefix.Prodosia.GUI.Taglist;
 
+import com.Bluefix.Prodosia.DataHandler.TaglistHandler;
 import com.Bluefix.Prodosia.DataType.Taglist.Taglist;
 import com.Bluefix.Prodosia.GUI.Helpers.DataFieldStorage;
 import com.Bluefix.Prodosia.GUI.Helpers.EditableWindowPane;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
+import javafx.scene.control.*;
 
 public class EditTaglistWindow extends EditableWindowPane
 {
@@ -52,7 +52,9 @@ public class EditTaglistWindow extends EditableWindowPane
     @FXML public Button button_back;
     @FXML public Button button_edit;
     @FXML public Button button_delete;
-
+    @FXML public TextField tf_abbreviation;
+    @FXML public CheckBox chk_ratings;
+    @FXML public TextArea ta_description;
 
 
     public void btn_CancelBack(ActionEvent actionEvent) throws Exception
@@ -109,6 +111,10 @@ public class EditTaglistWindow extends EditableWindowPane
                 button_edit.setText("Edit");
                 button_back.setDisable(false);
                 button_edit.setDisable(false);
+
+                tf_abbreviation.setDisable(true);
+                ta_description.setDisable(true);
+                chk_ratings.setDisable(true);
                 break;
 
             case EDIT:
@@ -121,6 +127,10 @@ public class EditTaglistWindow extends EditableWindowPane
                 button_edit.setText("Save");
                 button_back.setDisable(false);
                 button_edit.setDisable(false);
+
+                tf_abbreviation.setDisable(false);
+                ta_description.setDisable(false);
+                chk_ratings.setDisable(false);
                 break;
 
             case DELETE:
@@ -142,7 +152,9 @@ public class EditTaglistWindow extends EditableWindowPane
 
     private void clearData()
     {
-
+        tf_abbreviation.setText("");
+        ta_description.setText("");
+        chk_ratings.setSelected(false);
     }
 
     /**
@@ -167,6 +179,9 @@ public class EditTaglistWindow extends EditableWindowPane
 
         clearData();
 
+        tf_abbreviation.setText(taglist.getAbbreviation());
+        ta_description.setText(taglist.getDescription());
+        chk_ratings.setSelected(taglist.hasRatings());
 
 
         setState(WindowState.VIEW);
@@ -180,17 +195,20 @@ public class EditTaglistWindow extends EditableWindowPane
     protected DataFieldStorage storeFields()
     {
         return DataFieldStorage.store(
-
+            tf_abbreviation.getText(),
+            ta_description.getText(),
+                (chk_ratings.isSelected() ? "1" : "0")
         );
     }
 
     @Override
     protected void restoreFields(DataFieldStorage storage)
     {
-
         String[] fields = storage.retrieve();
 
-
+        tf_abbreviation.setText(fields[0]);
+        ta_description.setText(fields[1]);
+        chk_ratings.setSelected("1".equals(fields[2]));
     }
 
     //endregion
@@ -206,28 +224,69 @@ public class EditTaglistWindow extends EditableWindowPane
     }
 
     @Override
-    protected void deleteItem()
+    protected void deleteItem() throws Exception
     {
-
+        TaglistHandler.handler().remove(curTaglist);
     }
 
     @Override
-    protected boolean saveItem()
+    protected boolean saveItem() throws Exception
     {
+        Taglist tl = parseTaglist();
+
+        // if the taglist was null, indicate failure to save.
+        if (tl == null)
+            return false;
+
+        TaglistHandler.handler().update(curTaglist, tl);
+        curTaglist = tl;
+
         return true;
     }
 
     //endregion
 
-    //region Tracker Handling
+    //region Taglist Handling
 
+    /**
+     * Returns a valid taglist if applicable, or null otherwise.
+     * @return
+     */
+    private Taglist parseTaglist() throws Exception
+    {
+        if (tf_abbreviation.getText().isEmpty())
+        {
+            // alert the user that the abbreviation cannot be empty.
+            alertTaglistAbbreviationEmpty();
+            tf_abbreviation.setId("tlwInvalidAbbreviation");
+            return null;
+        }
+        else
+            tf_abbreviation.setId("");
 
+        // if this isn't a new taglist, use the id of the old taglist.
+        if (curTaglist == null)
+            return new Taglist(
+                tf_abbreviation.getText(),
+                ta_description.getText(),
+                chk_ratings.isSelected());
+        else
+            return new Taglist(
+                    curTaglist.getId(),
+                    tf_abbreviation.getText(),
+                    ta_description.getText(),
+                    chk_ratings.isSelected());
+    }
 
-    //endregion
+    private static void alertTaglistAbbreviationEmpty()
+    {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("Error");
+        alert.setHeaderText("Error! Abbreviation cannot be empty.");
+        //alert.setContentText("Ooops, there was an error!");
 
-    //region Deletion Handling
-
-
+        alert.showAndWait();
+    }
 
     //endregion
 

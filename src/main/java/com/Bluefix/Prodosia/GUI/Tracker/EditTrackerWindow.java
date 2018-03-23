@@ -311,16 +311,15 @@ public class EditTrackerWindow extends EditableWindowPane
         // parse the tracker from the fields.
         Tracker newTracker = parseTracker();
 
-        if (newTracker != null)
-        {
-            TrackerHandler.handler().update(curTracker, newTracker);
-            curTracker = newTracker;
-
-            return true;
-        }
-
         // if the parsed tracker was null, it was invalid and saving failed.
-        return false;
+        if (newTracker == null)
+            return false;
+
+
+        TrackerHandler.handler().update(curTracker, newTracker);
+        curTracker = newTracker;
+
+        return true;
     }
 
     //endregion
