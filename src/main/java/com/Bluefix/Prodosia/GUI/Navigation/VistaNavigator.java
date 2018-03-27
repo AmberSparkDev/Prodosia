@@ -34,11 +34,12 @@ public class VistaNavigator
     /* --- Vista urls --- */
 
     private static final String urlBase = "/com/Bluefix/Prodosia/GUI/";
-    private static final String MAIN_MENU = "ApplicationWindow.fxml";
+    private static final String MAIN_MENU = "Application/ApplicationWindow.fxml";
     private static final String API_KEYS = "ApiKeysWindow.fxml";
     private static final String TRACKER_EDIT = "Tracker/EditTrackerWindow.fxml";
     private static final String TAGLIST_EDIT = "Taglist/EditTaglistWindow.fxml";
     private static final String USER_EDIT = "User/EditUserWindow.fxml";
+    private static final String ARCHIVE_EDIT = "Archive/EditArchiveWindow.fxml";
 
     /* --- --- */
 
@@ -67,7 +68,8 @@ public class VistaNavigator
 
         TRACKER_EDIT,
         TAGLIST_EDIT,
-        USER_EDIT
+        USER_EDIT,
+        ARCHIVE_EDIT
     }
 
     private static GuiNode[] applicationWindows = null;
@@ -110,6 +112,9 @@ public class VistaNavigator
                     break;
                 case USER_EDIT:
                     url = urlBase + USER_EDIT;
+                    break;
+                case ARCHIVE_EDIT:
+                    url = urlBase + ARCHIVE_EDIT;
                     break;
 
                 default:

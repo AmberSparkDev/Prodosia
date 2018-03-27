@@ -20,7 +20,7 @@
  * SOFTWARE.
  */
 
-package com.Bluefix.Prodosia.GUI;
+package com.Bluefix.Prodosia.GUI.Application;
 
 import com.Bluefix.Prodosia.DataHandler.CommandPrefixStorage;
 import com.Bluefix.Prodosia.DataHandler.TaglistHandler;
@@ -36,6 +36,7 @@ import com.Bluefix.Prodosia.DataType.Tracker.TrackerPermissions;
 import com.Bluefix.Prodosia.DataType.User.User;
 import com.Bluefix.Prodosia.DataType.User.UserSubscription;
 import com.Bluefix.Prodosia.Exception.ExceptionHelper;
+import com.Bluefix.Prodosia.GUI.ApiKeysWindow;
 import com.Bluefix.Prodosia.GUI.Managers.CheckboxListManager.GuiCheckboxListManager;
 import com.Bluefix.Prodosia.GUI.Managers.CheckboxListManager.TaglistClManager;
 import com.Bluefix.Prodosia.GUI.Managers.ListManager.GuiListManager;
@@ -47,21 +48,38 @@ import com.Bluefix.Prodosia.GUI.Taglist.EditTaglistWindow;
 import com.Bluefix.Prodosia.GUI.Tracker.EditTrackerWindow;
 import com.Bluefix.Prodosia.GUI.User.EditUserWindow;
 import com.Bluefix.Prodosia.Logger.Logger;
-import com.Bluefix.Prodosia.Module.ModuleManager;
 import com.Bluefix.Prodosia.Module.TestModule;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.MenuButton;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 
 
 public class ApplicationWindow
 {
+    //region Archives
+
+    @FXML private VBox arch_taglistOverview;
+    @FXML private Button arch_addArchiveButton;
+    @FXML private Label arch_selectedTaglist;
+    @FXML private VBox arch_selectionBox;
+
+    /**
+     * The ApplicationWindow_Archive class manages all logic necessary for the Archives to function.
+     */
+    private ApplicationWindow_Archive archiveGui;
+
+    private void initializeArchive() throws Exception
+    {
+        if (archiveGui != null)
+            return;
+
+        archiveGui = new ApplicationWindow_Archive(arch_taglistOverview, arch_selectionBox, arch_selectedTaglist, arch_addArchiveButton);
+    }
+
+    //endregion
 
     //region Status
 
@@ -151,7 +169,7 @@ public class ApplicationWindow
     private void addTracker(ActionEvent actionEvent)
     {
         EditTrackerWindow controller = VistaNavigator.loadVista(VistaNavigator.AppStage.TRACKER_EDIT);
-        controller.initialize();
+        controller.init(null);
     }
 
     //endregion
@@ -164,7 +182,7 @@ public class ApplicationWindow
     private void addTaglist(ActionEvent actionEvent)
     {
         EditTaglistWindow controller = VistaNavigator.loadVista(VistaNavigator.AppStage.TAGLIST_EDIT);
-        controller.initialize();
+        controller.init(null);
     }
 
     //endregion
@@ -194,7 +212,7 @@ public class ApplicationWindow
     //region Initialization
 
     @FXML
-    private void initialize()
+    private void initialize() throws Exception
     {
         /* Status */
         initializeStatusWindow();
@@ -204,8 +222,12 @@ public class ApplicationWindow
         /* Tag a Post */
         initializeTap();
 
-        // initialize list managers
+        // init list managers
         setupListManagers();
+
+        // init Archive
+        initializeArchive();
+
     }
 
     private void initializeTap()
@@ -294,6 +316,9 @@ public class ApplicationWindow
         {
             glm.update();
         }
+
+        // update the archiving functionality.
+        archiveGui.update();
     }
 
 

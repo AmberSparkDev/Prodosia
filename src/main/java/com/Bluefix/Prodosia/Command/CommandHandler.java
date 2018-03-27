@@ -335,10 +335,10 @@ public class CommandHandler
      */
     private static void executeList(CommandInformation ci, String[] arguments) throws Exception
     {
-        // initialize the command list if it was null.
+        // init the command list if it was null.
         if (commandList == null)
         {
-            // initialize the commands if this wasn't done yet.
+            // init the commands if this wasn't done yet.
             initializeCommandMap();
 
             StringBuilder message = new StringBuilder();

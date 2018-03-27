@@ -148,7 +148,6 @@ public class UserSubscription
         // finally check to see if any filters apply
         if (this.filters != null && this.filters.matches(tr.getFilters()))
         {
-
             return false;
         }
 

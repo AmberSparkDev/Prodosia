@@ -75,7 +75,7 @@ public class SqlStatement
                         "CREATE TABLE IF NOT EXISTS Archive (" +
                         "taglistId integer, " +
                         "description text, " +
-                        "channel integer, " +
+                        "channel text, " +
                         "ratings text, " +
                         "filters text); ",
                 /* --- TagQueue --- */

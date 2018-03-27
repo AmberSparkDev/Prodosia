@@ -280,6 +280,12 @@ public class TagRequest implements ICommentRequest
         // default to the other filter
         return new TagRequest(this.imgurId, parentComment, mTag, mRat, o.filters);
     }
+
+
+    public String getArchiveMessage() throws BaringoApiException, IOException, URISyntaxException
+    {
+        return "https://imgur.com/gallery/" + getImgurId();
+    }
 }
 
 

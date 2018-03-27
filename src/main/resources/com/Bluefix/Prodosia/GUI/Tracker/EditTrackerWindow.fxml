@@ -34,9 +34,9 @@
 
 <AnchorPane minWidth="520.0" prefHeight="480.0" prefWidth="640.0" stylesheets="@../stylesheet.css" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.Bluefix.Prodosia.GUI.Tracker.EditTrackerWindow">
     <children>
-        <Button fx:id="button_back" layoutX="14.0" layoutY="42.0" mnemonicParsing="false" onAction="#btn_CancelBack" prefHeight="40.0" prefWidth="120.0" text="Back" />
-        <Button fx:id="button_edit" layoutX="151.0" layoutY="42.0" mnemonicParsing="false" onAction="#btn_EditSave" prefHeight="40.0" prefWidth="120.0" text="Edit" />
-        <Button fx:id="button_delete" layoutX="506.0" layoutY="42.0" mnemonicParsing="false" onAction="#btn_delete" prefHeight="40.0" prefWidth="120.0" text="Delete" />
+        <Button fx:id="button_back" layoutX="14.0" layoutY="42.0" mnemonicParsing="false" prefHeight="40.0" prefWidth="120.0" text="Back" />
+        <Button fx:id="button_edit" layoutX="151.0" layoutY="42.0" mnemonicParsing="false"  prefHeight="40.0" prefWidth="120.0" text="Edit" />
+        <Button fx:id="button_delete" layoutX="506.0" layoutY="42.0" mnemonicParsing="false"  prefHeight="40.0" prefWidth="120.0" text="Delete" />
         <TitledPane animated="false" collapsible="false" layoutX="15.0" layoutY="95.0" prefHeight="108.0" prefWidth="610.0" text="Imgur">
             <content>
                 <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="608.0">
@@ -75,7 +75,7 @@
         </TitledPane>
         <Label layoutX="15.0" layoutY="14.0" text="Tracker &gt; " />
         <Label fx:id="lbl_navigation" layoutX="93.0" layoutY="14.0" text="Add/Edit/Delete Tracker" />
-        <Button fx:id="button_confirmDelete" layoutX="371.0" layoutY="42.0" mnemonicParsing="false" onAction="#btn_confirmDelete" prefHeight="40.0" prefWidth="120.0" text="Yes" />
+        <Button fx:id="button_confirmDelete" layoutX="371.0" layoutY="42.0" mnemonicParsing="false"  prefHeight="40.0" prefWidth="120.0" text="Yes" />
         <Label fx:id="lbl_deleteConfirmation" layoutX="470.0" layoutY="14.0" text="Delete?" />
         <TitledPane collapsible="false" layoutX="15.0" layoutY="311.0" maxHeight="155.0" maxWidth="610.0" minHeight="155.0" minWidth="610.0" prefHeight="155.0" prefWidth="610.0" text="Permissions" AnchorPane.bottomAnchor="14.0" AnchorPane.leftAnchor="15.0" AnchorPane.rightAnchor="15.0" AnchorPane.topAnchor="311.0">
             <content>

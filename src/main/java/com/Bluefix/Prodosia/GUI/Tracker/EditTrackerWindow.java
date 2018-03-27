@@ -83,39 +83,6 @@ public class EditTrackerWindow extends EditableWindowPane
     @FXML public Button button_checkDiscordTag;
 
 
-    public void btn_CancelBack(ActionEvent actionEvent) throws Exception
-    {
-        super.button_Cancel_Back();
-    }
-
-
-    /**
-     * Button that, depending on the current state, either states Edit or Save.
-     *
-     * The Edit button will store the fields that currently exist to allow for restoration.
-     * The Save button will store the newly edited data.
-     * @param actionEvent The action-event corresponding to the button press.
-     */
-    public void btn_EditSave(ActionEvent actionEvent)
-    {
-        super.button_Edit_Save();
-    }
-
-    /**
-     * Button that, depending
-     * @param actionEvent
-     */
-    public void btn_delete(ActionEvent actionEvent)
-    {
-        super.button_Delete();
-    }
-
-    public void btn_confirmDelete(ActionEvent actionEvent) throws Exception
-    {
-        super.button_ConfirmDelete();
-    }
-
-
     //endregion
 
     //region State handling
@@ -135,16 +102,9 @@ public class EditTrackerWindow extends EditableWindowPane
                 txt_discordId.setDisable(true);
 
                 lbl_deleteConfirmation.setVisible(false);
-                button_confirmDelete.setVisible(false);
-                button_delete.setDisable(false);
-                button_delete.setText("Delete");
 
-                button_back.setText("Back");
-                button_edit.setText("Edit");
                 button_checkImgurName.setDisable(true);
                 button_checkDiscordTag.setDisable(true);
-                button_back.setDisable(false);
-                button_edit.setDisable(false);
 
                 // permissions
                 perm_scrollpane.setDisable(true);
@@ -162,15 +122,9 @@ public class EditTrackerWindow extends EditableWindowPane
                 txt_discordId.setDisable(false);
 
                 lbl_deleteConfirmation.setVisible(false);
-                button_confirmDelete.setVisible(false);
-                button_delete.setDisable(true);
 
-                button_back.setText("Cancel");
-                button_edit.setText("Save");
                 button_checkImgurName.setDisable(false);
                 button_checkDiscordTag.setDisable(false);
-                button_back.setDisable(false);
-                button_edit.setDisable(false);
 
                 // permissions
                 perm_chkAdmin.setDisable(false);
@@ -179,13 +133,6 @@ public class EditTrackerWindow extends EditableWindowPane
                 break;
             case DELETE:
                 lbl_deleteConfirmation.setVisible(true);
-                button_confirmDelete.setVisible(true);
-                button_delete.setText("No");
-
-                button_back.setDisable(true);
-                button_edit.setDisable(true);
-
-
                 break;
         }
     }
@@ -193,6 +140,13 @@ public class EditTrackerWindow extends EditableWindowPane
     //endregion
 
     //region initialization
+
+    @FXML private void initialize()
+    {
+        super.initialize(button_back, button_edit, button_delete, button_confirmDelete);
+    }
+
+
 
     private Tracker curTracker;
 
@@ -211,52 +165,51 @@ public class EditTrackerWindow extends EditableWindowPane
 
         previousImgurName = "";
         previousDiscordId = "";
+
+        if (curTracker != null)
+        {
+
+            // if imgur-credentials exist, set them up.
+            if (curTracker.getImgurName() != null && !curTracker.getImgurName().isEmpty())
+            {
+                txt_imgurName.setText(curTracker.getImgurName());
+                lbl_imgurId.setText("" + curTracker.getImgurId());
+            }
+
+            // if discord-credentials exist, set them up.
+            if (curTracker.getDiscordId() != null && !curTracker.getDiscordId().isEmpty())
+            {
+                txt_discordName.setText(curTracker.getDiscordName());
+                txt_discordTag.setText(curTracker.getDiscordTag());
+                txt_discordId.setText(curTracker.getDiscordId());
+            }
+
+            // setup the permissions
+            displayPermissions();
+        }
     }
 
-    /**
-     * Initialize an empty window
-     */
-    public void initialize()
-    {
-        curTracker = null;
 
-        clearData();
-
-        setState(WindowState.EDIT);
-    }
 
     /**
      * Initialize a window with the tracker-information.
-     * @param tracker
+     * @param tracker The tracker to initialize on. Can be null.
      */
-    public void initialize(Tracker tracker)
+    public void init(Tracker tracker)
     {
         curTracker = tracker;
 
         clearData();
 
-        // if imgur-credentials exist, set them up.
-        if (tracker.getImgurName() != null && !tracker.getImgurName().isEmpty())
+        if (tracker != null)
         {
-            txt_imgurName.setText(tracker.getImgurName());
-            lbl_imgurId.setText("" + tracker.getImgurId());
+            // clear the update data to prevent the window from updating itself.
+            clearUpdate();
+
+            setState(WindowState.VIEW);
         }
-
-        // if discord-credentials exist, set them up.
-        if (tracker.getDiscordId() != null && !tracker.getDiscordId().isEmpty())
-        {
-            txt_discordName.setText(tracker.getDiscordName());
-            txt_discordTag.setText(tracker.getDiscordTag());
-            txt_discordId.setText(tracker.getDiscordId());
-        }
-
-        // setup the permissions
-        displayPermissions();
-
-        // clear the update data to prevent the window from updating itself.
-        clearUpdate();
-
-        setState(WindowState.VIEW);
+        else
+            setState(WindowState.EDIT);
     }
 
     //endregion

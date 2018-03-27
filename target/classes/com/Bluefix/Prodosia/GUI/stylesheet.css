@@ -104,6 +104,18 @@
 }
 
 
+/* Archive */
+#awInvalidDiscordChannel
+{
+    -fx-base: #ff6961;
+}
+
+#awInvalidDescription
+{
+    -fx-base: #ff6961;
+}
+
+
 
 
 

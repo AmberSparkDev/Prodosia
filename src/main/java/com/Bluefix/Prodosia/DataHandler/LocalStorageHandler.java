@@ -95,7 +95,7 @@ public abstract class LocalStorageHandler <T>
         // if the local storage is used, replace the item.
         if (useLocalStorage)
         {
-            // initialize the local storage if necessary.
+            // init the local storage if necessary.
             if (data == null)
             {
                 data = getAllItems();

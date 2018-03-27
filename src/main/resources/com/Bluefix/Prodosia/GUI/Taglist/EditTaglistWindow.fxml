@@ -32,9 +32,9 @@
 
 <AnchorPane maxHeight="480.0" maxWidth="640.0" prefHeight="480.0" prefWidth="640.0" stylesheets="@../stylesheet.css" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.Bluefix.Prodosia.GUI.Taglist.EditTaglistWindow">
    <children>
-      <Button fx:id="button_back" layoutX="14.0" layoutY="42.0" mnemonicParsing="false" onAction="#btn_CancelBack" prefHeight="40.0" prefWidth="120.0" text="Back" />
-      <Button fx:id="button_edit" layoutX="151.0" layoutY="42.0" mnemonicParsing="false" onAction="#btn_EditSave" prefHeight="40.0" prefWidth="120.0" text="Edit" />
-      <Button fx:id="button_delete" layoutX="506.0" layoutY="42.0" mnemonicParsing="false" onAction="#btn_delete" prefHeight="40.0" prefWidth="120.0" text="Delete" />
+      <Button fx:id="button_back" layoutX="14.0" layoutY="42.0" mnemonicParsing="false"  prefHeight="40.0" prefWidth="120.0" text="Back" />
+      <Button fx:id="button_edit" layoutX="151.0" layoutY="42.0" mnemonicParsing="false" prefHeight="40.0" prefWidth="120.0" text="Edit" />
+      <Button fx:id="button_delete" layoutX="506.0" layoutY="42.0" mnemonicParsing="false"  prefHeight="40.0" prefWidth="120.0" text="Delete" />
       <TitledPane animated="false" collapsible="false" layoutX="15.0" layoutY="95.0" prefHeight="231.0" prefWidth="610.0" text="Taglist">
          <content>
             <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="608.0">
@@ -52,7 +52,7 @@
       </TitledPane>
       <Label layoutX="15.0" layoutY="14.0" text="Taglist &gt; " />
       <Label fx:id="lbl_navigation" layoutX="86.0" layoutY="14.0" text="Add/Edit/Delete Taglist" />
-      <Button fx:id="button_confirmDelete" layoutX="371.0" layoutY="42.0" mnemonicParsing="false" onAction="#btn_confirmDelete" prefHeight="40.0" prefWidth="120.0" text="Yes" />
+      <Button fx:id="button_confirmDelete" layoutX="371.0" layoutY="42.0" mnemonicParsing="false"  prefHeight="40.0" prefWidth="120.0" text="Yes" />
       <Label fx:id="lbl_deleteConfirmation" layoutX="470.0" layoutY="14.0" text="Delete?" />
    </children>
 </AnchorPane>

@@ -39,7 +39,7 @@
   ~ SOFTWARE.
   -->
 
-<GridPane alignment="center" hgap="10" minWidth="520.0" prefHeight="480.0" prefWidth="640.0" stylesheets="@stylesheet.css" vgap="10" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.Bluefix.Prodosia.GUI.ApplicationWindow">
+<GridPane alignment="center" hgap="10" minWidth="520.0" prefHeight="480.0" prefWidth="640.0" stylesheets="@../stylesheet.css" vgap="10" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.Bluefix.Prodosia.GUI.Application.ApplicationWindow">
    <columnConstraints>
       <ColumnConstraints />
    </columnConstraints>
@@ -194,18 +194,25 @@
                                 <tooltip>
                                     <Tooltip text="Empty Tooltip" />
                                 </tooltip></Label>
-                            <Button layoutX="517.0" layoutY="61.0" mnemonicParsing="false" onAction="#addTracker" prefHeight="50.0" prefWidth="109.0" text="Add Archive" />
-                            <ScrollPane hbarPolicy="NEVER" layoutX="14.0" layoutY="61.0" maxHeight="364.0" maxWidth="490.0" vbarPolicy="ALWAYS">
+                            <ScrollPane hbarPolicy="NEVER" layoutX="14.0" layoutY="61.0" maxHeight="365.0" maxWidth="285.0" vbarPolicy="ALWAYS">
                                 <content>
                                     <AnchorPane>
                                         <children>
-                                            <VBox fx:id="archives_overview" />
+                                            <VBox fx:id="arch_taglistOverview" />
                                         </children>
                                     </AnchorPane>
                                 </content>
                             </ScrollPane>
                             <TextField layoutX="14.0" layoutY="14.0" prefHeight="29.0" prefWidth="250.0" />
                             <Label layoutX="271.0" layoutY="14.0" styleClass="infomarker" text="?" />
+                        <Label layoutX="320.0" layoutY="61.0" text="Taglist:" />
+                            <Button fx:id="arch_addArchiveButton" layoutX="320.0" layoutY="85.0" mnemonicParsing="false" onAction="#addTracker" prefHeight="36.0" prefWidth="109.0" text="Add Archive" />
+                        <Label fx:id="arch_selectedTaglist" layoutX="377.0" layoutY="61.0" text="selectedTaglist" />
+                        <ScrollPane hbarPolicy="NEVER" layoutX="320.0" layoutY="135.0" maxHeight="287.0" maxWidth="300.0" vbarPolicy="ALWAYS">
+                           <content>
+                              <VBox fx:id="arch_selectionBox" />
+                           </content>
+                        </ScrollPane>
                         </children></AnchorPane>
                 </content>
             </Tab>

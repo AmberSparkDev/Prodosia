@@ -73,7 +73,7 @@ public class TrackerListManager extends GuiListManager<Button>
             button.setOnAction(event ->
             {
                 EditTrackerWindow controller = VistaNavigator.loadVista(VistaNavigator.AppStage.TRACKER_EDIT);
-                controller.initialize(tr);
+                controller.init(tr);
             });
 
             buttons[i] = button;

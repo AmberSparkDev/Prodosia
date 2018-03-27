@@ -25,61 +25,87 @@ package com.Bluefix.Prodosia.GUI.Managers.ButtonListManager;
 
 import com.Bluefix.Prodosia.DataHandler.TaglistHandler;
 import com.Bluefix.Prodosia.DataType.Taglist.Taglist;
-import com.Bluefix.Prodosia.GUI.Managers.ListManager.GuiListManager;
+import com.Bluefix.Prodosia.DataType.Taglist.TaglistComparator;
 import com.Bluefix.Prodosia.GUI.Navigation.VistaNavigator;
 import com.Bluefix.Prodosia.GUI.Taglist.EditTaglistWindow;
-import javafx.scene.control.Button;
-import javafx.scene.layout.VBox;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
+import javafx.scene.layout.Pane;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 
 /**
  * A GUI Manager that will keep track of a list of users.
  */
-public class TaglistListManager extends GuiListManager<Button>
+public class TaglistListManager extends ButtonListManager
 {
-
     /**
-     * Initialize a new Taglist Manager with a VBox element.
-     * Depending on the methods called, this object will manage the items
-     * in the vbox.
-     * @param vbox The VBox element that is used to display the users.
+     * Create a new GuiListManager object that is linked to the root pane.
+     * This list-manager will instantiate itself by filling the items
+     * from `listItems()`
+     *
+     * @param root The root in which the items will be displayed.
      */
-    public TaglistListManager(VBox vbox) throws Exception
+    public TaglistListManager(Pane root) throws Exception
     {
-        super(vbox);
+        super(root);
     }
-
 
 
     //region IListManager implementation
 
     @Override
-    protected Button[] listItems() throws Exception
+    protected Iterable<String> listButtonItems() throws Exception
     {
+        // retrieve the taglists and sort them.
         ArrayList<Taglist> data = TaglistHandler.handler().getAll();
-        Button[] buttons = new Button[data.size()];
+        data.sort(new TaglistComparator());
 
-        for (int i = 0; i < data.size(); i++)
+        // init the output and taglist map
+        LinkedList<String> output = new LinkedList<>();
+        this.taglistCollection = new Taglist[data.size()];
+
+        int counter = 0;
+
+        // parse a list with all button items and store the abbreviation for the event handler.
+        for (Taglist t : data)
         {
-            Taglist tl = data.get(i);
-
-            Button button = new Button(tl.getAbbreviation());
-            button.setMaxWidth(Double.MAX_VALUE);
-            //button.getStyleClass().add("trackerButton");
-
-            // set button action
-            button.setOnAction(event ->
-            {
-                EditTaglistWindow controller = VistaNavigator.loadVista(VistaNavigator.AppStage.TAGLIST_EDIT);
-                controller.initialize(tl);
-            });
-
-            buttons[i] = button;
+            output.addLast(t.getAbbreviation());
+            this.taglistCollection[counter++] = t;
         }
 
-        return buttons;
+        return output;
     }
+
+
+    private Taglist[] taglistCollection;
+
+    /**
+     * Retrieve the Event Handler for the button. This indicates what the button should do when pressed.
+     * @param entry The index of the entry.
+     * @return
+     */
+    @Override
+    protected EventHandler<ActionEvent> getEventHandlerForButton(int entry)
+    {
+        return getEventHandlerForButton(taglistCollection[entry]);
+    }
+
+    /**
+     * Indicate what a button should do when it is pressed.
+     * @param taglist
+     * @return
+     */
+    protected EventHandler<ActionEvent> getEventHandlerForButton(Taglist taglist)
+    {
+        return event ->
+        {
+            EditTaglistWindow controller = VistaNavigator.loadVista(VistaNavigator.AppStage.TAGLIST_EDIT);
+            controller.init(taglist);
+        };
+    }
+
 
     //endregion
 }

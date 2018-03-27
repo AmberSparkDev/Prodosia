@@ -30,7 +30,7 @@ import java.util.regex.Pattern;
 /**
  * Interface for a list manager.
  */
-public abstract class GuiListManager<T extends Labeled>
+public abstract class GuiListManager<T extends Labeled> implements AutoCloseable
 {
     protected Pane root;
     protected T[] items;
@@ -58,6 +58,9 @@ public abstract class GuiListManager<T extends Labeled>
      */
     private void fill() throws Exception
     {
+        if (root == null)
+            return;
+
         root.getChildren().clear();
 
         // retrieve the items.
@@ -128,5 +131,15 @@ public abstract class GuiListManager<T extends Labeled>
     public void update() throws Exception
     {
         fill();
+    }
+
+
+    @Override
+    public void close()
+    {
+        if (this.root != null)
+            this.root.getChildren().clear();
+
+        this.root = null;
     }
 }

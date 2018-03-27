@@ -83,37 +83,7 @@ public class EditUserWindow extends EditableWindowPane
     @FXML public Button button_checkImgurName;
 
 
-    public void btn_CancelBack(ActionEvent actionEvent) throws Exception
-    {
-        super.button_Cancel_Back();
-    }
 
-
-    /**
-     * Button that, depending on the current state, either states Edit or Save.
-     *
-     * The Edit button will store the fields that currently exist to allow for restoration.
-     * The Save button will store the newly edited data.
-     * @param actionEvent The action-event corresponding to the button press.
-     */
-    public void btn_EditSave(ActionEvent actionEvent)
-    {
-        super.button_Edit_Save();
-    }
-
-    /**
-     * Button that, depending
-     * @param actionEvent
-     */
-    public void btn_delete(ActionEvent actionEvent)
-    {
-        super.button_Delete();
-    }
-
-    public void btn_confirmDelete(ActionEvent actionEvent) throws Exception
-    {
-        super.button_ConfirmDelete();
-    }
 
 
     //endregion
@@ -130,13 +100,6 @@ public class EditUserWindow extends EditableWindowPane
                 lbl_navigation.setText("Inspect User");
 
                 lbl_deleteConfirmation.setVisible(false);
-                button_confirmDelete.setVisible(false);
-                button_delete.setDisable(false);
-                button_delete.setText("Delete");
-                button_back.setText("Back");
-                button_edit.setText("Edit");
-                button_back.setDisable(false);
-                button_edit.setDisable(false);
 
                 tf_imgurName.setDisable(true);
                 button_checkImgurName.setDisable(true);
@@ -152,12 +115,6 @@ public class EditUserWindow extends EditableWindowPane
                 lbl_navigation.setText("Edit User");
 
                 lbl_deleteConfirmation.setVisible(false);
-                button_confirmDelete.setVisible(false);
-                button_delete.setDisable(true);
-                button_back.setText("Cancel");
-                button_edit.setText("Save");
-                button_back.setDisable(false);
-                button_edit.setDisable(false);
 
                 tf_imgurName.setDisable(false);
                 button_checkImgurName.setDisable(false);
@@ -170,10 +127,6 @@ public class EditUserWindow extends EditableWindowPane
 
             case DELETE:
                 lbl_deleteConfirmation.setVisible(true);
-                button_confirmDelete.setVisible(true);
-                button_delete.setText("No");
-                button_back.setDisable(true);
-                button_edit.setDisable(true);
                 break;
         }
     }
@@ -201,6 +154,8 @@ public class EditUserWindow extends EditableWindowPane
     @FXML
     private void initialize()
     {
+        super.initialize(button_back, button_edit, button_delete, button_confirmDelete);
+
         // setup a listener for the filter.
         tf_usFilter.textProperty().addListener((o, oldVal, newVal) ->
         {
@@ -217,11 +172,12 @@ public class EditUserWindow extends EditableWindowPane
 
     /**
      * Initialize a window with the user-information.
-     * @param user the user to initialize on. Can be null for an empty window.
+     * @param user the user to init on. Can be null for an empty window.
      */
     public void init(User user) throws Exception
     {
         curUser = user;
+        previousImgurName = null;
 
         clearData();
 
@@ -232,14 +188,12 @@ public class EditUserWindow extends EditableWindowPane
 
         if (curUser == null)
         {
-            previousImgurName = null;
             tf_imgurName.setText("");
             lbl_imgurId.setText("");
             setState(WindowState.EDIT);
         }
         else
         {
-            previousImgurName = curUser.getImgurName();
             tf_imgurName.setText(curUser.getImgurName());
             lbl_imgurId.setText("" + curUser.getImgurId());
             setState(WindowState.VIEW);

@@ -23,12 +23,11 @@
 package com.Bluefix.Prodosia.GUI.Helpers;
 
 import com.Bluefix.Prodosia.Exception.ExceptionHelper;
-import com.Bluefix.Prodosia.GUI.ApplicationWindow;
+import com.Bluefix.Prodosia.GUI.Application.ApplicationWindow;
 import com.Bluefix.Prodosia.GUI.Navigation.VistaNavigator;
-import javafx.scene.control.Alert;
+import javafx.fxml.FXML;
 import javafx.scene.control.Button;
-
-import java.sql.SQLException;
+import javafx.scene.control.Label;
 
 /**
  * This is a helper class aimed at an editable window.
@@ -43,6 +42,67 @@ import java.sql.SQLException;
  */
 public abstract class EditableWindowPane
 {
+    //region Constructor
+
+    private Button button_back;
+    private Button button_edit;
+    private Button button_delete;
+    @FXML
+    private Button button_confirmDelete;
+
+    /**
+     * Initialize buttons associated with this editable window pane.
+     * Every single user-element is optional, but functionality won't be complete if they are omitted.
+     * @param button_back The back / cancel button of the editable pane.
+     * @param button_edit The edit / save button of the editable pane.
+     * @param button_delete The delete button of the editable pane.
+     * @param button_confirmDelete The button that confirms deletion.
+     */
+    protected void initialize(Button button_back, Button button_edit, Button button_delete, Button button_confirmDelete)
+    {
+        this.button_back = button_back;
+        this.button_edit = button_edit;
+        this.button_delete = button_delete;
+        this.button_confirmDelete = button_confirmDelete;
+
+        if (this.button_back != null)
+            this.button_back.setOnAction(event ->
+            {
+                try
+                {
+                    button_Cancel_Back();
+                } catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+            });
+
+        if (this.button_edit != null)
+            this.button_edit.setOnAction(event -> button_Edit_Save());
+
+        if (this.button_delete != null)
+            this.button_delete.setOnAction(event -> button_Delete());
+
+        if (this.button_confirmDelete != null)
+        {
+            this.button_confirmDelete.setOnAction(event ->
+            {
+                try
+                {
+                    button_ConfirmDelete();
+                } catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+            });
+
+            // init default confirmation text.
+            this.button_confirmDelete.setText("Yes");
+        }
+    }
+
+    //endregion
+
 
 
     //region State handling
@@ -61,6 +121,70 @@ public abstract class EditableWindowPane
     protected void setState(WindowState state)
     {
         curState = state;
+
+        // for whichever buttons is applicable to us, set the text and values.
+        switch (curState)
+        {
+
+            case VIEW:
+                if (button_confirmDelete != null)
+                    button_confirmDelete.setVisible(false);
+
+                if (button_delete != null)
+                {
+                    button_delete.setDisable(false);
+                    button_delete.setText("Delete");
+                }
+
+                if (button_back != null)
+                {
+                    button_back.setText("Back");
+                    button_back.setDisable(false);
+                }
+
+                if (button_edit != null)
+                {
+                    button_edit.setText("Edit");
+                    button_edit.setDisable(false);
+                }
+                break;
+
+            case EDIT:
+                if (button_confirmDelete != null)
+                    button_confirmDelete.setVisible(false);
+
+                if (button_delete != null)
+                    button_delete.setDisable(true);
+
+                if (button_back != null)
+                {
+                    button_back.setText("Cancel");
+                    button_back.setDisable(false);
+                }
+
+                if (button_edit != null)
+                {
+                    button_edit.setText("Save");
+                    button_edit.setDisable(false);
+                }
+                break;
+
+            case DELETE:
+                if (button_confirmDelete != null)
+                    button_confirmDelete.setVisible(true);
+
+                if (button_delete != null)
+                    button_delete.setText("No");
+
+                if (button_back != null)
+                    button_back.setDisable(true);
+
+                if (button_edit != null)
+                    button_edit.setDisable(true);
+                break;
+        }
+
+        // allow the subclass to set its state information.
         applyState(state);
     }
 
@@ -184,10 +308,18 @@ public abstract class EditableWindowPane
     }
 
     /**
-     * @return The data from the fields in the window.
+     * Give a complete collection of data-items that can be used to reconstruct the
+     * current values in the UI. When an edit is cancelled, `restoreFields` will be
+     * called and the subclass will be prompted to restore these same values.
+     * @return The data from the fields in the UI.
      */
     protected abstract DataFieldStorage storeFields();
 
+    /**
+     * Restore the fields as given according to the storage. The storage will have
+     * the same items that were added in `storeFields` (and hence is its opposite).
+     * @param storage The storage with items originally given in `storeFields`
+     */
     protected abstract void restoreFields(DataFieldStorage storage);
 
 
@@ -203,7 +335,7 @@ public abstract class EditableWindowPane
     protected abstract boolean isCreating();
 
     /**
-     * Deletion has been confirmed.
+     * Deletion has been confirmed. Requests the subclass to remove the item from storage.
      */
     protected abstract void deleteItem() throws Exception;
 

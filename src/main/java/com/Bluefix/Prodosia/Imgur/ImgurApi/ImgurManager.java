@@ -109,13 +109,13 @@ public class ImgurManager
         if (client != null)
             return true;
 
-        throw new Exception("Could not initialize the Imgur client");
+        throw new Exception("Could not init the Imgur client");
         */
     }
 
 
     /**
-     * Prompts the Client to re-initialize
+     * Prompts the Client to re-init
      */
     public static void update() throws IOException, URISyntaxException, BaringoApiException
     {

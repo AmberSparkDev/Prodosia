@@ -34,63 +34,23 @@ import java.util.ArrayList;
 
 public class EditTaglistWindow extends EditableWindowPane
 {
-    //region Constructor
-
-
-
-    //endregion
 
     //region Textfields and labels
 
-
     @FXML public Label lbl_navigation;
     @FXML public Label lbl_deleteConfirmation;
-    @FXML public Button button_confirmDelete;
-
-    //endregion
-
-    //region Button actions
-
-    @FXML public Button button_back;
-    @FXML public Button button_edit;
-    @FXML public Button button_delete;
     @FXML public TextField tf_abbreviation;
     @FXML public CheckBox chk_ratings;
     @FXML public TextArea ta_description;
 
+    //endregion
 
-    public void btn_CancelBack(ActionEvent actionEvent) throws Exception
-    {
-        super.button_Cancel_Back();
-    }
+    //region Editable Window Pane GUI components
 
-
-    /**
-     * Button that, depending on the current state, either states Edit or Save.
-     *
-     * The Edit button will store the fields that currently exist to allow for restoration.
-     * The Save button will store the newly edited data.
-     * @param actionEvent The action-event corresponding to the button press.
-     */
-    public void btn_EditSave(ActionEvent actionEvent)
-    {
-        super.button_Edit_Save();
-    }
-
-    /**
-     * Button that, depending
-     * @param actionEvent
-     */
-    public void btn_delete(ActionEvent actionEvent)
-    {
-        super.button_Delete();
-    }
-
-    public void btn_confirmDelete(ActionEvent actionEvent) throws Exception
-    {
-        super.button_ConfirmDelete();
-    }
-
+    @FXML public Button button_back;
+    @FXML public Button button_edit;
+    @FXML public Button button_delete;
+    @FXML public Button button_confirmDelete;
 
     //endregion
 
@@ -106,13 +66,6 @@ public class EditTaglistWindow extends EditableWindowPane
                 lbl_navigation.setText("Inspect Taglist");
 
                 lbl_deleteConfirmation.setVisible(false);
-                button_confirmDelete.setVisible(false);
-                button_delete.setDisable(false);
-                button_delete.setText("Delete");
-                button_back.setText("Back");
-                button_edit.setText("Edit");
-                button_back.setDisable(false);
-                button_edit.setDisable(false);
 
                 tf_abbreviation.setDisable(true);
                 ta_description.setDisable(true);
@@ -123,12 +76,6 @@ public class EditTaglistWindow extends EditableWindowPane
                 lbl_navigation.setText("Edit Taglist");
 
                 lbl_deleteConfirmation.setVisible(false);
-                button_confirmDelete.setVisible(false);
-                button_delete.setDisable(true);
-                button_back.setText("Cancel");
-                button_edit.setText("Save");
-                button_back.setDisable(false);
-                button_edit.setDisable(false);
 
                 tf_abbreviation.setDisable(false);
                 ta_description.setDisable(false);
@@ -137,11 +84,6 @@ public class EditTaglistWindow extends EditableWindowPane
 
             case DELETE:
                 lbl_deleteConfirmation.setVisible(true);
-                button_confirmDelete.setVisible(true);
-                button_delete.setText("No");
-
-                button_back.setDisable(true);
-                button_edit.setDisable(true);
                 break;
         }
     }
@@ -150,43 +92,48 @@ public class EditTaglistWindow extends EditableWindowPane
 
     //region initialization
 
+    /**
+     * Initialize this item with the specified buttons.
+     */
+    @FXML
+    private void initialize()
+    {
+        super.initialize(button_back, button_edit, button_delete, button_confirmDelete);
+    }
+
+
     private Taglist curTaglist;
 
     private void clearData()
     {
-        tf_abbreviation.setText("");
-        ta_description.setText("");
-        chk_ratings.setSelected(false);
-    }
-
-    /**
-     * Initialize an empty window
-     */
-    public void initialize()
-    {
-        curTaglist = null;
-
-        clearData();
-
-        setState(WindowState.EDIT);
+        if (curTaglist == null)
+        {
+            tf_abbreviation.setText("");
+            ta_description.setText("");
+            chk_ratings.setSelected(false);
+        }
+        else
+        {
+            tf_abbreviation.setText(curTaglist.getAbbreviation());
+            ta_description.setText(curTaglist.getDescription());
+            chk_ratings.setSelected(curTaglist.hasRatings());
+        }
     }
 
     /**
      * Initialize a window with the taglist information.
      * @param taglist the taglist to be initialized on.
      */
-    public void initialize(Taglist taglist)
+    public void init(Taglist taglist)
     {
         curTaglist = taglist;
 
         clearData();
 
-        tf_abbreviation.setText(taglist.getAbbreviation());
-        ta_description.setText(taglist.getDescription());
-        chk_ratings.setSelected(taglist.hasRatings());
-
-
-        setState(WindowState.VIEW);
+        if (taglist == null)
+            setState(WindowState.EDIT);
+        else
+            setState(WindowState.VIEW);
     }
 
     //endregion
@@ -218,7 +165,7 @@ public class EditTaglistWindow extends EditableWindowPane
     //region inherited methods
 
     /**
-     * @return true iff we are still in the process of creating the tracker.
+     * @return true iff we are still in the process of creating the taglist.
      */
     protected boolean isCreating()
     {
@@ -229,6 +176,7 @@ public class EditTaglistWindow extends EditableWindowPane
     protected void deleteItem() throws Exception
     {
         TaglistHandler.handler().remove(curTaglist);
+        curTaglist = null;
     }
 
     @Override

@@ -20,8 +20,8 @@
  * SOFTWARE.
  */
 
-package com.Bluefix.Prodosia.DataHandler;
+package com.Bluefix.Prodosia.GUI.Application;
 
-public class ArchiveHandler
+public class ApplicationWindow_Taglist
 {
 }

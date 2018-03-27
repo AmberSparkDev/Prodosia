@@ -197,7 +197,7 @@ public class SqlDatabase
      */
     public synchronized static <T extends Object> ArrayList<T> Commit(SqlBuilder.StoredQuery... query) throws SQLException
     {
-        // initialize an arraylist with the proper size.
+        // init an arraylist with the proper size.
         ArrayList<T> out = new ArrayList<T>(query.length);
 
         try
