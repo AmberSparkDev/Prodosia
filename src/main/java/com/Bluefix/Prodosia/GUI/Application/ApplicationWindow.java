@@ -44,6 +44,7 @@ import com.Bluefix.Prodosia.GUI.Managers.ButtonListManager.TaglistListManager;
 import com.Bluefix.Prodosia.GUI.Managers.ButtonListManager.TrackerListManager;
 import com.Bluefix.Prodosia.GUI.Managers.ButtonListManager.UserListManager;
 import com.Bluefix.Prodosia.GUI.Navigation.VistaNavigator;
+import com.Bluefix.Prodosia.GUI.PrefixWindow;
 import com.Bluefix.Prodosia.GUI.Taglist.EditTaglistWindow;
 import com.Bluefix.Prodosia.GUI.Tracker.EditTrackerWindow;
 import com.Bluefix.Prodosia.GUI.User.EditUserWindow;
@@ -90,7 +91,17 @@ public class ApplicationWindow
     {
         // set `ApiKeysWindow` as active window.
         ApiKeysWindow akw = VistaNavigator.loadVista(VistaNavigator.AppStage.API_KEYS);
-        akw.initialize();
+        //akw.initialize();
+    }
+
+    public void gotoPrefix(ActionEvent actionEvent)
+    {
+        PrefixWindow pfw = VistaNavigator.loadVista(VistaNavigator.AppStage.PREFIX);
+    }
+
+    public void gotoImportExport(ActionEvent actionEvent)
+    {
+        VistaNavigator.loadVista(VistaNavigator.AppStage.IMPORT_EXPORT);
     }
 
     private void initializeStatusWindow()
@@ -98,8 +109,6 @@ public class ApplicationWindow
         // set the output of the logger to the textarea
         Logger.setupOutput(statusConsole);
     }
-
-
 
     //endregion
 
@@ -421,6 +430,10 @@ public class ApplicationWindow
         // test0 s -> u0, u1, u2
         // test0 cows -> u0, u2
     }
+
+
+
+
 
 }
 

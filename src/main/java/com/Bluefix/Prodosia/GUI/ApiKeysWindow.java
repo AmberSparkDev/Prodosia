@@ -53,7 +53,7 @@ public class ApiKeysWindow
      * what is available in the KeyStorage.
      */
     @FXML
-    public void initialize()
+    private void initialize()
     {
         // setup imgur credentials
         try

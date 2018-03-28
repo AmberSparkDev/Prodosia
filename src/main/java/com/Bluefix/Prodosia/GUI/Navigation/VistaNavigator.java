@@ -40,6 +40,8 @@ public class VistaNavigator
     private static final String TAGLIST_EDIT = "Taglist/EditTaglistWindow.fxml";
     private static final String USER_EDIT = "User/EditUserWindow.fxml";
     private static final String ARCHIVE_EDIT = "Archive/EditArchiveWindow.fxml";
+    private static final String PREFIX_VIEW = "PrefixWindow.fxml";
+    private static final String IMPORT_EXPORT = "ImportExportWindow.fxml";
 
     /* --- --- */
 
@@ -65,6 +67,8 @@ public class VistaNavigator
     {
         MAIN_MENU,
         API_KEYS,
+        PREFIX,
+        IMPORT_EXPORT,
 
         TRACKER_EDIT,
         TAGLIST_EDIT,
@@ -103,6 +107,12 @@ public class VistaNavigator
                     break;
                 case API_KEYS:
                     url = urlBase + API_KEYS;
+                    break;
+                case PREFIX:
+                    url = urlBase + PREFIX_VIEW;
+                    break;
+                case IMPORT_EXPORT:
+                    url = urlBase + IMPORT_EXPORT;
                     break;
                 case TRACKER_EDIT:
                     url = urlBase + TRACKER_EDIT;
