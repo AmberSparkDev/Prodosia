@@ -20,9 +20,9 @@
  * SOFTWARE.
  */
 
-package com.Bluefix.Prodosia.DataHandler;
+package com.Bluefix.Prodosia.Prefix;
 
-import com.Bluefix.Prodosia.DataType.Command.CommandPrefix;
+import com.Bluefix.Prodosia.DataHandler.LocalStorageHandler;
 import com.Bluefix.Prodosia.SQLite.SqlDatabase;
 
 import java.sql.PreparedStatement;

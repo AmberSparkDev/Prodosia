@@ -31,18 +31,18 @@
    <children>
       <Label layoutX="15.0" layoutY="14.0" text="Main Menu &gt; " />
       <Button layoutX="14.0" layoutY="42.0" mnemonicParsing="false" onAction="#accept" prefHeight="40.0" prefWidth="120.0" text="Accept" />
-      <TitledPane animated="false" collapsible="false" layoutX="14.0" layoutY="89.0" maxHeight="372.0" maxWidth="299.0" prefHeight="372.0" prefWidth="299.0" text="Imgur">
+      <TitledPane animated="false" collapsible="false" layoutX="14.0" layoutY="89.0" maxHeight="372.0" maxWidth="299.0" minHeight="372.0" minWidth="299.0" prefHeight="372.0" prefWidth="299.0" text="Imgur">
         <content>
-          <AnchorPane fx:id="ap_imgur" minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
+          <AnchorPane fx:id="ap_imgur" maxHeight="342.0" maxWidth="297.0" minHeight="0.0" minWidth="0.0" prefHeight="342.0" prefWidth="297.0" />
         </content>
       </TitledPane>
       <Label layoutX="115.0" layoutY="14.0" text="Prefix" />
       <Button layoutX="506.0" layoutY="42.0" mnemonicParsing="false" onAction="#reset" prefHeight="40.0" prefWidth="120.0" text="Reset" />
       <Label layoutX="144.0" layoutY="48.0" styleClass="infomarker" text="?" />
       <Label layoutX="467.0" layoutY="48.0" styleClass="infomarker" text="?" />
-      <TitledPane collapsible="false" layoutX="327.0" layoutY="89.0" maxHeight="372.0" maxWidth="299.0" prefHeight="372.0" prefWidth="299.0" text="Discord">
+      <TitledPane collapsible="false" layoutX="327.0" layoutY="89.0" maxHeight="372.0" maxWidth="299.0" minHeight="372.0" minWidth="299.0" prefHeight="372.0" prefWidth="299.0" text="Discord">
          <content>
-            <AnchorPane fx:id="ap_discord" prefHeight="200.0" prefWidth="200.0" />
+            <AnchorPane fx:id="ap_discord" maxHeight="342.0" maxWidth="297.0" minHeight="0.0" minWidth="0.0" prefHeight="342.0" prefWidth="297.0" />
          </content>
       </TitledPane>
    </children>

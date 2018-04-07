@@ -22,13 +22,10 @@
 
 package com.Bluefix.Prodosia.Command;
 
-import com.Bluefix.Prodosia.DataHandler.CommandPrefixStorage;
+import com.Bluefix.Prodosia.Prefix.CommandPrefixStorage;
 import com.Bluefix.Prodosia.DataType.Command.CommandInformation;
-import com.Bluefix.Prodosia.DataType.Command.CommandPrefix;
-import com.Bluefix.Prodosia.DataType.Tracker.Tracker;
+import com.Bluefix.Prodosia.Prefix.CommandPrefix;
 import com.Bluefix.Prodosia.Logger.Logger;
-
-import java.util.List;
 
 /**
  * Executes strings if they adhere to the prefix syntax.

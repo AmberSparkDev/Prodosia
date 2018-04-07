@@ -22,11 +22,11 @@
 
 package com.Bluefix.Prodosia.GUI.Application;
 
-import com.Bluefix.Prodosia.DataHandler.CommandPrefixStorage;
+import com.Bluefix.Prodosia.Prefix.CommandPrefixStorage;
 import com.Bluefix.Prodosia.DataHandler.TaglistHandler;
 import com.Bluefix.Prodosia.DataHandler.TrackerHandler;
 import com.Bluefix.Prodosia.DataHandler.UserHandler;
-import com.Bluefix.Prodosia.DataType.Command.CommandPrefix;
+import com.Bluefix.Prodosia.Prefix.CommandPrefix;
 import com.Bluefix.Prodosia.DataType.Data;
 import com.Bluefix.Prodosia.DataType.Taglist.Rating;
 import com.Bluefix.Prodosia.DataType.Taglist.Taglist;

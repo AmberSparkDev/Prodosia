@@ -22,7 +22,8 @@
 
 package com.Bluefix.Prodosia.DataHandler;
 
-import com.Bluefix.Prodosia.DataType.Command.CommandPrefix;
+import com.Bluefix.Prodosia.Prefix.CommandPrefix;
+import com.Bluefix.Prodosia.Prefix.CommandPrefixStorage;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

@@ -23,13 +23,12 @@
 package com.Bluefix.Prodosia.Discord;
 
 import com.Bluefix.Prodosia.Command.CommandRecognition;
-import com.Bluefix.Prodosia.DataHandler.CommandPrefixStorage;
+import com.Bluefix.Prodosia.Prefix.CommandPrefixStorage;
 import com.Bluefix.Prodosia.DataHandler.TrackerHandler;
 import com.Bluefix.Prodosia.DataType.Command.CommandInformation;
-import com.Bluefix.Prodosia.DataType.Command.CommandPrefix;
+import com.Bluefix.Prodosia.Prefix.CommandPrefix;
 import com.Bluefix.Prodosia.DataType.Command.DiscordCommandInformation;
 import com.Bluefix.Prodosia.DataType.Tracker.Tracker;
-import com.Bluefix.Prodosia.Logger.Logger;
 import com.Bluefix.Prodosia.Storage.KeyStorage;
 import net.dv8tion.jda.core.AccountType;
 import net.dv8tion.jda.core.JDA;
@@ -43,7 +42,6 @@ import net.dv8tion.jda.core.hooks.EventListener;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
 
 import javax.security.auth.login.LoginException;
-import java.io.IOException;
 import java.util.LinkedList;
 
 public class DiscordManager

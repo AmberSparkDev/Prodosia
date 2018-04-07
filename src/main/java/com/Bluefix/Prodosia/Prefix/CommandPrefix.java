@@ -20,8 +20,10 @@
  * SOFTWARE.
  */
 
-package com.Bluefix.Prodosia.DataType.Command;
+package com.Bluefix.Prodosia.Prefix;
 
+import java.util.Arrays;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Objects;
 import java.util.regex.Matcher;
@@ -90,6 +92,10 @@ public class CommandPrefix
         return type;
     }
 
+    /**
+     * Retrieve the pattern for this CommandPrefix.
+     * @return
+     */
     public String getRegex()
     {
         return regex;
@@ -132,6 +138,11 @@ public class CommandPrefix
     }
 
 
+    /**
+     * Generate a new CommandPrefix pattern for the specified items.
+     * @param items
+     * @return
+     */
     public static String parsePatternForItems(String... items)
     {
         StringBuilder sb = new StringBuilder();
@@ -157,6 +168,26 @@ public class CommandPrefix
         sb.append(")");
 
         return sb.toString();
+    }
+
+    /**
+     * Generate a new CommandPrefix pattern for the specified items.
+     * @param items
+     * @return
+     */
+    public static String parsePatternForItems(Iterable<String> items)
+    {
+        if (items == null)
+            return parsePatternForItems();
+
+        LinkedList<String> list = new LinkedList<>();
+
+        Iterator<String> it = items.iterator();
+
+        while (it.hasNext())
+            list.add(it.next());
+
+        return parsePatternForItems(list.toArray(new String[0]));
     }
 
     /**

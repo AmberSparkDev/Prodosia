@@ -23,6 +23,8 @@
 package com.Bluefix.Prodosia.SQLite;
 
 import com.Bluefix.Prodosia.DataHandler.TrackerHandler;
+import com.Bluefix.Prodosia.Prefix.CommandPrefix;
+import com.Bluefix.Prodosia.Prefix.CommandPrefixStorage;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -102,6 +104,32 @@ public class SqlDatabase
         }
 
         SqlDatabaseHelper.setVersion(DatabaseVersion, CreatedBy);
+
+        // initialize the default CommandPrefixes
+        try
+        {
+            createDefaultPrefix();
+        } catch (Exception e)
+        {
+            // exception is annoying but not detrimental to application functionality
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Initialize the default prefixes.
+     */
+    private void createDefaultPrefix() throws Exception
+    {
+        // Imgur
+        // default prefix is: @Tagaroo
+        String pattern = CommandPrefix.parsePatternForItems("@Tagaroo");
+        CommandPrefix imgCp = new CommandPrefix(CommandPrefix.Type.IMGUR, pattern);
+        CommandPrefixStorage.handler().set(imgCp);
+
+        // Discord
+        // Discord command prefix is automatically initialized when discord
+        // is connected, no need for us to worry about it.
     }
 
 

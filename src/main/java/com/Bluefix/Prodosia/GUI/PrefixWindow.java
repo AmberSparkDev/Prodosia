@@ -22,7 +22,11 @@
 
 package com.Bluefix.Prodosia.GUI;
 
-import com.Bluefix.Prodosia.GUI.Managers.DeletableItemList.DeletableLabelList;
+import com.Bluefix.Prodosia.GUI.Navigation.VistaNavigator;
+import com.Bluefix.Prodosia.Prefix.CommandPrefixStorage;
+import com.Bluefix.Prodosia.Prefix.CommandPrefix;
+import com.Bluefix.Prodosia.GUI.Managers.DeletableItemList.EditableReadonlyTextfieldList;
+import com.Bluefix.Prodosia.Prefix.EditablePrefixList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.layout.AnchorPane;
@@ -34,29 +38,32 @@ public class PrefixWindow
     @FXML private AnchorPane ap_imgur;
     @FXML private AnchorPane ap_discord;
 
-    private DeletableLabelList dll;
+    private EditablePrefixList imgurList;
+    private EditablePrefixList discordList;
 
 
 
 
-    public void accept(ActionEvent actionEvent)
+    public void accept(ActionEvent actionEvent) throws Exception
     {
+        imgurList.store();
+        discordList.store();
+
+        VistaNavigator.loadVista(VistaNavigator.AppStage.MAIN_MENU);
     }
 
     public void reset(ActionEvent actionEvent)
     {
+        imgurList.reset();
+        discordList.reset();
     }
     
     
     
     @FXML
-    private void initialize()
+    private void initialize() throws Exception
     {
-        LinkedList<String> items = new LinkedList<>();
-        items.add("item 1");
-        items.add("item 2");
-        items.add("item 3");
-
-        dll = new DeletableLabelList(ap_imgur, items);
+        this.imgurList = new EditablePrefixList(CommandPrefix.Type.IMGUR, ap_imgur);
+        this.discordList = new EditablePrefixList(CommandPrefix.Type.DISCORD, ap_discord);
     }
 }

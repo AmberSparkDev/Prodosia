@@ -23,6 +23,8 @@
 package com.Bluefix.Prodosia.GUI.Managers.DeletableItemList;
 
 import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
 
 import java.util.LinkedList;
@@ -31,7 +33,7 @@ import java.util.List;
 /**
  * Create a new editable list with Label entries.
  */
-public class DeletableLabelList extends DeletableItemList<Label>
+public class EditableReadonlyTextfieldList extends EditableItemList<TextField>
 {
     private Iterable<String> items;
 
@@ -40,11 +42,28 @@ public class DeletableLabelList extends DeletableItemList<Label>
      *
      * @param root The room within which the items can be placed.
      */
-    public DeletableLabelList(Pane root, Iterable<String> items)
+    public EditableReadonlyTextfieldList(Pane root, Iterable<String> items)
     {
         super(root);
 
         this.items = items;
+        super.update();
+    }
+
+
+    /**
+     * Create a new list with deletable items.
+     *
+     * @param root The room within which the items can be placed.
+     * @param items The items that should be displayed by default.
+     * @param fixedEntries The amount of 0-based entries that should not be deletable.
+     */
+    public EditableReadonlyTextfieldList(Pane root, Iterable<String> items, int fixedEntries)
+    {
+        super(root, fixedEntries);
+
+        this.items = items;
+        super.update();
     }
 
 
@@ -56,16 +75,21 @@ public class DeletableLabelList extends DeletableItemList<Label>
      * the proper order.
      */
     @Override
-    protected List<Label> listItems()
+    protected List<TextField> listItems()
     {
-        LinkedList<Label> output = new LinkedList<>();
+        LinkedList<TextField> output = new LinkedList<>();
 
         if (this.items == null)
             return output;
 
         for (String i : items)
         {
-            output.add(new Label(i));
+            TextField newItem = new TextField(i);
+            newItem.setMaxWidth(Double.MAX_VALUE);
+            //newItem.setPrefWidth(Double.MAX_VALUE);
+            newItem.setEditable(false);
+
+            output.add(newItem);
         }
 
         return output;
@@ -78,8 +102,43 @@ public class DeletableLabelList extends DeletableItemList<Label>
      * @return
      */
     @Override
-    protected Label createItem(String data)
+    protected TextField createItem(String data)
     {
-        return new Label(data);
+        TextField output = new TextField(data);
+        output.setMaxWidth(Double.MAX_VALUE);
+        output.setEditable(false);
+        return output;
+    }
+
+
+    /**
+     * Retrieve the original items from the editable list, the ones that weren't altered yet.
+     * @return An iterable object containing the original items before the last store-call.
+     */
+    public Iterable<String> getOriginalItems()
+    {
+        return this.items;
+    }
+
+
+    public Iterable<String> getItems()
+    {
+        LinkedList<String> items = new LinkedList<>();
+
+        if (super.items == null)
+            return items;
+
+        for (TextField t : super.items)
+            items.add(t.getText());
+
+        return items;
+    }
+
+    /**
+     * Override our items with the items from the editable list, thus finalizing them.
+     */
+    public void store()
+    {
+        this.items = getItems();
     }
 }

@@ -23,12 +23,12 @@
 package com.Bluefix.Prodosia.Command.CommandFunc;
 
 import com.Bluefix.Prodosia.Command.CommandRecognition;
-import com.Bluefix.Prodosia.DataHandler.CommandPrefixStorage;
+import com.Bluefix.Prodosia.Prefix.CommandPrefixStorage;
 import com.Bluefix.Prodosia.DataHandler.TaglistHandler;
 import com.Bluefix.Prodosia.DataHandler.TrackerHandler;
 import com.Bluefix.Prodosia.DataHandler.UserHandler;
 import com.Bluefix.Prodosia.DataType.Command.CommandInformation;
-import com.Bluefix.Prodosia.DataType.Command.CommandPrefix;
+import com.Bluefix.Prodosia.Prefix.CommandPrefix;
 import com.Bluefix.Prodosia.DataType.Command.ImgurCommandInformation;
 import com.Bluefix.Prodosia.DataType.Taglist.Rating;
 import com.Bluefix.Prodosia.DataType.Taglist.Taglist;
@@ -48,8 +48,6 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashSet;
-
-import static org.junit.Assert.*;
 
 public class SubCommandTest
 {

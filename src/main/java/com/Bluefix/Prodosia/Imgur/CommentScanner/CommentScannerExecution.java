@@ -25,7 +25,7 @@ package com.Bluefix.Prodosia.Imgur.CommentScanner;
 import com.Bluefix.Prodosia.Command.CommandRecognition;
 import com.Bluefix.Prodosia.DataHandler.TrackerHandler;
 import com.Bluefix.Prodosia.DataType.Command.CommandInformation;
-import com.Bluefix.Prodosia.DataType.Command.CommandPrefix;
+import com.Bluefix.Prodosia.Prefix.CommandPrefix;
 import com.Bluefix.Prodosia.DataType.Command.ImgurCommandInformation;
 import com.Bluefix.Prodosia.DataType.Tracker.Tracker;
 import com.Bluefix.Prodosia.DataType.Tracker.TrackerBookmark;
