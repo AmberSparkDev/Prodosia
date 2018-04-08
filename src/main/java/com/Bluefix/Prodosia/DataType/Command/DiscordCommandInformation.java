@@ -25,6 +25,7 @@ package com.Bluefix.Prodosia.DataType.Command;
 import com.Bluefix.Prodosia.DataType.Tracker.Tracker;
 import com.Bluefix.Prodosia.Discord.StatDiscord;
 import net.dv8tion.jda.core.entities.Message;
+import net.dv8tion.jda.core.requests.restaction.MessageAction;
 
 import java.util.LinkedList;
 
@@ -55,7 +56,7 @@ public class DiscordCommandInformation extends CommandInformation
 
         for (String r : replies)
         {
-            message.getChannel().sendMessage(r);
+            message.getChannel().sendMessage(r).submit();
         }
     }
 }

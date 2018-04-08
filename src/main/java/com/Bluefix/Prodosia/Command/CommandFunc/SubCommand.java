@@ -35,6 +35,9 @@ import javax.activation.CommandInfo;
 import java.util.HashSet;
 import java.util.LinkedList;
 
+/**
+ * Handles the command to subscribe a user.
+ */
 public class SubCommand implements ICommandFunc
 {
     @Override
@@ -42,9 +45,7 @@ public class SubCommand implements ICommandFunc
     {
         // if there was no tracker data provided, do not execute the method.
         if (ci.getTracker() == null)
-        {
             throw new IllegalArgumentException("A tracker was not provided!");
-        }
 
         // first see if the arguments could contain the data.
         if (arguments == null || arguments.length == 0)

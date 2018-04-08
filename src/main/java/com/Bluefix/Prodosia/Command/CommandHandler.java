@@ -121,8 +121,6 @@ public class CommandHandler
      */
     public static void execute(CommandInformation ci, String command, String arguments)
     {
-        System.out.println("### actual command = \"" + command + "\"");
-
         // keep parts between quotes together.
         String[] quoteSplit = arguments.trim().split("\"");
 

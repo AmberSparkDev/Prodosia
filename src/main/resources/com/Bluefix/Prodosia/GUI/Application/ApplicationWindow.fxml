@@ -53,7 +53,7 @@
             <content>
               <AnchorPane>
                      <children>
-                        <TextArea id="logger" fx:id="statusConsole" editable="false" layoutX="14.0" layoutY="14.0" prefHeight="325.0" prefWidth="353.0" wrapText="true" />
+                        <TextArea id="logger" fx:id="statusConsole" editable="false" layoutX="14.0" layoutY="14.0" prefHeight="411.0" prefWidth="353.0" wrapText="true" />
                         <Button layoutX="483.0" layoutY="14.0" maxHeight="29.0" maxWidth="136.0" mnemonicParsing="false" onAction="#gotoApiKeys" prefHeight="29.0" prefWidth="136.0" text="API keys" />
                         <Label layoutX="447.0" layoutY="14.0" styleClass="infomarker" text="?">
                            <tooltip>

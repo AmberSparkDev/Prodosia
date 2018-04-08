@@ -191,7 +191,7 @@ public class DiscordManager
         @Override
         public void onMessageReceived(MessageReceivedEvent event)
         {
-            System.out.println("#### Discord Message ####\n" + event.getMessage().getContentRaw()+ "\n\n#### ####");
+            System.out.println("#### Discord Message ####\n" + event.getMessage().getContentRaw()+ "\n#### ####");
 
             // --- Trackers ---
             // Attempt to retrieve the tracker that parsed this message.

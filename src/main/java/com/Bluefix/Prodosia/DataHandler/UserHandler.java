@@ -398,6 +398,12 @@ public class UserHandler extends LocalStorageHandler<User>
         return null;
     }
 
+    /**
+     * Retrieve the Imgur user by its name. If the user could not be found, returns null.
+     * @param name The Imgur name of the user.
+     * @return The Imgur User object, or null if it could not be found.
+     * @throws Exception
+     */
     public static User getUserByImgurName(String name) throws Exception
     {
         ArrayList<User> users = handler().getAll();
