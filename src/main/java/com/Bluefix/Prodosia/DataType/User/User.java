@@ -207,10 +207,16 @@ public class User
         }
     }
 
+    /**
+     * Merge Users with the same id together.
+     * @param u
+     * @return
+     * @throws Exception
+     */
     private User merge(User u) throws Exception
     {
         if (u == null)
-            return null;
+            return this;
 
         if (u.getImgurId() != this.imgurId)
             throw new IllegalArgumentException("This is an illegal merge.");

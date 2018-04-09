@@ -20,55 +20,34 @@
  * SOFTWARE.
  */
 
-package com.Bluefix.Prodosia.DataType.Command;
+package com.Bluefix.Prodosia.Command.CommandFunc.Subscription;
 
-import com.Bluefix.Prodosia.DataType.Tracker.Tracker;
-import com.Bluefix.Prodosia.Discord.StatDiscord;
-import net.dv8tion.jda.core.entities.Message;
-import net.dv8tion.jda.core.requests.restaction.MessageAction;
+import com.Bluefix.Prodosia.Command.CommandFunc.ICommandFunc;
+import com.Bluefix.Prodosia.DataType.Command.CommandInformation;
 
-import java.io.File;
-import java.util.LinkedList;
-
-public class DiscordCommandInformation extends CommandInformation implements FileTransferable
+public class UnsuballCommand implements ICommandFunc
 {
-    private Message message;
-
-    public DiscordCommandInformation(Tracker t, Message message)
-    {
-        super();
-        super.setTracker(t);
-
-        this.message = message;
-    }
-
-
-
-
     /**
-     * Reply to the user with the following entries.
+     * Execute the command with the specified parameters.
      *
-     * @param entries The entries to reply to the user to.
+     * @param ci        Information pertaining to the command.
+     * @param arguments The parameters for the command.
+     * @return The response text for executing this command.
      */
     @Override
-    public void reply(String... entries) throws Exception
+    public void execute(CommandInformation ci, String[] arguments) throws Exception
     {
-        LinkedList<String> replies = ReplyHelper.prepareReply(entries, StatDiscord.MaximumMessageSize, false);
 
-        for (String r : replies)
-        {
-            message.getChannel().sendMessage(r).submit();
-        }
     }
 
     /**
-     * Send a file to the user.
+     * Give information on how this command should be used.
      *
-     * @param file The file to be send.
+     * @return
      */
     @Override
-    public void sendFile(File file)
+    public String info()
     {
-        message.getChannel().sendFile(file).submit();
+        return null;
     }
 }

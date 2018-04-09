@@ -23,6 +23,10 @@
 package com.Bluefix.Prodosia.Command;
 
 import com.Bluefix.Prodosia.Command.CommandFunc.*;
+import com.Bluefix.Prodosia.Command.CommandFunc.Subscription.SubCommand;
+import com.Bluefix.Prodosia.Command.CommandFunc.Subscription.SuballCommand;
+import com.Bluefix.Prodosia.Command.CommandFunc.Subscription.UnsubCommand;
+import com.Bluefix.Prodosia.Command.CommandFunc.Subscription.UnsuballCommand;
 import com.Bluefix.Prodosia.DataType.Command.CommandInformation;
 
 import java.util.ArrayList;
@@ -76,6 +80,8 @@ public class CommandHandler
         commandMap.put("unsub", new UnsubCommand());
         commandMap.put("getuser", new GetuserCommand());
         commandMap.put("getlist", new GetlistCommand());
+        commandMap.put("suball", new SuballCommand());
+        commandMap.put("unsuball", new UnsuballCommand());
     }
 
     //endregion

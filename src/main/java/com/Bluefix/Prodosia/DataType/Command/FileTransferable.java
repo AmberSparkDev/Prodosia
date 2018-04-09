@@ -22,53 +22,16 @@
 
 package com.Bluefix.Prodosia.DataType.Command;
 
-import com.Bluefix.Prodosia.DataType.Tracker.Tracker;
-import com.Bluefix.Prodosia.Discord.StatDiscord;
-import net.dv8tion.jda.core.entities.Message;
-import net.dv8tion.jda.core.requests.restaction.MessageAction;
-
 import java.io.File;
-import java.util.LinkedList;
 
-public class DiscordCommandInformation extends CommandInformation implements FileTransferable
+/**
+ * Interface for sending files to the user.
+ */
+public interface FileTransferable
 {
-    private Message message;
-
-    public DiscordCommandInformation(Tracker t, Message message)
-    {
-        super();
-        super.setTracker(t);
-
-        this.message = message;
-    }
-
-
-
-
-    /**
-     * Reply to the user with the following entries.
-     *
-     * @param entries The entries to reply to the user to.
-     */
-    @Override
-    public void reply(String... entries) throws Exception
-    {
-        LinkedList<String> replies = ReplyHelper.prepareReply(entries, StatDiscord.MaximumMessageSize, false);
-
-        for (String r : replies)
-        {
-            message.getChannel().sendMessage(r).submit();
-        }
-    }
-
     /**
      * Send a file to the user.
-     *
      * @param file The file to be send.
      */
-    @Override
-    public void sendFile(File file)
-    {
-        message.getChannel().sendFile(file).submit();
-    }
+    void sendFile(File file);
 }

@@ -20,8 +20,9 @@
  * SOFTWARE.
  */
 
-package com.Bluefix.Prodosia.Command.CommandFunc;
+package com.Bluefix.Prodosia.Command.CommandFunc.Subscription;
 
+import com.Bluefix.Prodosia.Command.CommandFunc.ICommandFunc;
 import com.Bluefix.Prodosia.DataHandler.TaglistHandler;
 import com.Bluefix.Prodosia.DataHandler.UserHandler;
 import com.Bluefix.Prodosia.DataType.Command.CommandInformation;

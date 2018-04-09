@@ -25,6 +25,7 @@ package com.Bluefix.Prodosia.DataHandler;
 
 import com.Bluefix.Prodosia.DataType.User.User;
 import com.Bluefix.Prodosia.DataType.User.UserSubscription;
+import com.Bluefix.Prodosia.GUI.GuiUpdate;
 import com.Bluefix.Prodosia.SQLite.SqlBuilder;
 import com.Bluefix.Prodosia.SQLite.SqlDatabase;
 
@@ -65,6 +66,21 @@ public class UserHandler extends LocalStorageHandler<User>
     //endregion
 
     //region Local Storage Handler implementation
+
+
+    @Override
+    public void set(User user) throws Exception
+    {
+        super.set(user);
+        GuiUpdate.updateUsers();
+    }
+
+    @Override
+    public void remove(User user) throws Exception
+    {
+        super.remove(user);
+        GuiUpdate.updateUsers();
+    }
 
     /**
      * Add an item to the storage.

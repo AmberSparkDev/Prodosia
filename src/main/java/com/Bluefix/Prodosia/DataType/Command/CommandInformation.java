@@ -47,51 +47,63 @@ public abstract class CommandInformation
     private String imgurId;
 
     /**
-     * The parent-id that pertains to the command.
+     * The parent comment that pertains to the command.
      */
-    private long parentId;
-
-
     private Comment parentComment;
 
 
     //region builder
 
-    protected CommandInformation()
-    {
-
-    }
-
+    /**
+     * Set the Tracker information for this command.
+     * @param t The Tracker that issued the command.
+     * @return Builder feedback.
+     */
     public CommandInformation setTracker(Tracker t)
     {
         this.tracker = t;
         return this;
     }
 
+    /**
+     * Set the Imgur Id of the specified post for this command.
+     * @param imgurId The Imgur Id of the post.
+     * @return Builder feedback.
+     */
     public CommandInformation setImgurId(String imgurId)
     {
         this.imgurId = imgurId;
         return this;
     }
 
+    /**
+     * Set the parent-id of the specified parent comment for this command.
+     * @param parentId The id of the parent comment.
+     * @return Builder feedback.
+     * @throws BaringoApiException
+     * @throws IOException
+     * @throws URISyntaxException
+     */
     public CommandInformation setParentId(long parentId) throws BaringoApiException, IOException, URISyntaxException
     {
-        this.parentId = parentId;
-
         // retrieve the comment if necessary.
-        if (parentComment == null || parentComment.getId() != this.parentId)
+        if (parentComment == null || parentComment.getId() != parentId)
         {
             this.parentComment =
-                    ImgurManager.client().commentService().getComment(this.parentId);
+                    ImgurManager.client().commentService().getComment(parentId);
         }
 
         return this;
     }
 
+    /**
+     * Set the specified parent comment for this command.
+     * @param parentComment The parent comment.
+     * @return Builder feedback.
+     */
     public CommandInformation setParentComment(Comment parentComment)
     {
         this.parentComment = parentComment;
-        this.parentId = this.parentComment.getId();
 
         return this;
     }
@@ -101,24 +113,37 @@ public abstract class CommandInformation
     //endregion
 
 
-
-
-
+    /**
+     * Retrieve the stored Tracker.
+     * @return The stored Tracker object.
+     */
     public Tracker getTracker()
     {
         return tracker;
     }
 
+    /**
+     * Retrieve the imgur-id of the specified post.
+     * @return The imgur-id of the specified post, or null if no specified post was indicated.
+     */
     public String getImgurId()
     {
+        // if the imgur id was not known, attempt to extract if from the parent comment.
+        if (this.imgurId == null || this.imgurId.trim().isEmpty())
+        {
+            if (this.parentComment == null)
+                return null;
+
+            this.imgurId = this.parentComment.getImageId();
+        }
+
         return imgurId;
     }
 
-    public long getParentId()
-    {
-        return parentId;
-    }
-
+    /**
+     * Retrieve the parent comment.
+     * @return The parent comment object.
+     */
     public Comment getParentComment()
     {
         return parentComment;
