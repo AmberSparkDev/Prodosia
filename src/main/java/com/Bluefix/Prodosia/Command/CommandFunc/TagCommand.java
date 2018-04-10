@@ -22,14 +22,14 @@
 
 package com.Bluefix.Prodosia.Command.CommandFunc;
 
-import com.Bluefix.Prodosia.DataHandler.TaglistHandler;
+import com.Bluefix.Prodosia.Command.CommandHelper.TagRequestParser;
 import com.Bluefix.Prodosia.DataType.Command.CommandInformation;
 import com.Bluefix.Prodosia.DataType.Comments.FeedbackRequest;
 import com.Bluefix.Prodosia.DataType.Comments.ICommentRequest;
-import com.Bluefix.Prodosia.DataType.Comments.TagRequest;
+import com.Bluefix.Prodosia.DataType.Comments.TagRequest.BaseTagRequest;
+import com.Bluefix.Prodosia.DataType.Comments.TagRequest.TagRequest;
 import com.Bluefix.Prodosia.DataType.Taglist.Rating;
 import com.Bluefix.Prodosia.DataType.Taglist.Taglist;
-import com.Bluefix.Prodosia.DataType.User.Filter;
 import com.Bluefix.Prodosia.Imgur.ImgurApi.ImgurManager;
 import com.Bluefix.Prodosia.Imgur.Tagging.CommentExecution;
 import com.Bluefix.Prodosia.Imgur.Tagging.TagRequestStorage;
@@ -38,8 +38,8 @@ import com.github.kskelm.baringo.util.BaringoApiException;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.Objects;
 
 public class TagCommand implements ICommandFunc
@@ -91,89 +91,41 @@ public class TagCommand implements ICommandFunc
             imgurId = ci.getImgurId();
         }
 
-        HashSet<Taglist> taglists = new HashSet<>();
-        Rating rating = Rating.UNKNOWN;
-        ArrayList<String> filters = new ArrayList<>();
+
+        // filter out all arguments that don't pertain to the tag request.
+        LinkedList<String> tagRequestArguments = new LinkedList<>();
         String parentComment = null;
 
-        boolean wasTaglist = false;
-
-
-        // loop through the remaining arguments and ascertain what they are.
-        while (pointer < arguments.length)
+        for (String a : arguments)
         {
-            // retrieve the current argument and increment the pointer.
-            String curArg = arguments[pointer++].toLowerCase();
-
-            // check if the current pointer is a rating
-            if ("s".equals(curArg))
+            if (a.startsWith("\"") && a.endsWith("\""))
             {
-                rating = Rating.SAFE;
-            } else if ("q".equals(curArg))
-            {
-                rating = Rating.QUESTIONABLE;
-            } else if ("e".equals(curArg))
-            {
-                rating = Rating.EXPLICIT;
-            } else if (curArg.startsWith("\"") && curArg.endsWith("\""))
-            {
-                // since this is a quote, it will be the parent comment.
-                parentComment = curArg.replace("\"", "");
-            } else
-            {
-                // check if there is a taglist that corresponds to this argument.
-                Taglist tl = TaglistHandler.getTaglistByAbbreviation(curArg);
-
-                if (tl != null)
-                {
-                    wasTaglist = true;
-
-                    // check if the user has permissions to tag to this taglist.
-                    if (ci.getTracker().hasPermission(tl))
-                    {
-                        taglists.add(tl);
-                    }
-                }
-                else
-                {
-                    // if the item was not a taglist or rating, it must be considered a filter.
-                    filters.add(curArg);
-                }
+                // this is a quote and as such it will be the parent comment.
+                parentComment = a.substring(1, a.length()-1);
             }
-        }
-
-        // sanity check
-        // if no taglists were supplied or allowed, return null
-        if (taglists.size() <= 0)
-        {
-            // if there was a taglist, the tracker wasn't allowed
-            if (wasTaglist)
-                msgNotAllowed(ci);
             else
-                msgNoTaglists(ci);
-
-            return;
-        }
-
-        // if no rating was supplied, complete all taglists that require a rating.
-        if (rating == Rating.UNKNOWN)
-        {
-            for (Taglist t : taglists)
             {
-                if (t.hasRatings())
-                    taglists.remove(t);
+                tagRequestArguments.addLast(a);
             }
         }
 
-        // if no taglists were remaining, indicate this to the user.
-        if (taglists.size() <= 0)
+        // parse the tag request from the remaining comments.
+        TagRequestParser.ParseTagRequestResult trr = TagRequestParser.parseTagRequest(ci.getTracker(), tagRequestArguments.toArray(new String[0]));
+
+        switch (trr.getTagRequestStatus())
         {
-            msgForgotRating(ci);
-            return;
+            case NO_TAGLISTS:
+                msgNoTaglists(ci);
+                return;
+            case NO_TAGLISTS_ALLOWED:
+                msgNotAllowed(ci);
+                return;
+            case NO_RATING:
+                msgForgotRating(ci);
+                return;
         }
 
-        // get the pattern String for the filters
-        String filterPattern = Filter.getPatternForFilters(filters.iterator());
+
 
 
         if (parentComment != null)
@@ -182,15 +134,14 @@ public class TagCommand implements ICommandFunc
             // and handle the rest of the TagRequest there
 
             FeedbackRequest fr = new TagParentFeedbackRequest(
-                    parentComment, imgurId, taglists, rating, filterPattern);
+                    parentComment, imgurId, trr.getTagRequest());
 
             CommentExecution.executeFeedbackRequest(fr);
         }
         else
         {
             // parse the tag request and add it to the queue.
-            TagRequest tr =
-                    new TagRequest(imgurId, ci.getParentComment(), taglists, rating, filterPattern, true);
+            TagRequest tr = trr.getTagRequest().parseTagRequest(imgurId, ci.getParentComment());
 
             TagRequestStorage.handler().set(tr);
         }
@@ -205,18 +156,15 @@ public class TagCommand implements ICommandFunc
      */
     private static class TagParentFeedbackRequest extends FeedbackRequest
     {
+        private BaseTagRequest btr;
         private String imgurId;
-        private HashSet<Taglist> taglists;
-        private Rating rating;
-        private String filters;
 
-        public TagParentFeedbackRequest(String comment, String imgurId, HashSet<Taglist> taglists, Rating rating, String filters)
+        public TagParentFeedbackRequest(String comment, String imgurId, BaseTagRequest btr)
         {
             super(comment);
             this.imgurId = imgurId;
-            this.taglists = taglists;
-            this.rating = rating;
-            this.filters = filters;
+
+            this.btr = btr;
         }
 
         /**
@@ -231,9 +179,12 @@ public class TagCommand implements ICommandFunc
             {
                 Comment pComment = ImgurManager.client().commentService().getComment(commentId);
 
+                // if the parent comment could not be posted, cancel the tag request for now.
+                if (pComment == null)
+                    return;
+
                 // parse the tag request and add it to the queue.
-                TagRequest tr =
-                        new TagRequest(imgurId, pComment, taglists, rating, filters.toString(), true);
+                TagRequest tr = btr.parseTagRequest(pComment);
 
                 TagRequestStorage.handler().set(tr);
             }
@@ -293,17 +244,15 @@ public class TagCommand implements ICommandFunc
             if (this == o) return true;
             if (o == null || getClass() != o.getClass()) return false;
             TagParentFeedbackRequest that = (TagParentFeedbackRequest) o;
-            return Objects.equals(imgurId, that.imgurId) &&
-                    Objects.equals(taglists, that.taglists) &&
-                    rating == that.rating &&
-                    Objects.equals(filters, that.filters);
+            return Objects.equals(btr, that.btr) &&
+                    Objects.equals(imgurId, that.imgurId);
         }
 
         @Override
         public int hashCode()
         {
 
-            return Objects.hash(imgurId, taglists, rating, filters);
+            return Objects.hash(btr, imgurId);
         }
     }
 

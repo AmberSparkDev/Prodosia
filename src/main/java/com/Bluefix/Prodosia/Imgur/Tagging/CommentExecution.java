@@ -23,8 +23,8 @@
 package com.Bluefix.Prodosia.Imgur.Tagging;
 
 import com.Bluefix.Prodosia.DataType.Comments.*;
+import com.Bluefix.Prodosia.DataType.Comments.TagRequest.TagRequest;
 import com.Bluefix.Prodosia.Imgur.ImgurApi.ImgurManager;
-import com.Bluefix.Prodosia.Logger.Logger;
 import com.github.kskelm.baringo.model.Comment;
 import com.github.kskelm.baringo.util.BaringoApiException;
 

@@ -121,6 +121,17 @@ public class SuballCommand implements ICommandFunc
             return;
         }
 
+        // filter out all the taglists that the user doesn't have access to.
+        taglists.removeIf(tl -> !ci.getTracker().hasPermission(tl));
+
+        if (taglists.isEmpty())
+        {
+            msgNoTaglistsAllowed(ci);
+            return;
+        }
+
+
+
 
         // get all comments that correspond to our parent comment.
         List<Comment> subComments = SubComHelper.getCommentsFromSameTier(comments, ci.getParentComment());
@@ -291,6 +302,13 @@ public class SuballCommand implements ICommandFunc
     private static void msgNoPreviouslyTaggedContentFound(CommandInformation ci) throws Exception
     {
         String msg = "There were no taglists detected that were previously tagged by '" + ci.getTracker().getName() + "'";
+
+        ci.reply(msg);
+    }
+
+    private static void msgNoTaglistsAllowed(CommandInformation ci) throws Exception
+    {
+        String msg = "You don't have permissions for any of the indicated taglists.";
 
         ci.reply(msg);
     }

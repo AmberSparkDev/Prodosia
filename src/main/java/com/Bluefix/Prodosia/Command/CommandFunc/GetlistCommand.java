@@ -23,14 +23,43 @@
 package com.Bluefix.Prodosia.Command.CommandFunc;
 
 import com.Bluefix.Prodosia.DataType.Command.CommandInformation;
+import com.Bluefix.Prodosia.DataType.Command.FileTransferable;
 
 public class GetlistCommand implements ICommandFunc
 {
     @Override
-    public void execute(CommandInformation ci, String[] arguments)
+    public void execute(CommandInformation ci, String[] arguments) throws Exception
     {
+        // if there was no tracker data provided, do not execute the method.
+        if (ci.getTracker() == null)
+            throw new IllegalArgumentException("A tracker was not provided!");
+
+        // if the command information doesn't allow for file transfer, return
+        if (!(ci instanceof FileTransferable))
+        {
+            msgOnlyUsableOnFileTransferable(ci);
+            return;
+        }
+
 
     }
+
+
+
+    //region Messages
+
+    private static void msgOnlyUsableOnFileTransferable(CommandInformation ci) throws Exception
+    {
+        String msg = "This command can only be used on a platform that allows for file transfer.";
+
+        ci.reply(msg);
+    }
+
+    //endregion
+
+
+
+
 
     @Override
     public String info()

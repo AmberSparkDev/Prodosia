@@ -25,7 +25,7 @@ package com.Bluefix.Prodosia.Imgur.Tagging;
 import com.Bluefix.Prodosia.Algorithm.Partition;
 import com.Bluefix.Prodosia.DataHandler.UserHandler;
 import com.Bluefix.Prodosia.DataType.Comments.StatComment;
-import com.Bluefix.Prodosia.DataType.Comments.TagRequest;
+import com.Bluefix.Prodosia.DataType.Comments.TagRequest.TagRequest;
 import com.Bluefix.Prodosia.DataType.User.User;
 import com.Bluefix.Prodosia.Imgur.ImgurApi.ImgurManager;
 import com.github.kskelm.baringo.model.Comment;

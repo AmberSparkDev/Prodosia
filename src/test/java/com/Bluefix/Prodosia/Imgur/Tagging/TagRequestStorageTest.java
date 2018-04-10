@@ -23,7 +23,7 @@
 package com.Bluefix.Prodosia.Imgur.Tagging;
 
 import com.Bluefix.Prodosia.DataHandler.TaglistHandler;
-import com.Bluefix.Prodosia.DataType.Comments.TagRequest;
+import com.Bluefix.Prodosia.DataType.Comments.TagRequest.TagRequest;
 import com.Bluefix.Prodosia.DataType.Taglist.Rating;
 import com.Bluefix.Prodosia.DataType.Taglist.Taglist;
 import com.Bluefix.Prodosia.Imgur.ImgurApi.ImgurManager;

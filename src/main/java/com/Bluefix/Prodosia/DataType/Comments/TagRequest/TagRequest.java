@@ -20,9 +20,10 @@
  * SOFTWARE.
  */
 
-package com.Bluefix.Prodosia.DataType.Comments;
+package com.Bluefix.Prodosia.DataType.Comments.TagRequest;
 
-import com.Bluefix.Prodosia.DataHandler.TaglistHandler;
+import com.Bluefix.Prodosia.DataType.Comments.ICommentRequest;
+import com.Bluefix.Prodosia.DataType.Comments.SimpleCommentRequest;
 import com.Bluefix.Prodosia.DataType.Taglist.Rating;
 import com.Bluefix.Prodosia.DataType.Taglist.Taglist;
 import com.Bluefix.Prodosia.Exception.BaringoExceptionHelper;
@@ -48,7 +49,7 @@ import java.util.Objects;
  * The Tag Request will create a parent comment if it wasn't provided.
  * The Tag Request will filter out users that were already tagged on a post.
  */
-public class TagRequest implements ICommentRequest
+public class TagRequest extends BaseTagRequest implements ICommentRequest
 {
     /**
      * The maximum amount of times that the tag request can be attempted to be posted again
@@ -59,10 +60,7 @@ public class TagRequest implements ICommentRequest
     private String imgurId;
     private Comment parentComment;
     private long parentId;
-    private HashSet<Taglist> taglists;
-    private Rating rating;
-    private String filters;
-    private boolean cleanComments;
+
 
     /**
      * Boolean to indicate whether the Tag Request was already started once.
@@ -72,23 +70,14 @@ public class TagRequest implements ICommentRequest
 
     public TagRequest(String imgurId, Comment parentComment, HashSet<Taglist> taglists, Rating rating, String filters, boolean cleanComments)
     {
-        if ((imgurId == null || imgurId.trim().isEmpty()) &&
-            parentComment == null)
-            throw new IllegalArgumentException("The imgur-id and parentComment cannot be both empty. ");
-
-        if (taglists == null || taglists.isEmpty())
-            throw new IllegalArgumentException("The taglists supplied cannot be null or empty");
+        super(taglists, rating, filters, cleanComments);
 
         if (imgurId != null)
             this.imgurId = imgurId.trim();
 
         this.parentComment = parentComment;
 
-        this.taglists = taglists;
-        this.rating = rating;
-        this.filters = filters;
-        this.cleanComments = cleanComments;
-
+        checkCreationConditions();
         defaultValues();
     }
 
@@ -102,32 +91,41 @@ public class TagRequest implements ICommentRequest
      */
     public TagRequest(String imgurId, long parentId, String taglists, int rating, String filters, boolean cleanComments) throws Exception
     {
-        if ((imgurId == null || imgurId.trim().isEmpty()) &&
-                parentComment == null)
-            throw new IllegalArgumentException("The imgur-id and parentComment cannot be both empty. ");
-
-        if (taglists == null || taglists.isEmpty())
-            throw new IllegalArgumentException("The taglists supplied cannot be null or empty");
+        super(taglists, rating, filters, cleanComments);
 
         if (imgurId != null)
             this.imgurId = imgurId.trim();
 
         this.parentId = parentId;
 
-        this.taglists = new HashSet<>();
-        String[] tlArr = taglists.split(";");
-
-        for (String t : tlArr)
-        {
-            this.taglists.add(TaglistHandler.getTaglistById(Long.parseLong(t)));
-        }
-
-        this.rating = Rating.parseValue(rating);
-        this.filters = filters;
-
-        this.cleanComments = cleanComments;
-
+        checkCreationConditions();
         defaultValues();
+    }
+
+    protected TagRequest(String imgurId, Comment parentComment, BaseTagRequest btr)
+    {
+        super(btr);
+
+        if (imgurId != null)
+            this.imgurId = imgurId.trim();
+
+        this.parentComment = parentComment;
+
+        checkCreationConditions();
+        defaultValues();
+    }
+
+
+    private void checkCreationConditions()
+    {
+        if ((imgurId == null || imgurId.isEmpty()) &&
+                parentComment == null)
+            throw new IllegalArgumentException("The imgur-id and parentComment cannot be both empty. ");
+
+        if (    imgurId != null &&
+                parentComment != null &&
+                !parentComment.getImageId().equals(imgurId))
+            throw new IllegalArgumentException("The imgur-id and parentComment do not correspond to the same post. ");
     }
 
     private void defaultValues()
@@ -140,41 +138,7 @@ public class TagRequest implements ICommentRequest
     }
 
 
-    public HashSet<Taglist> getTaglists()
-    {
-        return taglists;
-    }
 
-
-    public String getDbTaglists() throws Exception
-    {
-        StringBuilder sb = new StringBuilder();
-
-        for (Taglist t : taglists)
-            sb.append(t.getId() + ";");
-
-        return sb.toString();
-    }
-
-
-    public Rating getRating()
-    {
-        return rating;
-    }
-
-    /**
-     * Will return a regular expression that matches with filters by a user.
-     * @return
-     */
-    public String getFilters()
-    {
-        return filters;
-    }
-
-    public boolean isCleanComments()
-    {
-        return cleanComments;
-    }
 
     //region Comment Request implementation
 
@@ -303,9 +267,7 @@ public class TagRequest implements ICommentRequest
         TagRequest that = (TagRequest) cq;
         return Objects.equals(imgurId, that.imgurId) &&
                 Objects.equals(getParentId(), that.getParentId()) &&
-                Objects.equals(taglists, that.taglists) &&
-                rating == that.rating &&
-                Objects.equals(filters, that.filters);
+                super.equals(that);
     }
 
     private int counter;
@@ -317,7 +279,7 @@ public class TagRequest implements ICommentRequest
     public void complete() throws Exception
     {
         // if the parent has become invalid, delete this tag request.
-        if (postIsInvalid)
+        if (parentIsInvalid)
         {
             Logger.logMessage("Parent-comment for post \"" + getImgurId() + "\" was deleted.", Logger.Severity.INFORMATIONAL);
             TagRequestStorage.handler().remove(this);
@@ -342,7 +304,7 @@ public class TagRequest implements ICommentRequest
             int amount = TagRequestComments.findNumberOfMyMentions(lastKnownComments);
 
             // retrieve the actual tag comments and delete them if applicable.
-            if (this.cleanComments)
+            if (this.isCleanComments())
             {
                 List<Comment> tagComments = TagRequestComments.findMyTagComments(lastKnownComments);
 
@@ -428,12 +390,12 @@ public class TagRequest implements ICommentRequest
             throw new IllegalArgumentException("Merging is only supported for the same post");
 
         // default to the other rating
-        Rating mRat = o.rating;
+        Rating mRat = o.getRating();
 
         //merge the taglists.
         HashSet<Taglist> mTag = new HashSet<>();
-        mTag.addAll(this.taglists);
-        mTag.addAll(o.taglists);
+        mTag.addAll(this.getTaglists());
+        mTag.addAll(o.getTaglists());
 
         // default to the other parentComment
         Comment parentComment;
@@ -444,7 +406,7 @@ public class TagRequest implements ICommentRequest
             parentComment = this.parentComment;
 
         // default to the other filter
-        return new TagRequest(this.imgurId, parentComment, mTag, mRat, o.filters, this.cleanComments);
+        return new TagRequest(this.imgurId, parentComment, mTag, mRat, o.getFilters(), this.isCleanComments());
     }
 
 

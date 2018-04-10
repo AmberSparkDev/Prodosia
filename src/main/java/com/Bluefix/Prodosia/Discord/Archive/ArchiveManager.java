@@ -23,7 +23,7 @@
 package com.Bluefix.Prodosia.Discord.Archive;
 
 import com.Bluefix.Prodosia.DataType.Archive.Archive;
-import com.Bluefix.Prodosia.DataType.Comments.TagRequest;
+import com.Bluefix.Prodosia.DataType.Comments.TagRequest.TagRequest;
 import com.Bluefix.Prodosia.Discord.DiscordManager;
 import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.MessageHistory;

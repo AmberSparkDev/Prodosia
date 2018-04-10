@@ -23,7 +23,7 @@
 package com.Bluefix.Prodosia.Imgur.Tagging;
 
 import com.Bluefix.Prodosia.DataHandler.LocalStorageHandler;
-import com.Bluefix.Prodosia.DataType.Comments.TagRequest;
+import com.Bluefix.Prodosia.DataType.Comments.TagRequest.TagRequest;
 import com.Bluefix.Prodosia.Discord.Archive.ArchiveManager;
 import com.Bluefix.Prodosia.SQLite.SqlDatabase;
 import com.github.kskelm.baringo.util.BaringoApiException;
