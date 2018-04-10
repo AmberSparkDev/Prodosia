@@ -84,7 +84,7 @@ public class SuballCommand implements ICommandFunc
                 return;
             }
 
-            pattern = arguments[0];
+            pattern = arguments[0].substring(1, arguments[0].length()-1);
         }
 
 
@@ -175,6 +175,7 @@ public class SuballCommand implements ICommandFunc
 
         for (Comment c : comments)
         {
+            // if the comment didn't adhere to the pattern, skip it.
             if (    p != null &&
                     !p.matcher(c.getComment()).find())
                 continue;
@@ -304,6 +305,6 @@ public class SuballCommand implements ICommandFunc
     @Override
     public String info()
     {
-        return null;
+        return "Please visit https://github.com/RoseLaLuna/Prodosia/wiki/%28Un%29suball-Command for information";
     }
 }

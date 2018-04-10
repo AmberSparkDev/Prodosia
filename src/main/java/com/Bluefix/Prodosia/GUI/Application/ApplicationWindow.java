@@ -403,16 +403,14 @@ public class ApplicationWindow
 
         Pattern p = Pattern.compile(".+[Tt][Aa][Gg]\\s+(.+)\\z");
 
-        String s0 = "@something tag something blah";
+        String s0 = "\"@something tag something blah\"";
         String s1 = "tag something blah";
         String s2 = "@something tagsomething blah";
 
         Matcher m0 = p.matcher(s0);
 
-        if (m0.find())
-        {
-            System.out.println("match 0 : " + m0.group(1));
-        }
+        System.out.println(s0);
+        System.out.println(s0.substring(1, s0.length()-1));
 
 
         /*
