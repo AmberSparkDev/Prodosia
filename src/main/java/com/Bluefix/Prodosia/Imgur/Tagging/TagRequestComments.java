@@ -25,6 +25,7 @@ package com.Bluefix.Prodosia.Imgur.Tagging;
 import com.Bluefix.Prodosia.Algorithm.Partition;
 import com.Bluefix.Prodosia.DataHandler.UserHandler;
 import com.Bluefix.Prodosia.DataType.Comments.StatComment;
+import com.Bluefix.Prodosia.DataType.Comments.TagRequest.BaseTagRequest;
 import com.Bluefix.Prodosia.DataType.Comments.TagRequest.TagRequest;
 import com.Bluefix.Prodosia.DataType.User.User;
 import com.Bluefix.Prodosia.Imgur.ImgurApi.ImgurManager;
@@ -57,10 +58,10 @@ public class TagRequestComments
      * @return
      * @throws Exception
      */
-    public static LinkedList<String> parseCommentsForTagRequest(TagRequest tr, List<Comment> postComments) throws Exception
+    public static LinkedList<String> parseCommentsForTagRequest(BaseTagRequest tr, List<Comment> postComments) throws Exception
     {
         // find all the users necessary for the tag request.
-        ArrayList<String> users = findUsersForTagRequest(tr);
+        ArrayList<String> users = findUsernamesForTagRequest(tr);
 
         HashSet<String> mentionedUsers = findMentionedUsers(postComments);
 
@@ -93,9 +94,9 @@ public class TagRequestComments
      * @return A list of users that correspond with the tag request.
      * @throws Exception Issue retrieving users in `UserHandler`
      */
-    private static ArrayList<String> findUsersForTagRequest(TagRequest tr) throws Exception
+    public static ArrayList<User> findUsersForTagRequest(BaseTagRequest tr) throws Exception
     {
-        ArrayList<String> output = new ArrayList<>();
+        ArrayList<User> output = new ArrayList<>();
 
         // retrieve all users and filter out the ones that do not adhere to the tag request filters.
         ArrayList<User> users = UserHandler.handler().getAll();
@@ -104,10 +105,27 @@ public class TagRequestComments
         {
             // add all users that were part of the tag request.
             if (u.partOfTagRequest(tr))
-                output.add(u.getImgurName());
+                output.add(u);
         }
 
         return output;
+    }
+
+    private static ArrayList<String> findUsernamesForTagRequest(BaseTagRequest tr) throws Exception
+    {
+        ArrayList<String> items = new ArrayList<>();
+
+        ArrayList<User> users = findUsersForTagRequest(tr);
+
+        if (users == null || users.isEmpty())
+            return items;
+
+        for (User u : users)
+        {
+            items.add(u.getImgurName());
+        }
+
+        return items;
     }
 
 

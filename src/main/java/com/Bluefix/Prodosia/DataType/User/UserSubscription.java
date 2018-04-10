@@ -23,6 +23,7 @@
 package com.Bluefix.Prodosia.DataType.User;
 
 import com.Bluefix.Prodosia.DataHandler.TaglistHandler;
+import com.Bluefix.Prodosia.DataType.Comments.TagRequest.BaseTagRequest;
 import com.Bluefix.Prodosia.DataType.Comments.TagRequest.TagRequest;
 import com.Bluefix.Prodosia.DataType.Taglist.Rating;
 import com.Bluefix.Prodosia.DataType.Taglist.Taglist;
@@ -140,7 +141,7 @@ public class UserSubscription
      * @param tr the tag request to check against.
      * @return True iff part of the tag request, false otherwise.
      */
-    public boolean partOf(TagRequest tr)
+    public boolean partOf(BaseTagRequest tr)
     {
         // first check to see if our taglist is contained in the tag request.
         if (!tr.getTaglists().contains(this.taglist))

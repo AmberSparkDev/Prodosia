@@ -22,8 +22,18 @@
 
 package com.Bluefix.Prodosia.Command.CommandFunc;
 
+import com.Bluefix.Prodosia.Command.CommandHelper.TagRequestParser;
 import com.Bluefix.Prodosia.DataType.Command.CommandInformation;
 import com.Bluefix.Prodosia.DataType.Command.FileTransferable;
+import com.Bluefix.Prodosia.DataType.User.User;
+import com.Bluefix.Prodosia.Imgur.Tagging.TagRequestComments;
+
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedList;
 
 public class GetlistCommand implements ICommandFunc
 {
@@ -42,6 +52,75 @@ public class GetlistCommand implements ICommandFunc
         }
 
 
+        // filter out all arguments that don't pertain to the tag request.
+        LinkedList<String> tagRequestArguments = new LinkedList<>();
+        String syntaxPattern = "%n\n";
+
+        for (String a : arguments)
+        {
+            if (a.startsWith("\"") && a.endsWith("\""))
+            {
+                // this is a quote and as such it will be the parent comment.
+                syntaxPattern = a.substring(1, a.length()-1);
+            }
+            else
+            {
+                tagRequestArguments.addLast(a);
+            }
+        }
+
+        // parse the tag request from the remaining comments.
+        TagRequestParser.ParseTagRequestResult trr = TagRequestParser.parseTagRequest(ci.getTracker(), tagRequestArguments.toArray(new String[0]));
+
+        switch (trr.getTagRequestStatus())
+        {
+            case NO_TAGLISTS:
+                msgNoTaglists(ci);
+                return;
+            case NO_TAGLISTS_ALLOWED:
+                msgNotAllowed(ci);
+                return;
+            case NO_RATING:
+                msgForgotRating(ci);
+                return;
+        }
+
+        // find all users that correspond to this tag request.
+        ArrayList<User> users = TagRequestComments.findUsersForTagRequest(trr.getTagRequest());
+
+        // sort the users.
+        Collections.sort(users, new User.AlphabeticalComparator());
+
+
+        // write all these users to a temporary file
+        try
+        {
+            File temp = File.createTempFile("list", ".txt");
+
+            BufferedWriter bw = new BufferedWriter(new FileWriter(temp));
+            int counter = 0;
+
+            for (User u : users)
+            {
+                String item = syntaxPattern;
+
+                item = item.replace("%n", u.getImgurName());
+                item = item.replace("%i", "" + u.getImgurId());
+                item = item.replace("%c", "" + counter++);
+
+                bw.write(item);
+            }
+
+            bw.close();
+
+            // finally, send the file to the user.
+            ((FileTransferable)ci).sendFile(temp);
+        } catch (Exception ex)
+        {
+            msgErrorWhileWritingFile(ci);
+        }
+
+
     }
 
 
@@ -53,6 +132,26 @@ public class GetlistCommand implements ICommandFunc
         String msg = "This command can only be used on a platform that allows for file transfer.";
 
         ci.reply(msg);
+    }
+
+    private static void msgNoTaglists(CommandInformation ci) throws Exception
+    {
+        ci.reply("Error! No taglists were found.");
+    }
+
+    private static void msgNotAllowed(CommandInformation ci) throws Exception
+    {
+        ci.reply("Error! Tracker does not have permission for the indicated taglists");
+    }
+
+    private static void msgForgotRating(CommandInformation ci) throws Exception
+    {
+        ci.reply("Error! All provided taglists require a rating. Please provide one (s / q / e).");
+    }
+
+    private static void msgErrorWhileWritingFile(CommandInformation ci) throws Exception
+    {
+        ci.reply("Something went wrong while trying to write your file :<");
     }
 
     //endregion
