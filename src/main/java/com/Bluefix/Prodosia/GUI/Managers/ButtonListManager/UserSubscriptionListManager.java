@@ -85,6 +85,15 @@ public abstract class UserSubscriptionListManager extends GuiListManager<Button>
                 {
                     if (us.getTaglist().equals(tl))
                     {
+                        // just in case, refresh the user-subscription taglist.
+                        try
+                        {
+                            us.setTaglist(tl);
+                        } catch (Exception e)
+                        {
+                            e.printStackTrace();
+                        }
+
                         taglistSelected(tl, us);
                         return;
                     }

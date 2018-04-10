@@ -118,7 +118,7 @@ public class Taglist
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Taglist taglist = (Taglist) o;
-        return Objects.equals(abbreviation, taglist.abbreviation);
+        return Objects.equals(this.id, taglist.id);
     }
 
     @Override

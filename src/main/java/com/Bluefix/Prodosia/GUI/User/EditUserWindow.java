@@ -475,9 +475,9 @@ public class EditUserWindow extends EditableWindowPane
         }
         else
         {
-            chk_safe.setSelected(us.hasRating(Rating.SAFE));
-            chk_questionable.setSelected(us.hasRating(Rating.QUESTIONABLE));
-            chk_explicit.setSelected(us.hasRating(Rating.EXPLICIT));
+            chk_safe.setSelected(us.hasRating(Rating.SAFE) || us.hasRating(Rating.ALL));
+            chk_questionable.setSelected(us.hasRating(Rating.QUESTIONABLE) || us.hasRating(Rating.ALL));
+            chk_explicit.setSelected(us.hasRating(Rating.EXPLICIT) || us.hasRating(Rating.ALL));
         }
     }
 
@@ -560,6 +560,8 @@ public class EditUserWindow extends EditableWindowPane
             if (chk_explicit.isSelected())
                 ratings.add(Rating.EXPLICIT);
         }
+        else
+            ratings.add(Rating.ALL);
 
         return new UserSubscription(selectedTaglist, ratings, ta_filters.getText().trim());
     }

@@ -108,18 +108,10 @@ public class TaglistHandler extends LocalStorageHandler<Taglist>
         // insert the tracker into the database.
         // if this replaces a taglist, use the old taglist id.
         String query;
-        if (oldTaglist == null)
-        {
-            query = "INSERT INTO Taglist " +
-                    "(abbreviation, description, hasRatings) " +
-                    "VALUES (?,?,?);";
-        }
-        else
-        {
-            query = "INSERT INTO Taglist " +
-                    "(id, abbreviation, description, hasRatings) " +
-                    "VALUES (?, ?,?,?);";
-        }
+
+        query = "INSERT INTO Taglist " +
+                "(abbreviation, description, hasRatings) " +
+                "VALUES (" + (oldTaglist != null ? "?," : "") + "?,?,?);";
 
         // set the arguments
         PreparedStatement prep = SqlDatabase.getStatement(query);

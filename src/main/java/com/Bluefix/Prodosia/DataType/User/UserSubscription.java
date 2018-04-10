@@ -87,6 +87,17 @@ public class UserSubscription
         return taglist;
     }
 
+    public void setTaglist(Taglist taglist) throws Exception
+    {
+        if (this.taglist == null)
+            return;
+
+        if (this.taglist.getId() != taglist.getId())
+            return;
+
+        this.taglist = taglist;
+    }
+
     public String getDbRating()
     {
         if (this.ratings == null)
@@ -139,7 +150,9 @@ public class UserSubscription
         // this check is only used if the taglist incorporates ratings at all.
         if (this.taglist.hasRatings())
         {
-            if (this.ratings == null || !this.ratings.contains(tr.getRating()))
+            if (    this.ratings == null ||
+                        (!this.ratings.contains(tr.getRating()) &&
+                        !this.ratings.contains(Rating.ALL)))
             {
                 return false;
             }
