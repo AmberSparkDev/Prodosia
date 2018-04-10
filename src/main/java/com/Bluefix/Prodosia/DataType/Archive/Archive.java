@@ -164,7 +164,9 @@ public class Archive
                 return false;
 
         // if the archive has filters that the tag request contains, return false
-        if (this.filters != null && this.filters.matches(tagRequest.getFilters()))
+        if (    this.filters != null &&
+                !this.filters.trim().isEmpty() &&
+                this.filters.matches(tagRequest.getFilters()))
             return false;
 
         // since all items have passed, this archive is part of the tag request.

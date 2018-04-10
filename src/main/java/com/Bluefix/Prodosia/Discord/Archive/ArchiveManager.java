@@ -116,7 +116,7 @@ public class ArchiveManager
             while (comments.size() > HistoryLimit)
                 comments.removeFirst();
 
-            textChannel.sendMessage(message);
+            textChannel.sendMessage(message).submit();
         }
     }
 
