@@ -63,9 +63,9 @@ public interface ICommentRequest
 
 
     /**
-     * Remove the item from the storage.
+     * Indicate that the comment request has been completed.
      */
-    void remove() throws Exception;
+    void complete() throws Exception;
 
 
 

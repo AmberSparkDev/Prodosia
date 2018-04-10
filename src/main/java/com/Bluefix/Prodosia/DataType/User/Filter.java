@@ -50,7 +50,7 @@ public class Filter
             sb.append(f + "|");
         }
 
-        // remove the last latch
+        // complete the last latch
         sb.setLength(sb.length()-1);
 
         // close the pattern and return

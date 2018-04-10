@@ -103,7 +103,7 @@ public class CommentScannerStorage extends LocalStorageHandler<TrackerBookmark>
         // retrieve the old tracker bookmark
         TrackerBookmark oldBookmark = dbGetBookmark(tb.getTracker().getImgurId());
 
-        // remove the old bookmark and replace it.
+        // complete the old bookmark and replace it.
         dbRemoveBookmark(oldBookmark);
 
         String query =

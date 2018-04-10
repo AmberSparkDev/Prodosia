@@ -84,7 +84,8 @@ public class SqlStatement
                         "parentComment integer, " +
                         "taglists text, " +
                         "rating integer, " +
-                        "filters text); ",
+                        "filters text, " +
+                        "cleanComments integer); ",
                 /* --- CommentDeletion --- */
                         "CREATE TABLE IF NOT EXISTS CommentDeletion (" +
                         "id integer PRIMARY KEY); ",
@@ -99,6 +100,7 @@ public class SqlStatement
                         "regex text); ",
                 /* --- CommentQueue --- */
                         "CREATE TABLE IF NOT EXISTS CommentQueue (" +
+                        "id integer PRIMARY KEY, " +
                         "imgurId text, " +
                         "parentId integer, " +
                         "lines text); "

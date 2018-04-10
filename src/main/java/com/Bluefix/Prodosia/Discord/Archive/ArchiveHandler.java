@@ -111,7 +111,7 @@ public class ArchiveHandler extends LocalStorageHandler<Archive>
         // retrieve the old archive (if applicable)
         Archive oldArchive = dbGetArchive(archive.getTaglist().getId(), archive.getChannelId());
 
-        // remove the old archive and replace it.
+        // complete the old archive and replace it.
         dbRemoveArchive(oldArchive);
 
         // insert the archive data.
@@ -139,7 +139,7 @@ public class ArchiveHandler extends LocalStorageHandler<Archive>
         if (archive == null)
             return;
 
-        // if the data fits, remove the taglist.
+        // if the data fits, complete the taglist.
         String query =
                 "DELETE FROM Archive " +
                 "WHERE taglistId = ? AND " +

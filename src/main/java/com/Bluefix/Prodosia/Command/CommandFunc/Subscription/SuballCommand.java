@@ -32,9 +32,13 @@ import com.Bluefix.Prodosia.DataType.User.User;
 import com.Bluefix.Prodosia.DataType.User.UserSubscription;
 import com.Bluefix.Prodosia.Imgur.ImgurApi.ImgurManager;
 import com.github.kskelm.baringo.model.Comment;
+import com.github.kskelm.baringo.util.BaringoApiException;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.HashSet;
 import java.util.List;
+import java.util.regex.Pattern;
 
 public class SuballCommand implements ICommandFunc
 {
@@ -123,8 +127,21 @@ public class SuballCommand implements ICommandFunc
 
         if (subComments != null)
         {
-            // remove the calls from the tracker.
-            subComments.removeIf(c -> (c.getAuthorId() == ci.getTracker().getImgurId()));
+            // complete the calls from the tracker and the bot account itself.
+            subComments.removeIf(c ->
+            {
+                try
+                {
+                    return (
+                            c.getAuthorId() == ci.getTracker().getImgurId() ||
+                            c.getAuthorId() == ImgurManager.client().getAuthenticatedAccount().getId());
+                } catch (Exception ex)
+                {
+                    // an exception here might be cause for concern, but it shouldn't impede functionality.
+                    ex.printStackTrace();
+                    return false;
+                }
+            });
         }
 
         if (subComments == null || subComments.isEmpty())
@@ -149,17 +166,21 @@ public class SuballCommand implements ICommandFunc
 
     private static int subscribeComments(CommandInformation ci, List<Comment> comments, String pattern, List<Taglist> taglists) throws Exception
     {
+        Pattern p = null;
+
+        if (pattern != null && !pattern.isEmpty())
+            p = Pattern.compile(pattern);
+
         int counter = 0;
 
         for (Comment c : comments)
         {
-            if (!c.getComment().matches(pattern))
-            continue;
+            if (    p != null &&
+                    !p.matcher(c.getComment()).find())
+                continue;
 
             try
             {
-
-
                 // create the subscription data for this user.
                 HashSet<UserSubscription> subscription = new HashSet<>();
 
@@ -268,7 +289,7 @@ public class SuballCommand implements ICommandFunc
 
     private static void msgNoPreviouslyTaggedContentFound(CommandInformation ci) throws Exception
     {
-        String msg = "There were no taglists detected that were previously tagged by " + ci.getTracker().getName();
+        String msg = "There were no taglists detected that were previously tagged by '" + ci.getTracker().getName() + "'";
 
         ci.reply(msg);
     }

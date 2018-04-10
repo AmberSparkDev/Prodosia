@@ -62,7 +62,7 @@ public class TagRequestStorageTest
         if (parentComment == null)
             parentComment = ImgurManager.client().commentService().getComment(1301573497);
 
-        this.request = new TagRequest(null, parentComment, tlSet, Rating.ALL, "filters");
+        this.request = new TagRequest(null, parentComment, tlSet, Rating.ALL, "filters", true);
     }
 
     @After

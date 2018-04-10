@@ -155,7 +155,7 @@ public class TagCommand implements ICommandFunc
             return;
         }
 
-        // if no rating was supplied, remove all taglists that require a rating.
+        // if no rating was supplied, complete all taglists that require a rating.
         if (rating == Rating.UNKNOWN)
         {
             for (Taglist t : taglists)
@@ -190,7 +190,7 @@ public class TagCommand implements ICommandFunc
         {
             // parse the tag request and add it to the queue.
             TagRequest tr =
-                    new TagRequest(imgurId, ci.getParentComment(), taglists, rating, filterPattern);
+                    new TagRequest(imgurId, ci.getParentComment(), taglists, rating, filterPattern, true);
 
             TagRequestStorage.handler().set(tr);
         }
@@ -233,7 +233,7 @@ public class TagCommand implements ICommandFunc
 
                 // parse the tag request and add it to the queue.
                 TagRequest tr =
-                        new TagRequest(imgurId, pComment, taglists, rating, filters.toString());
+                        new TagRequest(imgurId, pComment, taglists, rating, filters.toString(), true);
 
                 TagRequestStorage.handler().set(tr);
             }
@@ -282,7 +282,7 @@ public class TagCommand implements ICommandFunc
          * Remove the item from the storage.
          */
         @Override
-        public void remove() throws Exception
+        public void complete() throws Exception
         {
             // not necessary, since there is no storage for this feedback request.
         }

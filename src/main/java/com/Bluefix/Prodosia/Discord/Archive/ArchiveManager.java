@@ -152,7 +152,7 @@ public class ArchiveManager
     {
         ArrayList<Archive> archives = ArchiveHandler.handler().getAll();
 
-        // if there are any archives in the map that were deleted, remove them
+        // if there are any archives in the map that were deleted, complete them
         HashSet<Archive> removal = new HashSet<>();
 
         for (Archive a : channels.keySet())

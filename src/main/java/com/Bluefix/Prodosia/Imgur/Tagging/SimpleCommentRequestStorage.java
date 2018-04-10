@@ -115,27 +115,43 @@ public class SimpleCommentRequestStorage extends LocalStorageHandler<SimpleComme
         // retrieve the old comment request.
         SimpleCommentRequest oldRequest = dbGetCommentRequest(t.getImgurId(), t.getParentId());
 
-        // remove the old request
+        // complete the old request
         dbRemoveCommentRequest(oldRequest);
+
+        // if the id was already known, insert with id.
+        boolean hasId = t.getId() >= 0;
+
 
         String query =
                 "INSERT INTO CommentQueue " +
                 "(imgurId, parentId, lines) " +
-                "VALUES (?,?,?);";
+                "VALUES (" + (hasId ? "?," : "") + "?,?,?);";
 
         SqlBuilder builder = SqlBuilder.Builder();
 
-        for (String line : t.getComments())
-        {
-            PreparedStatement prep = SqlDatabase.getStatement(query);
-            prep.setString(1, t.getImgurId());
-            prep.setLong(2, t.getParent().getId());
-            prep.setString(3, line);
+        // set the parameters.
+        PreparedStatement prep = SqlDatabase.getStatement(query);
+        int counter = 1;
 
-            builder = builder.execute(prep);
+        if (hasId)
+            prep.setLong(counter++, t.getId());
+
+        prep.setString(counter++, t.getImgurId());
+        prep.setLong(counter++, t.getParentId());
+        prep.setString(counter++, t.dbParseComments());
+
+        // execute the query. Update the id if none was known beforehand.
+        if (hasId)
+        {
+            SqlDatabase.execute(prep);
+        }
+        else
+        {
+            t.setId(SqlDatabase.getAffectedRow(prep));
         }
 
-        builder.commit();
+
+
 
         return oldRequest;
     }
@@ -148,19 +164,17 @@ public class SimpleCommentRequestStorage extends LocalStorageHandler<SimpleComme
 
         String query =
                 "DELETE FROM CommentQueue " +
-                "WHERE imgurId = ? AND parentId = ? AND lines = ?;";
+                "WHERE id = ?;";
 
         PreparedStatement prep = SqlDatabase.getStatement(query);
-        prep.setString(1, t.getImgurId());
-        prep.setLong(2, t.getParent().getId());
-        prep.setString(3, t.dbParseComments());
+        prep.setLong(1, t.getId());
         SqlDatabase.execute(prep);
     }
 
     private synchronized static SimpleCommentRequest dbGetCommentRequest(String imgurId, long parentId) throws Exception
     {
         String query =
-                "SELECT imgurId, parentId, lines " +
+                "SELECT id, imgurId, parentId, lines " +
                 "FROM CommentQueue " +
                 "WHERE imgurId = ? AND parentId = ?;";
 
@@ -187,7 +201,7 @@ public class SimpleCommentRequestStorage extends LocalStorageHandler<SimpleComme
     private synchronized static ArrayList<SimpleCommentRequest> dbGetCommentRequests() throws Exception
     {
         String query =
-                "SELECT imgurId, parentId, lines " +
+                "SELECT id, imgurId, parentId, lines " +
                 "FROM CommentQueue;";
 
         PreparedStatement prep = SqlDatabase.getStatement(query);
@@ -207,11 +221,12 @@ public class SimpleCommentRequestStorage extends LocalStorageHandler<SimpleComme
 
         while (rs.next())
         {
-            String imgurId = rs.getString(1);
-            long parentId = rs.getLong(2);
-            String comments = rs.getString(3);
+            long id = rs.getLong(1);
+            String imgurId = rs.getString(2);
+            long parentId = rs.getLong(3);
+            String comments = rs.getString(4);
 
-            output.add(SimpleCommentRequest.parse(imgurId, parentId, comments));
+            output.add(SimpleCommentRequest.parse(id, imgurId, parentId, comments));
         }
 
         return output;

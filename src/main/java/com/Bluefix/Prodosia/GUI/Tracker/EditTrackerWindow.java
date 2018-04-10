@@ -446,12 +446,12 @@ public class EditTrackerWindow extends EditableWindowPane
         // if either of the data was erroneous, warn the user.
         else if (valImg == DataValidation.ERRONEOUS)
         {
-            alertUser("The imgur name was detected to be invalid. Check whether the name is correct or remove it to continue.");
+            alertUser("The imgur name was detected to be invalid. Check whether the name is correct or complete it to continue.");
             return null;
         }
         else if (valDis == DataValidation.ERRONEOUS)
         {
-            alertUser("The discord id was detected to be invalid. Check whether the id is correct or remove it to continue.");
+            alertUser("The discord id was detected to be invalid. Check whether the id is correct or complete it to continue.");
             return null;
         }
 

@@ -166,7 +166,7 @@ public class Partition
             output.add(pivotValue);
             lastPivot -= pivotValue;
 
-            // remove the pivot value from the entries.
+            // complete the pivot value from the entries.
             if (!entries.remove((Object)pivotValue))
                 throw new IllegalArgumentException("5061367f-6801-40d8-b6c5-86bd3117a59d");
         }

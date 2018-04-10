@@ -22,6 +22,7 @@
 
 package com.Bluefix.Prodosia.Command.CommandFunc.Subscription;
 
+import com.Bluefix.Prodosia.Command.CommandFunc.TagCommand;
 import com.Bluefix.Prodosia.DataHandler.TaglistHandler;
 import com.Bluefix.Prodosia.DataType.Taglist.Taglist;
 import com.Bluefix.Prodosia.DataType.Tracker.Tracker;
@@ -29,12 +30,15 @@ import com.github.kskelm.baringo.model.Comment;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Helper class for subscription commands.
  */
 public class SubComHelper
 {
+    private static final Pattern tagPattern = Pattern.compile(".+[Tt][Aa][Gg]\\s+(.+)\\z");
 
 
     /**
@@ -47,7 +51,7 @@ public class SubComHelper
     {
         // first, find all comments that were made by the tracker. Filter out the ones that contain
         // the `tag` command.
-        LinkedList<Comment> trackerComments = new LinkedList<>();
+        LinkedList<String> tagArguments = new LinkedList<>();
 
         List<Comment> tierItems = comments;
 
@@ -60,9 +64,15 @@ public class SubComHelper
             {
                 newTier.addAll(c.getChildren());
 
-                if (c.getAuthorId() == tracker.getImgurId() &&
-                        c.getComment().matches("[Tt][Aa][Gg]"))
-                    trackerComments.add(c);
+                if (c.getAuthorId() != tracker.getImgurId())
+                    continue;
+
+                Matcher m = tagPattern.matcher(c.getComment());
+
+                if (m.find())
+                {
+                    tagArguments.add(m.group(1));
+                }
             }
 
 
@@ -70,24 +80,22 @@ public class SubComHelper
         }
 
         // if no tracker comments could be found, return null.
-        if (trackerComments.isEmpty())
+        if (tagArguments.isEmpty())
             return null;
 
 
         // attempt to retrieve all taglists tagged by the tracker.
         List<Taglist> result = new LinkedList<>();
 
-        for (Comment c : trackerComments)
+        for (String arg : tagArguments)
         {
             // ignore everything up to the "tag" command.
-            String comment = c.getComment().toLowerCase().trim();
+            String comment = arg.toLowerCase().trim();
 
-            comment = comment.substring(comment.indexOf("tag") + 3);
-
-            if (comment.trim().isEmpty())
+            if (comment.isEmpty())
                 continue;
 
-            String[] split = comment.split("\\w");
+            String[] split = comment.split("\\s+");
 
             for (String s : split)
             {
@@ -136,6 +144,8 @@ public class SubComHelper
 
             for (Comment c : tierItems)
             {
+                newTier.addAll(c.getChildren());
+
                 if (c.getId() == commandComment.getParentId())
                 {
                     return c.getChildren();

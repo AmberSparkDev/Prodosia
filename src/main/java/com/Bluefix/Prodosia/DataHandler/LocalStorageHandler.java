@@ -120,11 +120,11 @@ public abstract class LocalStorageHandler <T>
         if (t == null)
             return;
 
-        // if the local storage is in use, remove the item
+        // if the local storage is in use, complete the item
         if (useLocalStorage && data != null)
             data.remove(t);
 
-        // remove the item from the database.
+        // complete the item from the database.
         removeItem(t);
     }
 

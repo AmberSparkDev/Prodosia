@@ -158,7 +158,7 @@ public class CommentScannerExecution extends ImgurIntervalRunner
     {
         boolean usedGet = false;
 
-        // if there was an old tracker that is the same, remove it first.
+        // if there was an old tracker that is the same, complete it first.
         trackerMap.remove(tracker.getImgurId());
 
         TrackerBookmark tb = CommentScannerStorage.getBookmarkByImgurId(tracker.getImgurId());
@@ -188,7 +188,7 @@ public class CommentScannerExecution extends ImgurIntervalRunner
     {
         trackerMap.remove(imgurId);
 
-        // also remove it from the bookmark storage.
+        // also complete it from the bookmark storage.
         TrackerBookmark tb = CommentScannerStorage.getBookmarkByImgurId(imgurId);
         CommentScannerStorage.handler().remove(tb);
     }
@@ -220,7 +220,7 @@ public class CommentScannerExecution extends ImgurIntervalRunner
         // retrieve all current trackers.
         ArrayList<Tracker> trackers = TrackerHandler.handler().getAll();
 
-        // if any trackers in our queue were removed, remove them from the queue as well.
+        // if any trackers in our queue were removed, complete them from the queue as well.
         for (Long imgId : trackerMap.keySet())
         {
             Iterator<Tracker> tIt = trackers.iterator();
@@ -232,7 +232,7 @@ public class CommentScannerExecution extends ImgurIntervalRunner
                     occurenceFound = true;
             }
 
-            // if no occurence of the imgur id was found in the tracker-list, remove it from the queue.
+            // if no occurence of the imgur id was found in the tracker-list, complete it from the queue.
             if (!occurenceFound)
             {
                 removeItem(imgId);

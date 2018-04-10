@@ -140,27 +140,7 @@ public class UserHandler extends LocalStorageHandler<User>
         prep0.setString(1, u.getImgurName());
         prep0.setLong(2, u.getImgurId());
 
-        // retrieve the rowid of the user we are about to add.
-        String query1 = "SELECT last_insert_rowid();";
-        PreparedStatement prep1 = SqlDatabase.getStatement(query1);
-
-        ArrayList<Object> result = SqlBuilder.Builder()
-                .execute(prep0)
-                .query(prep1)
-                .commit();
-
-        if (result == null)
-            throw new Exception("SqlDatabase exception: query result was null");
-
-        if (result.size() != 2)
-            throw new Exception("SqlDatabase exception: Expected result size did not match (was " + result.size() + ")");
-
-        ResultSet rs = (ResultSet)result.get(1);
-
-        if (!rs.next())
-            throw new Exception("SqlDatabase exception: The database did not provide a row-id for the inserted tracker");
-
-        long userIndex = rs.getLong(1);
+        long userIndex = SqlDatabase.getAffectedRow(prep0);
 
         // now that we know the user-id, we can start inserting the user-subscriptions.
         for (UserSubscription us : u.getSubscriptions())
@@ -190,7 +170,7 @@ public class UserHandler extends LocalStorageHandler<User>
         // first retrieve the user id
         long userIndex = getUserId(u);
 
-        // remove the user from the user table and the usersubscriptions.
+        // complete the user from the user table and the usersubscriptions.
         SqlBuilder sb = SqlBuilder.Builder();
 
         String query0 = "DELETE FROM User WHERE id = ?;";

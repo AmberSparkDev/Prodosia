@@ -29,15 +29,35 @@ import com.github.kskelm.baringo.util.BaringoApiException;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Objects;
 
 public class SimpleCommentRequest implements ICommentRequest
 {
+    private long id;
     private String imgurId;
     private Comment parent;
     private long parentId;
     private LinkedList<String> comments;
+
+    /**
+     * Create a simple comment request providing both the parent id and imgur Id
+     * @param imgurId The imgur id of the post
+     * @param parentId The parent id of the comment to reply to.
+     * @param comments The comments to be posted.
+     */
+    private SimpleCommentRequest(long id, String imgurId, long parentId, LinkedList<String> comments)
+    {
+        // check if the request is valid.
+        if ((imgurId == null || imgurId.trim().isEmpty()) && parentId < 0)
+            throw new IllegalArgumentException("Must provide either the imgur id or the parent id");
+
+        this.imgurId = imgurId;
+        this.parentId = parentId;
+        this.comments = comments;
+        this.id = id;
+    }
 
     /**
      * Create a simple comment request providing both the parent id and imgur Id
@@ -54,6 +74,7 @@ public class SimpleCommentRequest implements ICommentRequest
         this.imgurId = imgurId;
         this.parentId = parentId;
         this.comments = comments;
+        this.id = -1;
     }
 
     public SimpleCommentRequest(String imgurId, LinkedList<String> comments)
@@ -63,6 +84,7 @@ public class SimpleCommentRequest implements ICommentRequest
 
         this.imgurId = imgurId;
         this.comments = comments;
+        this.id = -1;
     }
 
     public SimpleCommentRequest(long parentId, LinkedList<String> comments)
@@ -73,6 +95,7 @@ public class SimpleCommentRequest implements ICommentRequest
         this.imgurId = "";
         this.parentId = parentId;
         this.comments = comments;
+        this.id = -1;
     }
 
     public SimpleCommentRequest(String imgurId, String... comments)
@@ -87,6 +110,8 @@ public class SimpleCommentRequest implements ICommentRequest
         {
             this.comments.add(c);
         }
+
+        this.id = -1;
     }
 
     public SimpleCommentRequest(long parentId, String... comments)
@@ -102,6 +127,8 @@ public class SimpleCommentRequest implements ICommentRequest
         {
             this.comments.add(c);
         }
+
+        this.id = -1;
     }
 
     /**
@@ -113,6 +140,16 @@ public class SimpleCommentRequest implements ICommentRequest
     public String getImgurId()
     {
         return this.imgurId;
+    }
+
+    public long getId()
+    {
+        return id;
+    }
+
+    public void setId(long id)
+    {
+        this.id = id;
     }
 
     /**
@@ -171,7 +208,7 @@ public class SimpleCommentRequest implements ICommentRequest
      * Remove the item from the storage.
      */
     @Override
-    public void remove() throws Exception
+    public void complete() throws Exception
     {
         SimpleCommentRequestStorage.handler().remove(this);
     }
@@ -195,7 +232,7 @@ public class SimpleCommentRequest implements ICommentRequest
 
     //region Database helper
 
-    public static SimpleCommentRequest parse(String imgurId, long parentId, String data)
+    public static SimpleCommentRequest parse(long id, String imgurId, long parentId, String data)
     {
         // split the data lines.
         String[] split = data.split(" ; ");
@@ -207,7 +244,7 @@ public class SimpleCommentRequest implements ICommentRequest
             items.add(s.replace(";;", ";"));
         }
 
-        return new SimpleCommentRequest(imgurId, parentId, items);
+        return new SimpleCommentRequest(id, imgurId, parentId, items);
     }
 
     private String dbString;
@@ -233,7 +270,7 @@ public class SimpleCommentRequest implements ICommentRequest
                 output.append(s.replace(";", ";;") + " ; ");
             }
 
-            // remove the last separator
+            // complete the last separator
             if (this.comments.size() > 0)
                 output.setLength(output.length() - 3);
 

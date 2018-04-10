@@ -102,7 +102,7 @@ public class TaglistHandler extends LocalStorageHandler<Taglist>
         // retrieve the old taglist
         Taglist oldTaglist = dbGetTaglist(t.getAbbreviation());
 
-        // remove the old taglist to replace it.
+        // complete the old taglist to replace it.
         dbRemoveTaglist(oldTaglist);
 
         // insert the tracker into the database.
@@ -145,7 +145,7 @@ public class TaglistHandler extends LocalStorageHandler<Taglist>
         if (t == null)
             return;
 
-        // if the abbreviation fits, remove the taglist.
+        // if the abbreviation fits, complete the taglist.
         String query =
                 "DELETE FROM Taglist " +
                 "WHERE abbreviation = ?;";

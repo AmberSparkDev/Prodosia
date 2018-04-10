@@ -239,7 +239,7 @@ public class KeyStorage
         return
                 "This document will contain any API keys known to the system.\n" +
                 "Unless you know what you are doing, please don't tamper with this file.\n" +
-                "When sharing the application with others, remove this file to keep the credentials secret.\n\n";
+                "When sharing the application with others, complete this file to keep the credentials secret.\n\n";
     }
 
     //endregion

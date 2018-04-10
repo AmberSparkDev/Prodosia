@@ -38,7 +38,6 @@ import java.util.LinkedList;
 public abstract class FeedbackRequest extends Thread implements ICommentRequest
 {
     private String comment;
-
     private long commentId;
 
 
@@ -89,7 +88,7 @@ public abstract class FeedbackRequest extends Thread implements ICommentRequest
 
     /**
      * This method will be executed after the comment has been posted.
-     * @param commentId The comment-id's of the comment(s) that were posted.
+     * @param commentId The comment-id of the comment that was posted.
      */
     protected abstract void runAfter(long commentId);
 

@@ -20,39 +20,40 @@
  * SOFTWARE.
  */
 
-package com.Bluefix.Prodosia.GUI;
+package com.Bluefix.Prodosia.Exception;
 
-import com.Bluefix.Prodosia.GUI.Application.ApplicationWindow;
+import com.github.kskelm.baringo.util.BaringoApiException;
 
 /**
- * A binder class that allows for components to request GUI components to update
- * themselves.
+ * Helps identify exceptions from the Baringo dependency.
+ *
  */
-public class GuiUpdate
+public class BaringoExceptionHelper
 {
 
+    /**
+     * Returns true iff the exception indicates a Bad Request call.
+     * @param ex The exception to check.
+     * @return True iff the exception indicates a Bad Request (400) error. False otherwise.
+     */
+    public static boolean isBadRequest(BaringoApiException ex)
+    {
+        // pattern
+        String pattern = "https://api.imgur.com/3/.+: Bad Request";
+
+        return ex.getMessage().matches(pattern);
+    }
 
     /**
-     * Update any collections pertaining to the users.
+     * Returns true iff the exception indicates Not Found.
+     * @param ex The exception to check.
+     * @return True iff the exception indicates Not Found (404). False otherwise.
      */
-    public static void updateUsers() throws Exception
+    public static boolean isNotFound(BaringoApiException ex)
     {
-        ApplicationWindow.updateUsers();
+        // pattern
+        String pattern = "https://api.imgur.com/3/.+: Not Found";
+
+        return ex.getMessage().matches(pattern);
     }
-
-    public static void updateTaglists()
-    {
-
-    }
-
-    public static void updateTrackers()
-    {
-
-    }
-
-    public static void updateArchives()
-    {
-
-    }
-
 }

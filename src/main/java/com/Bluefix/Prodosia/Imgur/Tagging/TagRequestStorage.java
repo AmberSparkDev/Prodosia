@@ -93,7 +93,7 @@ public class TagRequestStorage extends LocalStorageHandler<TagRequest>
             // merge-order is important, since the values from the new request are given priority
             TagRequest merge = oldT.merge(tagRequest);
 
-            // remove the old item and add the new one.
+            // complete the old item and add the new one.
             super.remove(oldT);
             super.set(merge);
         }
@@ -151,13 +151,13 @@ public class TagRequestStorage extends LocalStorageHandler<TagRequest>
         // retrieve the old tag request
         TagRequest oldRequest = dbGetTagrequest(t.getImgurId(), t.getParentId());
 
-        // remove the old tag request to replace it with the new one.
+        // complete the old tag request to replace it with the new one.
         dbRemoveTagrequest(oldRequest);
 
         String query =
                 "INSERT INTO TagQueue " +
-                "(imgurId, parentComment, taglists, rating, filters) " +
-                "VALUES (?,?,?,?,?);";
+                "(imgurId, parentComment, taglists, rating, filters, cleanComments) " +
+                "VALUES (?,?,?,?,?,?);";
 
         PreparedStatement prep = SqlDatabase.getStatement(query);
         prep.setString(1, t.getImgurId());
@@ -165,6 +165,7 @@ public class TagRequestStorage extends LocalStorageHandler<TagRequest>
         prep.setString(3, t.getDbTaglists());
         prep.setInt(4, t.getRating().getValue());
         prep.setString(5, t.getFilters());
+        prep.setBoolean(6, t.isCleanComments());
 
         SqlDatabase.execute(prep);
 
@@ -190,7 +191,7 @@ public class TagRequestStorage extends LocalStorageHandler<TagRequest>
     private synchronized static TagRequest dbGetTagrequest(String imgurId, long parentId) throws Exception
     {
         String query =
-                "SELECT imgurId, parentComment, taglists, rating, filters " +
+                "SELECT imgurId, parentComment, taglists, rating, filters, cleanComments " +
                 "FROM TagQueue " +
                 "WHERE imgurId = ? AND parentComment = ?;";
 
@@ -216,7 +217,7 @@ public class TagRequestStorage extends LocalStorageHandler<TagRequest>
     private synchronized static ArrayList<TagRequest> dbGetTagrequests() throws Exception
     {
         String query =
-                "SELECT imgurId, parentComment, taglists, rating, filters " +
+                "SELECT imgurId, parentComment, taglists, rating, filters, cleanComments " +
                 "FROM TagQueue;";
 
         PreparedStatement prep = SqlDatabase.getStatement(query);
@@ -241,8 +242,9 @@ public class TagRequestStorage extends LocalStorageHandler<TagRequest>
             String taglists = rs.getString(3);
             int rating = rs.getInt(4);
             String filters = rs.getString(5);
+            boolean cleanComments = rs.getBoolean(6);
 
-            output.add(new TagRequest(imgurId, parentComment, taglists, rating, filters));
+            output.add(new TagRequest(imgurId, parentComment, taglists, rating, filters, cleanComments));
         }
 
         return output;

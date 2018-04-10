@@ -101,7 +101,7 @@ public class CommandPrefixStorage extends LocalStorageHandler<CommandPrefix>
         // retrieve the old prefix item.
         CommandPrefix oldPrefix = dbGetCPrefix(cp.getType());
 
-        // remove the old prefix if it existed.
+        // complete the old prefix if it existed.
         dbRemoveCPrefix(oldPrefix);
 
         String query =

@@ -27,6 +27,7 @@ import com.Bluefix.Prodosia.Imgur.ImgurApi.ImgurManager;
 import com.Bluefix.Prodosia.Module.ImgurIntervalRunner;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 
 /**
@@ -89,13 +90,21 @@ public class CommentDeletionExecution extends ImgurIntervalRunner
 
             Iterator<Long> dIt = deletions.iterator();
 
+            HashSet<Long> completedDeletions = new HashSet<>();
+
             while (dIt.hasNext() && requestCounter < DeletionItemsPerCycle)
             {
                 // delete the item from imgur and from the storage.
                 long value = dIt.next();
                 requestCounter++;
-                ImgurManager.client().commentService().deleteComment(dIt.next());
-                CommentDeletionStorage.handler().remove(value);
+                ImgurManager.client().commentService().deleteComment(value);
+                completedDeletions.add(value);
+            }
+
+            // remove all deleted items from the storage.
+            for (Long l : completedDeletions)
+            {
+                CommentDeletionStorage.handler().remove(l);
             }
 
         } catch (Exception e)

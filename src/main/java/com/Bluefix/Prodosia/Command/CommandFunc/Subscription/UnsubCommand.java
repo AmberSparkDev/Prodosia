@@ -115,7 +115,7 @@ public class UnsubCommand implements ICommandFunc
     {
         // ignore the first argument since that is the username.
 
-        // if no further arguments were supplied, remove the user from all taglists.
+        // if no further arguments were supplied, complete the user from all taglists.
         if (arguments.length == 1)
         {
             return TaglistHandler.handler().getAll();

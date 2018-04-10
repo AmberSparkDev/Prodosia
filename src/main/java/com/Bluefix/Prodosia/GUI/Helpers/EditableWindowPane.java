@@ -335,7 +335,7 @@ public abstract class EditableWindowPane
     protected abstract boolean isCreating();
 
     /**
-     * Deletion has been confirmed. Requests the subclass to remove the item from storage.
+     * Deletion has been confirmed. Requests the subclass to complete the item from storage.
      */
     protected abstract void deleteItem() throws Exception;
 

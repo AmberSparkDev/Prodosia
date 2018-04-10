@@ -22,6 +22,9 @@
 
 package com.Bluefix.Prodosia.GUI.Application;
 
+import com.Bluefix.Prodosia.Exception.BaringoExceptionHelper;
+import com.Bluefix.Prodosia.Imgur.ImgurApi.ImgurManager;
+import com.Bluefix.Prodosia.Imgur.Tagging.TagRequestComments;
 import com.Bluefix.Prodosia.Prefix.CommandPrefixStorage;
 import com.Bluefix.Prodosia.DataHandler.TaglistHandler;
 import com.Bluefix.Prodosia.DataHandler.TrackerHandler;
@@ -50,16 +53,34 @@ import com.Bluefix.Prodosia.GUI.Tracker.EditTrackerWindow;
 import com.Bluefix.Prodosia.GUI.User.EditUserWindow;
 import com.Bluefix.Prodosia.Logger.Logger;
 import com.Bluefix.Prodosia.Module.TestModule;
+import com.github.kskelm.baringo.model.Account;
+import com.github.kskelm.baringo.model.Comment;
+import com.github.kskelm.baringo.util.BaringoApiException;
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 
 import java.util.HashSet;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 
 public class ApplicationWindow
 {
+    //region Singleton
+
+    private static ApplicationWindow me;
+
+    private static ApplicationWindow handler()
+    {
+        return me;
+    }
+
+    //endregion
+
     //region Archives
 
     @FXML private VBox arch_taglistOverview;
@@ -223,6 +244,9 @@ public class ApplicationWindow
     @FXML
     private void initialize() throws Exception
     {
+        // set a singleton variable.
+        ApplicationWindow.me = this;
+
         /* Status */
         initializeStatusWindow();
 
@@ -255,19 +279,19 @@ public class ApplicationWindow
     @FXML private TextField taglist_filter;
     @FXML private TextField user_filter;
 
-    private GuiListManager[] listManagers;
+    private TrackerListManager tlm;
+    private TaglistListManager tllm;
+    private UserListManager ulm;
 
     private GuiCheckboxListManager tap_taglist_cl;
 
 
     private void setupListManagers()
     {
-        listManagers = new GuiListManager[3];
-
         // tracker list
         try
         {
-            listManagers[0] = new TrackerListManager(trackers_overview);
+            tlm = new TrackerListManager(trackers_overview);
         } catch (Exception e)
         {
             ExceptionHelper.showWarning(e);
@@ -275,7 +299,7 @@ public class ApplicationWindow
 
         try
         {
-            listManagers[1] = new TaglistListManager(taglists_overview);
+            tllm = new TaglistListManager(taglists_overview);
         } catch (Exception e)
         {
             ExceptionHelper.showWarning(e);
@@ -283,7 +307,7 @@ public class ApplicationWindow
 
         try
         {
-            listManagers[2] = new UserListManager(users_overview);
+            ulm = new UserListManager(users_overview);
         } catch (Exception e)
         {
             ExceptionHelper.showWarning(e);
@@ -302,32 +326,64 @@ public class ApplicationWindow
 
         tracker_filter.textProperty().addListener((o, oldVal, newVal) ->
         {
-            listManagers[0].filter(newVal);
+            tlm.filter(newVal);
         });
 
         taglist_filter.textProperty().addListener((o, oldVal, newVal) ->
         {
-            listManagers[1].filter(newVal);
+            tllm.filter(newVal);
         });
 
         user_filter.textProperty().addListener((o, oldVal, newVal) ->
         {
-            listManagers[2].filter(newVal);
+            ulm.filter(newVal);
         });
     }
 
     /**
      * Update the components now that we changed data somewhere else.
      */
-    public void update() throws Exception
+    private void updateListManagers() throws Exception
     {
-        for (GuiListManager glm : listManagers)
-        {
-            glm.update();
-        }
+        tlm.update();
+        tllm.update();
+        ulm.update();
 
         // update the archiving functionality.
         archiveGui.update();
+    }
+
+
+    public static void update()
+    {
+        Platform.runLater(() ->
+        {
+            try
+            {
+                handler().updateListManagers();
+            } catch (Exception e)
+            {
+                e.printStackTrace();
+            }
+        });
+    }
+
+    /**
+     * Update the list containing the users.
+     * @throws Exception
+     */
+    public static void updateUsers()
+    {
+        Platform.runLater(() ->
+        {
+            try
+            {
+                handler().ulm.update();
+            } catch (Exception e)
+            {
+                e.printStackTrace();
+            }
+        });
     }
 
 
@@ -344,9 +400,44 @@ public class ApplicationWindow
      */
     public void test(ActionEvent actionEvent) throws Exception
     {
-        addStewTracker();
-        addPrefix();
-        addSimpleUserbase();
+
+        Pattern p = Pattern.compile(".+[Tt][Aa][Gg]\\s+(.+)\\z");
+
+        String s0 = "@something tag something blah";
+        String s1 = "tag something blah";
+        String s2 = "@something tagsomething blah";
+
+        Matcher m0 = p.matcher(s0);
+
+        if (m0.find())
+        {
+            System.out.println("match 0 : " + m0.group(1));
+        }
+
+
+        /*
+        try
+        {
+            //List<Comment> comments = ImgurManager.client().galleryService().getItemComments("ZqWMmil", Comment.Sort.Best);
+
+            //HashSet<String> mentions = TagRequestComments.findMentionedUsers(comments);
+
+            System.out.println("yay");
+        }
+        catch (BaringoApiException ex)
+        {
+            System.out.println("is bad request: " + BaringoExceptionHelper.isBadRequest(ex));
+            System.out.println("is not found: " + BaringoExceptionHelper.isNotFound(ex));
+
+            // https://api.imgur.com/3/gallery/Z%20WMmil/comments/best: Bad Request
+            System.out.println("####\n" + ex.getMessage() + "\n####");
+            //ex.printStackTrace();
+        }
+        */
+
+        //addStewTracker();
+        //addPrefix();
+        //addSimpleUserbase();
     }
 
     private static void addStewTracker() throws Exception

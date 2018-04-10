@@ -285,5 +285,44 @@ public class SqlDatabase
 
     //endregion
 
+    //region Helper method
+
+    /**
+     * Execute a Prepared Statement and retrieve the affected row id.
+     * @param prep The prepared statement to be executed.
+     * @return The row-id that was affected by this execution.
+     */
+    public static long getAffectedRow(PreparedStatement prep) throws SQLException
+    {
+        String query = "SELECT last_insert_rowid();";
+        PreparedStatement myPrep = getStatement(query);
+
+        ArrayList<Object> result = SqlBuilder.Builder()
+                .execute(prep)
+                .query(myPrep)
+                .commit();
+
+        if (result == null)
+            throw new SQLException("SqlDatabase exception: query result was null");
+
+        if (result.size() != 2)
+            throw new SQLException("SqlDatabase exception: Expected result size did not match (was " + result.size() + ")");
+
+        ResultSet rs = (ResultSet)result.get(1);
+
+        if (!rs.next())
+            throw new SQLException("SqlDatabase exception: The database did not provide a row-id for the inserted tracker");
+
+        return rs.getLong(1);
+    }
+
+    //endregion
+
+
+
+
+
+
+
 
 }

@@ -23,7 +23,6 @@
 package com.Bluefix.Prodosia.Imgur.Tagging;
 
 import com.Bluefix.Prodosia.DataType.Comments.*;
-import com.Bluefix.Prodosia.DataType.Taglist.Taglist;
 import com.Bluefix.Prodosia.Imgur.ImgurApi.ImgurManager;
 import com.Bluefix.Prodosia.Logger.Logger;
 import com.github.kskelm.baringo.model.Comment;
@@ -39,6 +38,7 @@ import java.util.*;
  * API costs:
  * 6 POST calls per minute for posting comments.
  * 1 GET call per unique TagRequest added.
+ * 1 GET call every time the comments for a TagRequest are checked (should hopefully only occur once).
  *
  * Although the ImgurIntervalRunner could have been used for this class, it is
  * not expected to cause a serious strain on the Imgur API due to the low amount of
@@ -51,15 +51,22 @@ public class CommentExecution extends Thread
     /**
      * The amount of tag requests that should be executed.
      * Recommended to have higher than 1, so that exceptionally large
-     * taglists don't clog the tag requests.
+     * taglists don't clog the tag requests. Preferable to have it
+     * over the amount of comments per minute to minimize the amount of wasted
+     * comments.
      */
-    private static final int SimultaneousTagRequest = 4;
+    private static final int SimultaneousTagRequest = 10;
 
     /**
      * The default delay in milliseconds how long it takes for the
      * comment posts to reset.
      */
     private static final int DefaultCommentDelay = 60000;
+
+    /**
+     * The shorter delay in case no comments were posted.
+     */
+    private static final int DefaultShortDelay = 10000;
 
 
     /**
@@ -85,7 +92,6 @@ public class CommentExecution extends Thread
     private CommentExecution()
     {
         this.actions = new HashMap<>();
-        this.parentMap = new HashMap<>();
 
         this.feedbackRequests = new LinkedList<>();
     }
@@ -95,10 +101,22 @@ public class CommentExecution extends Thread
 
     //region Feedback Request
 
+    /**
+     * A list of entries of comments that request feedback. These have the highest priority in the system since
+     * another part of the application is waiting for the feedback.
+     */
     private LinkedList<FeedbackRequest> feedbackRequests;
 
+    /**
+     * Execute a FeedbackRequest comment. After the comment has been posted, it will call the callback
+     * method.
+     * @param fr The feedbackrequest to be executed.
+     */
     public static void executeFeedbackRequest(FeedbackRequest fr)
     {
+        if (fr == null)
+            return;
+
         // add the feedback request to the queue.
         handler().feedbackRequests.addLast(fr);
     }
@@ -112,13 +130,17 @@ public class CommentExecution extends Thread
 
     /**
      * Queue for action items.
+     * This maps Command Requests to the actual comments it is requesting.
      */
     private HashMap<ICommentRequest, LinkedList<String>> actions;
 
+    /**
+     * Remove an item from the queue.
+     * @param item
+     */
     private void removeItem(ICommentRequest item)
     {
         actions.remove(item);
-        parentMap.remove(item);
     }
 
     /**
@@ -155,6 +177,11 @@ public class CommentExecution extends Thread
     //region Thread logic
 
     /**
+     * This counter keeps track of how many comments can still be posted during this cycle.
+     */
+    private int commentCounter;
+
+    /**
      * Continually execute the tag request logic. This thread remains running perpetually until
      * application termination.
      */
@@ -167,22 +194,25 @@ public class CommentExecution extends Thread
             // default delay between comment posting is 1 full minute.
             int delay = DefaultCommentDelay;
 
+            // reset the comment counter.
+            this.commentCounter = CommentsPerMinute;
+
             try
             {
                 // first execute the feedback requests, since they are a priority.
-                int postUsed = feedbackRequests();
+                feedbackRequests();
 
                 updateQueue();
 
-                // if the queue is empty, don't post the comments and use a shorter
-                // delay.
-                if (isEmptyQueue())
+                // if the queue is empty and no feedback requests were handled,
+                // don't post the comments and use a shorter delay.
+                if (isEmptyQueue() && commentCounter == CommentsPerMinute)
                 {
-                    delay = 10000;
+                    delay = DefaultShortDelay;
                 }
                 else
                 {
-                    postComments(postUsed);
+                    postComments();
                 }
 
                 // update the queue again so that requests that were completed can immediately be
@@ -200,7 +230,7 @@ public class CommentExecution extends Thread
                     Thread.sleep(delay);
                 } catch (InterruptedException e)
                 {
-
+                    // if this fails, it is most likely an application shutdown upon which we are done anyways.
                 }
             }
         }
@@ -215,12 +245,9 @@ public class CommentExecution extends Thread
      * @throws IOException
      * @throws URISyntaxException
      */
-    private int feedbackRequests() throws BaringoApiException, IOException, URISyntaxException
+    private void feedbackRequests() throws BaringoApiException, IOException, URISyntaxException
     {
-        int postUsed = 0;
-
-
-        while (postUsed < CommentsPerMinute && !feedbackRequests.isEmpty())
+        while (commentCounter > 0 && !feedbackRequests.isEmpty())
         {
             FeedbackRequest fr = feedbackRequests.removeFirst();
 
@@ -234,7 +261,7 @@ public class CommentExecution extends Thread
                     throw new IllegalArgumentException("FeedbackRequest is only supposed to have one comment.");
 
                 long commentId = postComment(fr, comments.get(0));
-                postUsed++;
+                commentCounter--;
 
                 fr.setCommentId(commentId);
                 fr.start();
@@ -245,12 +272,13 @@ public class CommentExecution extends Thread
                 e.printStackTrace();
             }
         }
-
-        return postUsed;
     }
 
 
-
+    /**
+     * Update all the queues that hold Comment Requests. 
+     * @throws Exception
+     */
     private void updateQueue() throws Exception
     {
         // clean any items that were completely posted.
@@ -269,7 +297,7 @@ public class CommentExecution extends Thread
      */
     private void cleanupEmptyItems() throws Exception
     {
-        // remove all items from the queue that were empty.
+        // complete all items from the queue that were empty.
         ArrayList<ICommentRequest> deletionList = new ArrayList<>();
 
         for (Map.Entry<ICommentRequest, LinkedList<String>> entry : actions.entrySet())
@@ -278,21 +306,21 @@ public class CommentExecution extends Thread
                 deletionList.add(entry.getKey());
         }
 
-        // remove the item from the global tagrequest queue as well.
-        for (ICommentRequest tr : deletionList)
+        // complete the item from the global tagrequest queue as well.
+        for (ICommentRequest icr : deletionList)
         {
-            actions.remove(tr);
+            actions.remove(icr);
 
-            tr.remove();
-
-            // if it was a tag request, indicate success to the user.
-            if (tr instanceof TagRequest && tr.getImgurId() != null)
-            {
-                Logger.logMessage("Post \"" + tr.getImgurId() + "\" successfully tagged.");
-            }
+            // handle deletion by the ICommentRequest object.
+            icr.complete();
         }
     }
 
+
+    /**
+     * Retrieves items from the `SimpleCommentRequestStorage` and adds them to our queue.
+     * @throws Exception
+     */
     private void updateSimpleCommentRequests() throws Exception
     {
         // we ignore the size of the queue since simple tag requests always take priority.
@@ -312,17 +340,15 @@ public class CommentExecution extends Thread
     }
 
     /**
-     * Update the tag request queue we maintain.
+     * Update the tag request queue we maintain. Retrieves items from `TagRequestStorage`
+     * and adds them to the action list if the maximum amount of simultaneous
+     * active requests hasn't been exceeded yet.
      *
      * If a tag request was updated, refresh its comment list.
      * @throws Exception
      */
     private void updateTagRequests() throws Exception
     {
-        // if the queue is still the full length, skip this phase.
-        if (actions.size() >= SimultaneousTagRequest)
-            return;
-
         // retrieve all current tag requests. Create a local copy.
         ArrayList<TagRequest> queueItems = new ArrayList<>(TagRequestStorage.handler().getAll());
 
@@ -336,7 +362,7 @@ public class CommentExecution extends Thread
             // find the corresponding item in queueItems.
             int index = queueItems.indexOf(tr);
 
-            // if the item wasn't in the queue anymore, remove it from the list
+            // if the item wasn't in the queue anymore, complete it from the list
             if (index < 0)
             {
                 removeItem(tr);
@@ -356,44 +382,40 @@ public class CommentExecution extends Thread
             // if the entry was equal, we are good.
 
 
-            // finally, remove the tagrequest from the queue-items since it was already handled.
+            // finally, complete the tagrequest from the queue-items since it was already handled.
             queueItems.remove(index);
         }
+
+        // if the queue is still the full length, skip this phase.
+        if (actions.size() >= SimultaneousTagRequest)
+            return;
+
 
         // if there is still room in the queue, add new items
         for (int i = 0; i < SimultaneousTagRequest - actions.size() && i < queueItems.size(); i++)
         {
             TagRequest newItem = queueItems.get(i);
             int comments = addItem(newItem);
-            Logger.logMessage("Start tag on \"" + newItem.getImgurId() + "\"\n" +
-                    "Estimated time: " + estimatedTime(comments) + "m", Logger.Severity.INFORMATIONAL);
+
         }
     }
-
-
-    private int estimatedTime(int comments)
-    {
-        // make an estimate on the amount of minutes based on how busy the list is right now
-        return (int)Math.ceil((comments / (double)CommentsPerMinute) / actions.size());
-    }
-
-
-
 
 
 
 
     /**
      * Post the comments of the respective tag requests to their posts.
-     * @param postUsed the amount of comment post requests that were already used.
+     *
+     * This method will loop through the actions in the queue in no particular order
+     * and will post comments until either its comment counter runs out or all entries
+     * in the queue were empty. The method uses a breadth-first approach to attempt to
+     * spread out the comments between the queue items.
      */
-    private void postComments(int postUsed) throws BaringoApiException, IOException, URISyntaxException
+    private void postComments() throws BaringoApiException, IOException, URISyntaxException
     {
-        int posted = postUsed;
-
         Set<Map.Entry<ICommentRequest, LinkedList<String>>> entries = actions.entrySet();
 
-        while (posted < CommentsPerMinute)
+        while (commentCounter > 0)
         {
             boolean allEmpty = true;
 
@@ -405,23 +427,29 @@ public class CommentExecution extends Thread
                     continue;
                 }
 
-                // post one of the strings of the currently collection and remove it
+                // post one of the strings of the current collection and complete it
                 String comment = e.getValue().remove(0);
                 allEmpty = false;
 
-                // add to the comment limit if we had to create a parent comment.
-                if (findParent(e.getKey()))
-                    posted++;
-
-                if (posted >= CommentsPerMinute)
+                if (commentCounter <= 0)
                     return;
 
-                // increment the comment limit as we post a reply.
-                postComment(e.getKey(), comment);
-                posted++;
+                // post a reply.
+                try
+                {
+                    postComment(e.getKey(), comment);
+                }
+                catch (Exception ex)
+                {
+                    // if posting a comment fails for whatever reason, it shouldn't affect the other queries.
+                    ex.printStackTrace();
+                }
+
+                // since the Imgur API can fail but still succeed in posting a comment, an attempt should always be counted.
+                commentCounter--;
 
                 // if we exceed the limit, return.
-                if (posted >= CommentsPerMinute)
+                if (commentCounter <= 0)
                     return;
 
             }
@@ -432,102 +460,31 @@ public class CommentExecution extends Thread
         }
     }
 
-    private HashMap<ICommentRequest, Comment> parentMap;
-
-
     /**
-     * Find or create the parent comment for the specified TagRequest
-     * @return true iff a comment was posted for this.
-     */
-    private boolean findParent(ICommentRequest cr) throws BaringoApiException, IOException, URISyntaxException
-    {
-        // return if the parent was already known.
-        if (parentMap.containsKey(cr))
-            return false;
-
-        // attempt to retrieve the parent comment.
-        Comment parentComment = cr.getParent();
-
-        if (parentComment == null)
-        {
-            // if it pertains a tag request, create a new parent comment.
-            if (cr instanceof TagRequest)
-            {
-                TagRequest tr = (TagRequest) cr;
-
-                parentComment = postParentComment(cr.getImgurId(), tr.getTaglists().iterator());
-                parentMap.put(tr, parentComment);
-                return true;
-            }
-        } else
-        {
-            // if the parent comment id was already known, retrieve its actual comment.
-            parentMap.put(cr, parentComment);
-        }
-
-        return false;
-    }
-
-    /**
-     * Post a comment according to the tag request data.
-     * @param tr The tag request data.
+     * Post a comment according to the Comment Request data.
+     * @param icr The Comment Request meta-data.
      * @param comment The comment to be posted.
      * @return The command id of the comment that was posted.
      * @throws BaringoApiException
      * @throws IOException
      * @throws URISyntaxException
      */
-    private long postComment(ICommentRequest tr, String comment) throws BaringoApiException, IOException, URISyntaxException
+    private long postComment(ICommentRequest icr, String comment) throws BaringoApiException, IOException, URISyntaxException
     {
         // retrieve the parent comment
-        Comment parentComment = tr.getParent();
-
-        if (parentComment == null)
-            parentComment = parentMap.get(tr);
-
-
+        Comment parentComment = icr.getParent();
 
         // if no parent comment was known, simply post directly to the post.
         if (parentComment == null)
         {
             // post the comment.
-            return ImgurManager.client().commentService().addComment(tr.getImgurId(), comment);
+            return ImgurManager.client().commentService().addComment(icr.getImgurId(), comment);
         }
         else
         {
             // post the reply
             return ImgurManager.client().commentService().addReply(parentComment, comment);
         }
-    }
-
-
-    /**
-     * Create a new parent comment on the specified imgur post.
-     * @param imgurId
-     * @param abbreviations
-     * @return
-     * @throws BaringoApiException
-     * @throws IOException
-     * @throws URISyntaxException
-     */
-    private static Comment postParentComment(String imgurId, Iterator<Taglist> abbreviations) throws BaringoApiException, IOException, URISyntaxException
-    {
-        StringBuilder message = new StringBuilder("Tag issued for lists (");
-
-        while (abbreviations.hasNext())
-            message.append(abbreviations.next().getAbbreviation() + ", ");
-
-
-        // trim the last comma
-        message.setLength(message.length()-2);
-        message.append(")");
-
-        // trim the length of the comment if it exceeds the max length
-        if (message.length() > StatComment.MaxCommentLength)
-            message.setLength(StatComment.MaxCommentLength);
-
-        long comId = ImgurManager.client().commentService().addComment(imgurId, message.toString());
-        return ImgurManager.client().commentService().getComment(comId);
     }
 
     //endregion

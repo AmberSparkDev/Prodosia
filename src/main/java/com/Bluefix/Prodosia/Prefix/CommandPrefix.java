@@ -160,7 +160,7 @@ public class CommandPrefix
             sb.append(i + "|");
         }
 
-        // if there was at least one item, remove the final superfluous `|`
+        // if there was at least one item, complete the final superfluous `|`
         if (items.length > 0)
             sb.setLength(sb.length()-1);
 
