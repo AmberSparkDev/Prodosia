@@ -139,8 +139,8 @@ public class Tracker
 
         if (this.imgurId >= 0)
         {
-            // TODO: can't yet parse imgur id to corresponding user because Baringo is insufficient
-
+            Account acc = ImgurManager.client().accountService().getAccount(this.imgurId);
+            this.imgurName = acc.getUserName();
         }
 
         if (this.discordId != null && !this.discordId.trim().isEmpty())
