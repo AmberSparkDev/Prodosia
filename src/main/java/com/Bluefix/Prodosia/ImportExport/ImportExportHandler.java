@@ -58,7 +58,8 @@ public class ImportExportHandler
     {
         OK,
         FILE_MISSING,
-        FILE_INCORRECT
+        FILE_INCORRECT,
+        NO_TAGLISTS_SUPPLIED
     }
 
 
@@ -85,6 +86,8 @@ public class ImportExportHandler
         // first, retrieve all the taglists and map their 'id' to the actual
         // id in the system here.
         Map<Long, Long> taglistIdMap = importTaglistData(data.getTaglists(), policy);
+        if (taglistIdMap == null)
+            return ImportResult.NO_TAGLISTS_SUPPLIED;
         GuiUpdate.updateTaglists();
 
         // import the tracker data.
@@ -127,6 +130,9 @@ public class ImportExportHandler
      */
     private static Map<Long, Long> importTaglistData(List<JsonTaglist> taglists, ImportPolicy policy) throws Exception
     {
+        if (taglists == null)
+            return null;
+
         // initialize the map
         Map<Long, Long> idMap = new HashMap<>();
 
@@ -177,6 +183,9 @@ public class ImportExportHandler
 
     private static void importTrackerData(List<JsonTracker> trackers, Map<Long, Long> taglistIdMap, ImportPolicy policy) throws Exception
     {
+        if (trackers == null)
+            return;
+
         // retrieve all currently known trackers.
         ArrayList<Tracker> dbTrackers = TrackerHandler.handler().getAll();
 
@@ -309,6 +318,9 @@ public class ImportExportHandler
 
     private static void importUserData(List<JsonUser> users, Map<Long, Long> taglistIdMap, ImportPolicy policy) throws Exception
     {
+        if (users == null)
+            return;
+
         // retrieve all currently known users.
         ArrayList<User> dbUsers = UserHandler.handler().getAll();
 
@@ -406,6 +418,9 @@ public class ImportExportHandler
 
     private static void importArchiveData(List<JsonArchive> archives, Map<Long, Long> taglistIdMap, ImportPolicy policy) throws Exception
     {
+        if (archives == null)
+            return;
+
         // retrieve all currently known Archives
         ArrayList<Archive> dbArchives = ArchiveHandler.handler().getAll();
 

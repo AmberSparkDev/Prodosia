@@ -249,6 +249,9 @@ public class ImportExportWindow
             case FILE_INCORRECT:
                 showWarning("This file isn't a proper import file; syntax incorrect.");
                 break;
+            case NO_TAGLISTS_SUPPLIED:
+                showWarning("This file does not contain any taglists and as such cannot import anything reliably.");
+                break;
         }
 
         this.importFile = null;

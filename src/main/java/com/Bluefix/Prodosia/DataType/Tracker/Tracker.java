@@ -147,9 +147,11 @@ public class Tracker
             if (DiscordManager.manager() != null)
             {
                 User u = DiscordManager.manager().getUserById(this.discordId);
-
-                this.discordName = u.getName();
-                this.discordTag = u.getDiscriminator();
+                if (u != null)
+                {
+                    this.discordName = u.getName();
+                    this.discordTag = u.getDiscriminator();
+                }
             }
         }
     }
