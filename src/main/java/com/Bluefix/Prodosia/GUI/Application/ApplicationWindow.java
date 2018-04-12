@@ -273,7 +273,7 @@ public class ApplicationWindow
 
     private TrackerListManager tlm;
     private TaglistListManager tllm;
-    private UserListManager ulm;
+    //private UserListManager ulm;
 
     private GuiCheckboxListManager tap_taglist_cl;
 
@@ -299,7 +299,7 @@ public class ApplicationWindow
 
         try
         {
-            ulm = new UserListManager(users_overview);
+            //ulm = new UserListManager(users_overview);
         } catch (Exception e)
         {
             ExceptionHelper.showWarning(e);
@@ -328,7 +328,7 @@ public class ApplicationWindow
 
         user_filter.textProperty().addListener((o, oldVal, newVal) ->
         {
-            ulm.filter(newVal);
+            //ulm.filter(newVal);
         });
     }
 
@@ -339,7 +339,7 @@ public class ApplicationWindow
     {
         tlm.update();
         tllm.update();
-        ulm.update();
+        //ulm.update();
 
         // update the archiving functionality.
         archiveGui.update();
@@ -370,7 +370,7 @@ public class ApplicationWindow
         {
             try
             {
-                handler().ulm.update();
+                //handler().ulm.update();
             } catch (Exception e)
             {
                 e.printStackTrace();

@@ -93,17 +93,19 @@ public class SubCommand implements ICommandFunc
             // attempt to parse the current argument as a taglist.
             Taglist tmpTl = TaglistHandler.getTaglistByAbbreviation(curArg);
 
-            // if the tracker has no permissions for this taglist, simply ignore it.
-            if (!ci.getTracker().hasPermission(tmpTl))
-            {
-                permissionMissing.add(curArg);
-                curTaglist = null;
-                continue;
-            }
+
 
             // if a new taglist is provided, switch data and store the old taglist.
             if (tmpTl != null)
             {
+                // if the tracker has no permissions for this taglist, simply ignore it.
+                if (!ci.getTracker().hasPermission(tmpTl))
+                {
+                    permissionMissing.add(curArg);
+                    curTaglist = null;
+                    continue;
+                }
+                
                 // if there was subscription data available, add it to the subscription data
                 UserSubscription us = parseUserSubscription(curTaglist, curRatings, filters);
 
