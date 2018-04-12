@@ -28,6 +28,7 @@ import com.Bluefix.Prodosia.Imgur.ImgurApi.ImgurManager;
 import com.github.kskelm.baringo.model.Account;
 import net.dv8tion.jda.core.entities.User;
 
+import java.util.Comparator;
 import java.util.Objects;
 
 /**

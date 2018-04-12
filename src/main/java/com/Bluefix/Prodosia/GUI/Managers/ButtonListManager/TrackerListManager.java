@@ -25,6 +25,7 @@ package com.Bluefix.Prodosia.GUI.Managers.ButtonListManager;
 
 import com.Bluefix.Prodosia.DataHandler.TrackerHandler;
 import com.Bluefix.Prodosia.DataType.Tracker.Tracker;
+import com.Bluefix.Prodosia.DataType.Tracker.TrackerComparator;
 import com.Bluefix.Prodosia.GUI.Managers.ListManager.GuiListManager;
 import com.Bluefix.Prodosia.GUI.Navigation.VistaNavigator;
 import com.Bluefix.Prodosia.GUI.Tracker.EditTrackerWindow;
@@ -32,6 +33,7 @@ import javafx.scene.control.Button;
 import javafx.scene.layout.VBox;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 /**
  * A GUI Manager that will keep track of a list of users.
@@ -58,7 +60,12 @@ public class TrackerListManager extends GuiListManager<Button>
     @Override
     protected Button[] listItems() throws Exception
     {
+        // retrieve the tracker data and sort is alphabetically. 
         ArrayList<Tracker> data = TrackerHandler.handler().getAll();
+        Collections.sort(data, new TrackerComparator());
+
+
+
         Button[] buttons = new Button[data.size()];
 
         for (int i = 0; i < data.size(); i++)

@@ -334,6 +334,7 @@ public class EditTrackerWindow extends EditableWindowPane
     {
         try
         {
+
             Account acc = ImgurManager.client().accountService().getAccount(previousImgurName);
 
             if (acc == null)
