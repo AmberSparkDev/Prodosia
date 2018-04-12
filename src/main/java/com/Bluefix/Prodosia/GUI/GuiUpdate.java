@@ -42,17 +42,17 @@ public class GuiUpdate
 
     public static void updateTaglists()
     {
-
+        ApplicationWindow.updateTaglists();
     }
 
     public static void updateTrackers()
     {
-
+        ApplicationWindow.updateTrackers();
     }
 
     public static void updateArchives()
     {
-
+        ApplicationWindow.updateArchives();
     }
 
 }

@@ -20,7 +20,7 @@
  * SOFTWARE.
  */
 
-package com.Bluefix.Prodosia.GUI;
+package com.Bluefix.Prodosia.GUI.Prefix;
 
 import com.Bluefix.Prodosia.GUI.Navigation.VistaNavigator;
 import com.Bluefix.Prodosia.Prefix.CommandPrefixStorage;

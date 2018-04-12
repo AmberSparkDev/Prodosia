@@ -22,9 +22,6 @@
 
 package com.Bluefix.Prodosia.GUI.Application;
 
-import com.Bluefix.Prodosia.Exception.BaringoExceptionHelper;
-import com.Bluefix.Prodosia.Imgur.ImgurApi.ImgurManager;
-import com.Bluefix.Prodosia.Imgur.Tagging.TagRequestComments;
 import com.Bluefix.Prodosia.Prefix.CommandPrefixStorage;
 import com.Bluefix.Prodosia.DataHandler.TaglistHandler;
 import com.Bluefix.Prodosia.DataHandler.TrackerHandler;
@@ -39,23 +36,19 @@ import com.Bluefix.Prodosia.DataType.Tracker.TrackerPermissions;
 import com.Bluefix.Prodosia.DataType.User.User;
 import com.Bluefix.Prodosia.DataType.User.UserSubscription;
 import com.Bluefix.Prodosia.Exception.ExceptionHelper;
-import com.Bluefix.Prodosia.GUI.ApiKeysWindow;
+import com.Bluefix.Prodosia.GUI.ApiKeys.ApiKeysWindow;
 import com.Bluefix.Prodosia.GUI.Managers.CheckboxListManager.GuiCheckboxListManager;
 import com.Bluefix.Prodosia.GUI.Managers.CheckboxListManager.TaglistClManager;
-import com.Bluefix.Prodosia.GUI.Managers.ListManager.GuiListManager;
 import com.Bluefix.Prodosia.GUI.Managers.ButtonListManager.TaglistListManager;
 import com.Bluefix.Prodosia.GUI.Managers.ButtonListManager.TrackerListManager;
 import com.Bluefix.Prodosia.GUI.Managers.ButtonListManager.UserListManager;
 import com.Bluefix.Prodosia.GUI.Navigation.VistaNavigator;
-import com.Bluefix.Prodosia.GUI.PrefixWindow;
+import com.Bluefix.Prodosia.GUI.Prefix.PrefixWindow;
 import com.Bluefix.Prodosia.GUI.Taglist.EditTaglistWindow;
 import com.Bluefix.Prodosia.GUI.Tracker.EditTrackerWindow;
 import com.Bluefix.Prodosia.GUI.User.EditUserWindow;
 import com.Bluefix.Prodosia.Logger.Logger;
 import com.Bluefix.Prodosia.Module.TestModule;
-import com.github.kskelm.baringo.model.Account;
-import com.github.kskelm.baringo.model.Comment;
-import com.github.kskelm.baringo.util.BaringoApiException;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -63,7 +56,6 @@ import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -343,7 +335,7 @@ public class ApplicationWindow
     /**
      * Update the components now that we changed data somewhere else.
      */
-    private void updateListManagers() throws Exception
+    public void updateListManagers() throws Exception
     {
         tlm.update();
         tllm.update();
@@ -379,6 +371,48 @@ public class ApplicationWindow
             try
             {
                 handler().ulm.update();
+            } catch (Exception e)
+            {
+                e.printStackTrace();
+            }
+        });
+    }
+
+    public static void updateTaglists()
+    {
+        Platform.runLater(() ->
+        {
+            try
+            {
+                handler().tllm.update();
+            } catch (Exception e)
+            {
+                e.printStackTrace();
+            }
+        });
+    }
+
+    public static void updateTrackers()
+    {
+        Platform.runLater(() ->
+        {
+            try
+            {
+                handler().tlm.update();
+            } catch (Exception e)
+            {
+                e.printStackTrace();
+            }
+        });
+    }
+
+    public static void updateArchives()
+    {
+        Platform.runLater(() ->
+        {
+            try
+            {
+                handler().archiveGui.update();
             } catch (Exception e)
             {
                 e.printStackTrace();

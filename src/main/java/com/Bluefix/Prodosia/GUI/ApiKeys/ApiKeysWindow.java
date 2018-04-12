@@ -20,7 +20,7 @@
  * SOFTWARE.
  */
 
-package com.Bluefix.Prodosia.GUI;
+package com.Bluefix.Prodosia.GUI.ApiKeys;
 
 import com.Bluefix.Prodosia.DataType.ImgurKey;
 import com.Bluefix.Prodosia.Discord.DiscordManager;

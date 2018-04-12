@@ -107,6 +107,8 @@ public class GetlistCommand implements ICommandFunc
                 item = item.replace("%n", u.getImgurName());
                 item = item.replace("%i", "" + u.getImgurId());
                 item = item.replace("%c", "" + counter++);
+                item = item.replace("\\n", "\n");
+                item = item.replace("\\t", "\t");
 
                 bw.write(item);
             }

@@ -23,6 +23,10 @@
 package com.Bluefix.Prodosia.DataType.Tracker;
 
 import com.Bluefix.Prodosia.DataType.Taglist.Taglist;
+import com.Bluefix.Prodosia.Discord.DiscordManager;
+import com.Bluefix.Prodosia.Imgur.ImgurApi.ImgurManager;
+import com.github.kskelm.baringo.model.Account;
+import net.dv8tion.jda.core.entities.User;
 
 import java.util.Objects;
 
@@ -113,6 +117,41 @@ public class Tracker
         this.discordTag = discordTag;
         this.discordId = discordId;
         this.permissions = permissions;
+    }
+
+    /**
+     * Create a new Tracker based on the known data. Will automatically parse the appropriate imgur
+     * username and discord credentials.
+     * @param imgurId
+     * @param discordId
+     * @param permissions
+     */
+    public Tracker(long imgurId, String discordId, TrackerPermissions permissions) throws Exception
+    {
+        if (imgurId < 0 && (discordId == null || discordId.trim().isEmpty()))
+            throw new IllegalArgumentException("Either hte imgur id or the discord id must be valid");
+
+        this.id = -1;
+        this.imgurId = imgurId;
+        this.discordId = discordId;
+        this.permissions = permissions;
+
+        if (this.imgurId >= 0)
+        {
+            // TODO: can't yet parse imgur id to corresponding user because Baringo is insufficient
+
+        }
+
+        if (this.discordId != null && !this.discordId.trim().isEmpty())
+        {
+            if (DiscordManager.manager() != null)
+            {
+                User u = DiscordManager.manager().getUserById(this.discordId);
+
+                this.discordName = u.getName();
+                this.discordTag = u.getDiscriminator();
+            }
+        }
     }
 
     //endregion
