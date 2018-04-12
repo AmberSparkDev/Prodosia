@@ -105,7 +105,7 @@ public class SubCommand implements ICommandFunc
                     curTaglist = null;
                     continue;
                 }
-                
+
                 // if there was subscription data available, add it to the subscription data
                 UserSubscription us = parseUserSubscription(curTaglist, curRatings, filters);
 

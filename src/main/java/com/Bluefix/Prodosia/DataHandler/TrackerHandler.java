@@ -362,11 +362,15 @@ public class TrackerHandler extends LocalStorageHandler<Tracker>
         if (discordId == null || discordId.trim().isEmpty())
             return null;
 
+        String trimId = discordId.trim();
+
         ArrayList<Tracker> trackers = handler().getAll();
 
         for (Tracker t : trackers)
         {
-            if (t.getDiscordId().equals(discordId.trim()));
+            String tDid = t.getDiscordId();
+
+            if (tDid.equals(trimId))
                 return t;
         }
 
