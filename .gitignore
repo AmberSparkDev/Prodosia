@@ -5,6 +5,9 @@ database.db-journal
 keys.txt
 cookie.txt
 
+# Java .class files
+.class
+
 
 # Created by https://www.gitignore.io/api/intellij
 
