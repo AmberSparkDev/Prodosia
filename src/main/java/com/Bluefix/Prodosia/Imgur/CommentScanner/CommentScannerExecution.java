@@ -393,7 +393,7 @@ public class CommentScannerExecution extends ImgurIntervalRunner
     private boolean queueIsDone()
     {
         for (QueueItem q : trackerMap.values())
-            if (q.reached = false)
+            if (!q.isReached())
                 return false;
 
         return true;
@@ -462,7 +462,7 @@ public class CommentScannerExecution extends ImgurIntervalRunner
         public void setReached() throws Exception
         {
             this.reached = true;
-            
+
             // replace the bookmark with the new one
             if (newBookmark != null)
                 bookmark = newBookmark;
