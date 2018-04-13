@@ -6,7 +6,7 @@ keys.txt
 cookie.txt
 
 # Java .class files
-.class
+*.class
 
 
 # Created by https://www.gitignore.io/api/intellij

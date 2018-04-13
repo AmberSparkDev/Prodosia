@@ -461,6 +461,8 @@ public class CommentScannerExecution extends ImgurIntervalRunner
          */
         public void setReached() throws Exception
         {
+            this.reached = true;
+            
             // replace the bookmark with the new one
             if (newBookmark != null)
                 bookmark = newBookmark;
@@ -469,6 +471,7 @@ public class CommentScannerExecution extends ImgurIntervalRunner
 
             //update the bookmark for the user.
             CommentScannerStorage.handler().set(bookmark);
+
         }
 
         public int getPage()
@@ -520,7 +523,7 @@ public class CommentScannerExecution extends ImgurIntervalRunner
      */
     private static TrackerBookmark defaultBookmark(Tracker tracker)
     {
-        return new TrackerBookmark(-1, new Date(0), tracker);
+        return new TrackerBookmark(-1, new Date(Long.MAX_VALUE), tracker);
     }
 
 
