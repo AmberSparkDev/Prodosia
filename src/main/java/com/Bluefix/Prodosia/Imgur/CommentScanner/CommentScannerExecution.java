@@ -287,7 +287,8 @@ public class CommentScannerExecution extends ImgurIntervalRunner
         }
 
         // open the queue again.
-        openQueue();
+        if (queueIsDone())
+            openQueue();
 
         // if the total size of the trackers is larger than the current request limit and
         // if there are still requests remaining, start processing again.
