@@ -22,9 +22,12 @@
 
 package com.Bluefix.Prodosia.Imgur.CommentDeletion;
 
+import com.Bluefix.Prodosia.Exception.BaringoExceptionHelper;
 import com.Bluefix.Prodosia.Imgur.ImgurApi.ApiDistribution;
 import com.Bluefix.Prodosia.Imgur.ImgurApi.ImgurManager;
 import com.Bluefix.Prodosia.Module.ImgurIntervalRunner;
+import com.github.kskelm.baringo.model.Comment;
+import com.github.kskelm.baringo.util.BaringoApiException;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -36,6 +39,12 @@ import java.util.Iterator;
 public class CommentDeletionExecution extends ImgurIntervalRunner
 {
     //region variables
+
+    /**
+     * If this option is enabled, the deletion of a comment is ensured, but
+     * the total amount of deletions per hours will decrease to half capacity.
+     */
+    private static final boolean ensureDeletion = false;
 
     /**
      * Separate the cycles in parts of 6, 10 minutes in between each.
@@ -67,6 +76,7 @@ public class CommentDeletionExecution extends ImgurIntervalRunner
     {
         super(ApiDistribution.DeletionModule);
 
+        this.deletedComments = new HashSet<>();
         requestCounter = 0;
     }
 
@@ -75,7 +85,7 @@ public class CommentDeletionExecution extends ImgurIntervalRunner
 
 
 
-
+    private HashSet<Long> deletedComments;
 
     private int requestCounter;
 
@@ -85,12 +95,49 @@ public class CommentDeletionExecution extends ImgurIntervalRunner
 
         try
         {
+            // check on the deletedComments if comment-deletion was ensured.
+            if (ensureDeletion)
+            {
+                // terrible name, but I need a set to store all the items that can be
+                // deleted afterwards.
+                HashSet<Long> deletionDeletion = new HashSet<>();
+                Iterator<Long> deletions = deletedComments.iterator();
+
+                while (deletions.hasNext() && requestCounter < DeletionItemsPerCycle)
+                {
+                    Long value = deletions.next();
+                    try
+                    {
+                        requestCounter++;
+                        Comment com = ImgurManager.client().commentService().getComment(value);
+
+                        if (com == null)
+                            deletionDeletion.add(value);
+                    }
+                    catch (BaringoApiException ex)
+                    {
+                        if (BaringoExceptionHelper.isNotFound(ex) ||
+                                BaringoExceptionHelper.isBadRequest(ex))
+                            deletionDeletion.add(value);
+                    }
+                }
+
+                for (Long l : deletionDeletion)
+                {
+                    deletedComments.remove(l);
+                    CommentDeletionStorage.handler().remove(l);
+                }
+            }
+            else
+            {
+                for (Long l : deletedComments)
+                    CommentDeletionStorage.handler().remove(l);
+            }
+
             // retrieve as many items from the Deletion Storage as our cycle permits.
             ArrayList<Long> deletions = CommentDeletionStorage.handler().getAll();
 
             Iterator<Long> dIt = deletions.iterator();
-
-            HashSet<Long> completedDeletions = new HashSet<>();
 
             while (dIt.hasNext() && requestCounter < DeletionItemsPerCycle)
             {
@@ -98,13 +145,7 @@ public class CommentDeletionExecution extends ImgurIntervalRunner
                 long value = dIt.next();
                 requestCounter++;
                 ImgurManager.client().commentService().deleteComment(value);
-                completedDeletions.add(value);
-            }
-
-            // remove all deleted items from the storage.
-            for (Long l : completedDeletions)
-            {
-                CommentDeletionStorage.handler().remove(l);
+                deletedComments.add(value);
             }
 
         } catch (Exception e)
