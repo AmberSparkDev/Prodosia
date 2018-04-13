@@ -130,7 +130,7 @@ public class Tracker
     public Tracker(long imgurId, String discordId, TrackerPermissions permissions) throws Exception
     {
         if (imgurId < 0 && (discordId == null || discordId.trim().isEmpty()))
-            throw new IllegalArgumentException("Either hte imgur id or the discord id must be valid");
+            throw new IllegalArgumentException("Either the imgur id or the discord id must be valid");
 
         this.id = -1;
         this.imgurId = imgurId;

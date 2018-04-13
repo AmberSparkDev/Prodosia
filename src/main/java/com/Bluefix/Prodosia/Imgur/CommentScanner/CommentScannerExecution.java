@@ -34,6 +34,7 @@ import com.Bluefix.Prodosia.Imgur.ImgurApi.ImgurManager;
 import com.Bluefix.Prodosia.Module.ImgurIntervalRunner;
 import com.github.kskelm.baringo.model.Comment;
 import com.github.kskelm.baringo.util.BaringoApiException;
+import com.sun.corba.se.spi.legacy.interceptor.RequestInfoExt;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -95,17 +96,13 @@ public class CommentScannerExecution extends ImgurIntervalRunner
     @Override
     protected void run()
     {
-        int allowedRequests = MaximumGetRequestsPerCycle;
-
         try
         {
             // refresh the queue items.
-            int requests = refreshQueue(allowedRequests);
-            allowedRequests -= requests;
-            requestCounter += requests;
+            refreshQueue();
 
             // loop through the queue items.
-            requestCounter += loopQueue(allowedRequests);
+            loopQueue();
         }
         catch (Exception e)
         {
@@ -174,7 +171,7 @@ public class CommentScannerExecution extends ImgurIntervalRunner
         }
 
         // add a default queue item
-        trackerMap.put(tracker.getImgurId(), new QueueItem(tb, true, 0));
+        trackerMap.put(tracker.getImgurId(), new QueueItem(tb));
 
         return usedGet;
     }
@@ -209,16 +206,13 @@ public class CommentScannerExecution extends ImgurIntervalRunner
      *
      * It is *highly* recommended to make the TrackerHandler retain its
      * local storage because of how often it is accessed.
-     * @param allowedRequests The maximum amount of GET requests this method can use.
      * @return The amount of GET requests that were executed
      * @throws Exception
      */
-    private synchronized int refreshQueue(int allowedRequests) throws Exception
+    private synchronized void refreshQueue() throws Exception
     {
-        int usedRequests = 0;
-
         // retrieve all current trackers.
-        ArrayList<Tracker> trackers = TrackerHandler.handler().getAll();
+        ArrayList<Tracker> trackers = new ArrayList<>(TrackerHandler.handler().getAll());
 
         // if any trackers in our queue were removed, complete them from the queue as well.
         for (Long imgId : trackerMap.keySet())
@@ -254,65 +248,53 @@ public class CommentScannerExecution extends ImgurIntervalRunner
             {
                 // add the item to the queue.
                 if (addItem(t))
-                    usedRequests++;
+                    requestCounter++;
 
-                if (usedRequests >= allowedRequests)
-                    return usedRequests;
+                if (requestCounter >= MaximumGetRequestsPerCycle)
+                    return;
             }
         }
-
-        return usedRequests;
     }
 
 
     /**
      * Loop through the queue items.
-     * @param allowedRequests The maximum amount of requests allowed
      * @return The total amount of GET requests used.
      */
-    private int loopQueue(int allowedRequests) throws Exception
+    private void loopQueue() throws Exception
     {
         // skip this method if the queue is empty
         if (trackerMap.isEmpty())
-            return 0;
+            return;
 
-        int requestsUsed = 0;
-
-        requestsUsed += processQueue(allowedRequests);
+        processQueue();
 
         // while the queue isn't done yet and there are still open requests, keep going.
-        while (!queueIsDone() && requestsUsed < allowedRequests)
+        while (!queueIsDone() && requestCounter < MaximumGetRequestsPerCycle)
         {
-            requestsUsed += processQueue(allowedRequests - requestsUsed);
+            processQueue();
         }
 
         // open the queue again.
         if (queueIsDone())
             openQueue();
 
-        // if the total size of the trackers is larger than the current request limit and
         // if there are still requests remaining, start processing again.
-        if (trackerMap.size() > allowedRequests && requestsUsed < allowedRequests)
+        if (requestCounter < MaximumGetRequestsPerCycle)
         {
-            requestsUsed += processQueue(allowedRequests - requestsUsed);
+            processQueue();
         }
-
-
-        return requestsUsed;
     }
 
     /**
-     * Process any entries in the queue, starting from
-     * @param allowedRequests The maximum amount of allowed requests
+     * Process any entries in the queue
      * @return The amount of requests that were used.
      */
-    private int processQueue(int allowedRequests) throws Exception
+    private void processQueue() throws Exception
     {
         // return if no requests were allowed
-        if (allowedRequests <= 0)
-            return 0;
-
-        int requestsUsed = 0;
+        if (requestCounter >= MaximumGetRequestsPerCycle)
+            return;
 
         // loop through all the queue items and process them if they were still open.
         for (QueueItem q : trackerMap.values())
@@ -322,12 +304,13 @@ public class CommentScannerExecution extends ImgurIntervalRunner
                 continue;
 
             // retrieve the latest page and increment it.
-            int curPage = q.page++;
+            int curPage = q.getPage();
+            q.incrementPage();
 
             // retrieve the current page and parse its comments.
             Tracker t = q.getBookmark().getTracker();
 
-            requestsUsed++;
+            requestCounter++;
             List<Comment> trackerComments = null;
 
             try
@@ -350,7 +333,8 @@ public class CommentScannerExecution extends ImgurIntervalRunner
 
             // set the new bookmark for the queue-item.
             Comment newestComment = trackerComments.get(0);
-            q.setNewBookmark(new TrackerBookmark(newestComment.getId(), newestComment.getCreatedAt(), t));
+            if (newestComment != null)
+                q.setNewBookmark(new TrackerBookmark(newestComment.getId(), newestComment.getCreatedAt(), t));
 
             // if any of the comments corresponded to the timestamp or id, set the queue-item as reached.
             Iterator<Comment> cIt = trackerComments.iterator();
@@ -362,11 +346,7 @@ public class CommentScannerExecution extends ImgurIntervalRunner
             {
                 Comment c = cIt.next();
 
-                if (    c.getId() == q.getBookmark().getLastCommentId() ||
-                        c.getCreatedAt().compareTo(q.getBookmark().getLastCommentTime()) <= 0 ||
-                        q.getBookmark().getLastCommentId() < 0)
-                    q.setReached();
-                else
+                if (!q.isBookmark(c))
                     newComments.addFirst(c);
             }
 
@@ -379,11 +359,9 @@ public class CommentScannerExecution extends ImgurIntervalRunner
             }
 
             // if we have reached the maximum amount of allowed requests, return.
-            if (requestsUsed >= allowedRequests)
-                return requestsUsed;
+            if (requestCounter >= MaximumGetRequestsPerCycle)
+                return;
         }
-
-        return requestsUsed;
     }
 
 
@@ -420,6 +398,10 @@ public class CommentScannerExecution extends ImgurIntervalRunner
 
     //region QueueItem struct
 
+    /**
+     * A Queue item for the Comment Scanner. This will keep a bookmark on the latest
+     * comment that was scanned for a user.
+     */
     private static class QueueItem
     {
         private TrackerBookmark bookmark;
@@ -433,11 +415,11 @@ public class CommentScannerExecution extends ImgurIntervalRunner
 
         private TrackerBookmark newBookmark;
 
-        public QueueItem(TrackerBookmark bookmark, boolean reached, int page)
+        public QueueItem(TrackerBookmark bookmark)
         {
             this.bookmark = bookmark;
-            this.reached = reached;
-            this.page = page;
+            this.reached = true;
+            this.page = 0;
         }
 
         public TrackerBookmark getBookmark()
@@ -455,6 +437,28 @@ public class CommentScannerExecution extends ImgurIntervalRunner
         public boolean isReached()
         {
             return reached;
+        }
+
+        /**
+         * Returns true iff the comment is equal or beyond the bookmark.
+         * @return
+         */
+        public boolean isBookmark(Comment c) throws Exception
+        {
+            if (c == null)
+                return false;
+
+            if (    this.bookmark == null ||
+                    this.bookmark.getLastCommentId() == -1 ||
+                    this.bookmark.getLastCommentTime().getTime() == Long.MAX_VALUE ||
+                    this.bookmark.getLastCommentId() == c.getId() ||
+                    this.bookmark.getLastCommentTime().compareTo(c.getCreatedAt()) >= 0)
+            {
+                setReached();
+                return true;
+            }
+
+            return false;
         }
 
         /**
@@ -478,6 +482,11 @@ public class CommentScannerExecution extends ImgurIntervalRunner
         public int getPage()
         {
             return page;
+        }
+
+        public void incrementPage()
+        {
+            this.page++;
         }
 
         public void open()

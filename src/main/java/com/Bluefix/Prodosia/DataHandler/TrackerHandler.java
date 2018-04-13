@@ -138,26 +138,7 @@ public class TrackerHandler extends LocalStorageHandler<Tracker>
         // if there was no old tracker, retrieve the index of the new tracker.
         if (oldTracker == null)
         {
-            String query1 = "SELECT last_insert_rowid()";
-            PreparedStatement prep1 = SqlDatabase.getStatement(query1);
-
-            ArrayList<Object> result = SqlBuilder.Builder()
-                    .execute(prep0)
-                    .query(prep1)
-                    .commit();
-
-            if (result == null)
-                throw new Exception("SqlDatabase exception: query result was null");
-
-            if (result.size() != 2)
-                throw new Exception("SqlDatabase exception: Expected result size did not match (was " + result.size() + ")");
-
-            ResultSet rs = (ResultSet) result.get(1);
-
-            if (!rs.next())
-                throw new Exception("SqlDatabase exception: The database did not provide a row-id for the inserted tracker");
-
-            trackerIndex = rs.getLong(1);
+            trackerIndex = SqlDatabase.getAffectedRow(prep0);
         }
         else
         {
@@ -242,6 +223,7 @@ public class TrackerHandler extends LocalStorageHandler<Tracker>
     {
         String query =
                 "SELECT " +
+                    "T.id, " +
                     "T.imgurId, " +
                     "T.imgurName, " +
                     "T.discordId, " +
@@ -276,6 +258,7 @@ public class TrackerHandler extends LocalStorageHandler<Tracker>
     {
         String query =
                 "SELECT " +
+                    "T.id, " +
                     "T.imgurId, " +
                     "T.imgurName, " +
                     "T.discordId, " +
@@ -303,18 +286,19 @@ public class TrackerHandler extends LocalStorageHandler<Tracker>
 
         while (rs.next())
         {
-            long imgurId = rs.getLong(1);
-            String imgurName = rs.getString(2);
-            String discordId = rs.getString(3);
-            String discordName = rs.getString(4);
-            String discordTag = rs.getString(5);
-            int permType = rs.getInt(6);
-            String permTaglists = rs.getString(7);
+            long id = rs.getLong(1);
+            long imgurId = rs.getLong(2);
+            String imgurName = rs.getString(3);
+            String discordId = rs.getString(4);
+            String discordName = rs.getString(5);
+            String discordTag = rs.getString(6);
+            int permType = rs.getInt(7);
+            String permTaglists = rs.getString(8);
 
             // initiate the permissions and create the tagger
             TrackerPermissions perm = new TrackerPermissions(permType, permTaglists);
 
-            Tracker myT = new Tracker(imgurName, imgurId, discordName, discordTag, discordId, perm);
+            Tracker myT = new Tracker(id, imgurName, imgurId, discordName, discordTag, discordId, perm);
 
             trackers.add(myT);
         }

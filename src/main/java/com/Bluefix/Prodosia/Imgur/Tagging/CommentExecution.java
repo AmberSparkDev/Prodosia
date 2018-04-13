@@ -154,7 +154,7 @@ public class CommentExecution extends Thread
         removeItem(item);
 
         // find the comments for the tag-request
-        LinkedList<String> comments = item.getComments();
+        LinkedList<String> comments = new LinkedList<>(item.getComments());
 
         // add the item to the list.
         actions.put(item, comments);
@@ -306,10 +306,12 @@ public class CommentExecution extends Thread
                 deletionList.add(entry.getKey());
         }
 
-        // complete the item from the global tagrequest queue as well.
+        // complete the item
         for (ICommentRequest icr : deletionList)
         {
-            actions.remove(icr);
+            // force a cast to object to ensure that no custom equals is called in the deletion.
+            Object icrObj = icr;
+            this.actions.remove(icrObj);
 
             // handle deletion by the ICommentRequest object.
             icr.complete();
@@ -325,6 +327,8 @@ public class CommentExecution extends Thread
     {
         // we ignore the size of the queue since simple tag requests always take priority.
         ArrayList<SimpleCommentRequest> scr = new ArrayList<>(SimpleCommentRequestStorage.handler().getAll());
+
+
 
         // filter out all items that were already in the queue.
         for (ICommentRequest cr : actions.keySet())

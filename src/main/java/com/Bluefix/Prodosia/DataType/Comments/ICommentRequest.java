@@ -68,5 +68,13 @@ public interface ICommentRequest
     void complete() throws Exception;
 
 
+    /**
+     * Force the underlying items to write their own equals method.
+     * @param o
+     * @return
+     */
+    boolean equals(Object o);
+
+
 
 }
