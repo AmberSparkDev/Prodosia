@@ -92,7 +92,6 @@ public class CommentDeletionExecution extends ImgurIntervalRunner
     @Override
     public void run()
     {
-
         try
         {
             // check on the deletedComments if comment-deletion was ensured.
@@ -144,7 +143,20 @@ public class CommentDeletionExecution extends ImgurIntervalRunner
                 // delete the item from imgur and from the storage.
                 long value = dIt.next();
                 requestCounter++;
-                ImgurManager.client().commentService().deleteComment(value);
+                try
+                {
+                    ImgurManager.client().commentService().deleteComment(value);
+                } catch (BaringoApiException ex)
+                {
+                    if (    !BaringoExceptionHelper.isNotFound(ex) &&
+                            !BaringoExceptionHelper.isBadRequest(ex))
+                        ex.printStackTrace();
+                }
+                catch (Exception ex)
+                {
+                    ex.printStackTrace();
+                }
+
                 deletedComments.add(value);
             }
 
