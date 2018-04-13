@@ -354,8 +354,9 @@ public class CommentScannerExecution extends ImgurIntervalRunner
             {
                 Comment c = cIt.next();
 
-                if (c.getId() == q.getBookmark().getLastCommentId() ||
-                    c.getCreatedAt().compareTo(q.getBookmark().getLastCommentTime()) <= 0)
+                if (    c.getId() == q.getBookmark().getLastCommentId() ||
+                        c.getCreatedAt().compareTo(q.getBookmark().getLastCommentTime()) <= 0 ||
+                        q.getBookmark().getLastCommentId() < 0)
                     q.setReached();
                 else
                     newComments.addFirst(c);
@@ -486,10 +487,20 @@ public class CommentScannerExecution extends ImgurIntervalRunner
      */
     private static TrackerBookmark getBookmarkForUser(Tracker tracker) throws BaringoApiException, IOException, URISyntaxException
     {
-        List<Comment> comments = ImgurManager.client().accountService().listComments(tracker.getImgurName(), Comment.Sort.Newest, 0);
+        List<Comment> comments = null;
+
+        try
+        {
+            comments = ImgurManager.client().accountService().listComments(tracker.getImgurName(), Comment.Sort.Newest, 0);
+        }
+        catch (Exception ex)
+        {
+            return defaultBookmark(tracker);
+        }
+
 
         // if there were no comments, return the default bookmark.
-        if (comments.isEmpty())
+        if (comments == null || comments.isEmpty())
             return defaultBookmark(tracker);
 
         Comment lastComment = comments.get(0);
@@ -502,7 +513,7 @@ public class CommentScannerExecution extends ImgurIntervalRunner
      */
     private static TrackerBookmark defaultBookmark(Tracker tracker)
     {
-        return new TrackerBookmark(0, new Date(0), tracker);
+        return new TrackerBookmark(-1, new Date(0), tracker);
     }
 
 

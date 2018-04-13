@@ -44,7 +44,7 @@ public class CommentDeletionExecution extends ImgurIntervalRunner
      * If this option is enabled, the deletion of a comment is ensured, but
      * the total amount of deletions per hours will decrease to half capacity.
      */
-    private static final boolean ensureDeletion = true;
+    private static final boolean ensureDeletion = false;
 
     /**
      * Separate the cycles in parts of 6, 10 minutes in between each.

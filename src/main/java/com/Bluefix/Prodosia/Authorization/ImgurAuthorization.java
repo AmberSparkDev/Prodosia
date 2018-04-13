@@ -89,8 +89,6 @@ public class ImgurAuthorization
                     "client_id=" + client.authService().getClientId() + "&" +
                     "response_type=code");
 
-            //URI redirectUri = new URI("https://imgur.com");
-
             UserAgent userAgent = new UserAgentImpl();
 
             AuthorizationResponse authorizationResponse =
