@@ -327,22 +327,29 @@ public class CommentScannerExecution extends ImgurIntervalRunner
             Tracker t = q.getBookmark().getTracker();
 
             requestsUsed++;
-            List<Comment> trackerComments = ImgurManager.client().accountService().listComments(
-                    t.getImgurName(),
-                    Comment.Sort.Newest,
-                    curPage);
+            List<Comment> trackerComments = null;
+
+            try
+            {
+                trackerComments = ImgurManager.client().accountService().listComments(
+                        t.getImgurName(),
+                        Comment.Sort.Newest,
+                        curPage);
+            }
+            catch (Exception ex)
+            {
+                // a single failure should not impede functionality alltogether.
+            }
+
+            if (trackerComments == null || trackerComments.isEmpty())
+            {
+                q.setReached();
+                continue;
+            }
 
             // set the new bookmark for the queue-item.
-            if (trackerComments.size() > 0)
-            {
-                Comment newestComment = trackerComments.get(0);
-                q.setNewBookmark(new TrackerBookmark(newestComment.getId(), newestComment.getCreatedAt(), t));
-            }
-            else if (trackerComments.size() == 0)
-            {
-                // if there were no comments remaining, we have reached the end.
-                q.setReached();
-            }
+            Comment newestComment = trackerComments.get(0);
+            q.setNewBookmark(new TrackerBookmark(newestComment.getId(), newestComment.getCreatedAt(), t));
 
             // if any of the comments corresponded to the timestamp or id, set the queue-item as reached.
             Iterator<Comment> cIt = trackerComments.iterator();
