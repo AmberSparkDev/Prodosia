@@ -39,6 +39,9 @@ public class Filter
 
         StringBuilder sb = new StringBuilder();
 
+        // make sure the entries are separate
+        sb.append("(^|\\s+)");
+
         // make the pattern case-insensitive.
         sb.append("(?i)(");
 
@@ -54,7 +57,7 @@ public class Filter
         sb.setLength(sb.length()-1);
 
         // close the pattern and return
-        sb.append(")");
+        sb.append(")($|\\s+)");
 
         return sb.toString();
     }

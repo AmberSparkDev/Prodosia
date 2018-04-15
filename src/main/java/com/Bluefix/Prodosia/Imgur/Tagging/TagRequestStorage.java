@@ -164,7 +164,7 @@ public class TagRequestStorage extends LocalStorageHandler<TagRequest>
         prep.setLong(2, t.getParent().getId());
         prep.setString(3, t.getDbTaglists());
         prep.setInt(4, t.getRating().getValue());
-        prep.setString(5, t.getFilters());
+        prep.setString(5, t.getFilter());
         prep.setBoolean(6, t.isCleanComments());
 
         SqlDatabase.execute(prep);

@@ -406,7 +406,7 @@ public class TagRequest extends BaseTagRequest implements ICommentRequest
             parentComment = this.parentComment;
 
         // default to the other filter
-        return new TagRequest(this.imgurId, parentComment, mTag, mRat, o.getFilters(), this.isCleanComments());
+        return new TagRequest(this.imgurId, parentComment, mTag, mRat, o.getFilter(), this.isCleanComments());
     }
 
 

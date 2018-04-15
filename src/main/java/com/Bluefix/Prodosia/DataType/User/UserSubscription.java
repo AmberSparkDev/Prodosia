@@ -24,7 +24,6 @@ package com.Bluefix.Prodosia.DataType.User;
 
 import com.Bluefix.Prodosia.DataHandler.TaglistHandler;
 import com.Bluefix.Prodosia.DataType.Comments.TagRequest.BaseTagRequest;
-import com.Bluefix.Prodosia.DataType.Comments.TagRequest.TagRequest;
 import com.Bluefix.Prodosia.DataType.Taglist.Rating;
 import com.Bluefix.Prodosia.DataType.Taglist.Taglist;
 
@@ -162,7 +161,7 @@ public class UserSubscription
         // finally check to see if any filters apply
         if (    this.filters != null &&
                 !this.filters.trim().isEmpty() &&
-                this.filters.matches(tr.getFilters()))
+                this.filters.matches(tr.getFilter()))
         {
             return false;
         }

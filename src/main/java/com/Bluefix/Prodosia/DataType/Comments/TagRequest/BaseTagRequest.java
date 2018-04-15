@@ -39,31 +39,31 @@ public class BaseTagRequest
 {
     private HashSet<Taglist> taglists;
     private Rating rating;
-    private String filters;
+    private String filter;
     private boolean cleanComments;
 
     protected BaseTagRequest(BaseTagRequest btr)
     {
         this.taglists = btr.taglists;
         this.rating = btr.rating;
-        this.filters = btr.filters;
+        this.filter = btr.filter;
         this.cleanComments = btr.cleanComments;
     }
 
 
-    public BaseTagRequest(HashSet<Taglist> taglists, Rating rating, String filters, boolean cleanComments)
+    public BaseTagRequest(HashSet<Taglist> taglists, Rating rating, String filter, boolean cleanComments)
     {
         if (taglists == null || taglists.isEmpty())
             throw new IllegalArgumentException("The taglists supplied cannot be null or empty");
 
         this.taglists = taglists;
         this.rating = rating;
-        this.filters = filters;
+        this.filter = filter;
         this.cleanComments = cleanComments;
     }
 
 
-    public BaseTagRequest(String taglists, int rating, String filters, boolean cleanComments) throws Exception
+    public BaseTagRequest(String taglists, int rating, String filter, boolean cleanComments) throws Exception
     {
         this.taglists = new HashSet<>();
         String[] tlArr = taglists.split(";");
@@ -77,7 +77,7 @@ public class BaseTagRequest
             throw new IllegalArgumentException("The taglists supplied cannot be null or empty");
 
         this.rating = Rating.parseValue(rating);
-        this.filters = filters;
+        this.filter = filter;
         this.cleanComments = cleanComments;
     }
 
@@ -102,9 +102,9 @@ public class BaseTagRequest
         return rating;
     }
 
-    public String getFilters()
+    public String getFilter()
     {
-        return filters;
+        return filter;
     }
 
     public boolean isCleanComments()
@@ -121,14 +121,14 @@ public class BaseTagRequest
         return cleanComments == that.cleanComments &&
                 Objects.equals(taglists, that.taglists) &&
                 rating == that.rating &&
-                Objects.equals(filters, that.filters);
+                Objects.equals(filter, that.filter);
     }
 
     @Override
     public int hashCode()
     {
 
-        return Objects.hash(taglists, rating, filters, cleanComments);
+        return Objects.hash(taglists, rating, filter, cleanComments);
     }
 
     public TagRequest parseTagRequest(String imgurId)
