@@ -104,7 +104,6 @@ public class ApplicationWindow
     {
         // set `ApiKeysWindow` as active window.
         ApiKeysWindow akw = VistaNavigator.loadVista(VistaNavigator.AppStage.API_KEYS);
-        //akw.initialize();
     }
 
     public void gotoPrefix(ActionEvent actionEvent)
@@ -273,7 +272,7 @@ public class ApplicationWindow
 
     private TrackerListManager tlm;
     private TaglistListManager tllm;
-    //private UserListManager ulm;
+    private UserListManager ulm;
 
     private GuiCheckboxListManager tap_taglist_cl;
 
@@ -299,7 +298,7 @@ public class ApplicationWindow
 
         try
         {
-            //ulm = new UserListManager(users_overview);
+            ulm = new UserListManager(users_overview);
         } catch (Exception e)
         {
             ExceptionHelper.showWarning(e);
@@ -328,7 +327,7 @@ public class ApplicationWindow
 
         user_filter.textProperty().addListener((o, oldVal, newVal) ->
         {
-            //ulm.filter(newVal);
+            ulm.filter(newVal);
         });
     }
 
@@ -339,7 +338,7 @@ public class ApplicationWindow
     {
         tlm.update();
         tllm.update();
-        //ulm.update();
+        ulm.update();
 
         // update the archiving functionality.
         archiveGui.update();
@@ -370,7 +369,7 @@ public class ApplicationWindow
         {
             try
             {
-                //handler().ulm.update();
+                handler().ulm.update();
             } catch (Exception e)
             {
                 e.printStackTrace();
@@ -425,9 +424,6 @@ public class ApplicationWindow
 
     //endregion
 
-    TestModule tm;
-    boolean isOn = false;
-
     /**
      * Temporary test method.
      * @param actionEvent
@@ -435,123 +431,7 @@ public class ApplicationWindow
     public void test(ActionEvent actionEvent) throws Exception
     {
 
-        Pattern p = Pattern.compile(".+[Tt][Aa][Gg]\\s+(.+)\\z");
 
-        String s0 = "\"@something tag something blah\"";
-        String s1 = "tag something blah";
-        String s2 = "@something tagsomething blah";
-
-        Matcher m0 = p.matcher(s0);
-
-        System.out.println(s0);
-        System.out.println(s0.substring(1, s0.length()-1));
-
-
-        /*
-        try
-        {
-            //List<Comment> comments = ImgurManager.client().galleryService().getItemComments("ZqWMmil", Comment.Sort.Best);
-
-            //HashSet<String> mentions = TagRequestComments.findMentionedUsers(comments);
-
-            System.out.println("yay");
-        }
-        catch (BaringoApiException ex)
-        {
-            System.out.println("is bad request: " + BaringoExceptionHelper.isBadRequest(ex));
-            System.out.println("is not found: " + BaringoExceptionHelper.isNotFound(ex));
-
-            // https://api.imgur.com/3/gallery/Z%20WMmil/comments/best: Bad Request
-            System.out.println("####\n" + ex.getMessage() + "\n####");
-            //ex.printStackTrace();
-        }
-        */
-
-        //addStewTracker();
-        //addPrefix();
-        //addSimpleUserbase();
-    }
-
-    private static void addStewTracker() throws Exception
-    {
-        Tracker myTracker = TrackerBuilder.builder()
-                .setImgurName("mashedstew")
-                .setPermissions(new TrackerPermissions(TrackerPermissions.TrackerType.ADMIN))
-                .build();
-
-        TrackerHandler.handler().set(myTracker);
-
-        Logger.logMessage("mashedstew successfully added as tracker.");
-    }
-
-    private static void addPrefix() throws Exception
-    {
-        String regex = CommandPrefix.parsePatternForItems("@mashedstew ");
-
-        CommandPrefix prefix = new CommandPrefix(CommandPrefix.Type.IMGUR,
-                regex);
-
-        CommandPrefixStorage.handler().set(prefix);
-
-        Logger.logMessage("`@mashedstew ` prefix successfully added.");
-    }
-
-    private static void addSimpleUserbase() throws Exception
-    {
-        Taglist newTl0 = new Taglist("test0", "test0 taglist", false);
-        Taglist newTl1 = new Taglist("test1", "test1 taglist", true);
-
-        TaglistHandler.handler().set(newTl0);
-        TaglistHandler.handler().set(newTl1);
-
-        HashSet<UserSubscription> sub0 = new HashSet<>();
-        HashSet<UserSubscription> sub1 = new HashSet<>();
-        HashSet<UserSubscription> sub2 = new HashSet<>();
-
-        HashSet<Rating> ratings = new HashSet<>();
-        ratings.add(Rating.SAFE);
-
-        Taglist tl0 = TaglistHandler.getTaglistByAbbreviation("test0");
-        Taglist tl1 = TaglistHandler.getTaglistByAbbreviation("test1");
-
-        UserSubscription us0 = new UserSubscription(tl0, null, null);
-        UserSubscription us1 = new UserSubscription(tl0, null, "cows");
-        UserSubscription us2 = new UserSubscription(tl0, ratings, null);
-        UserSubscription us3 = new UserSubscription(tl1, ratings, null);
-        UserSubscription us4 = new UserSubscription(tl1, null, null);
-        UserSubscription us5 = new UserSubscription(tl1, ratings, "cows");
-
-        sub0.add(us0);
-        sub0.add(us3);
-        sub1.add(us1);
-        sub1.add(us4);
-        sub2.add(us2);
-        sub2.add(us5);
-
-        String uName0 = "mashedstew";
-        String uName1 = "BloomingRose";
-        String uName2 = "MisterThree";
-
-        long u0Id = 33641050;
-        long u1Id = 58590281;
-        long u2Id = 13920225;
-
-        User u0 = new User(uName0, u0Id, sub0);
-        User u1 = new User(uName1, u1Id, sub1);
-        User u2 = new User(uName2, u2Id, sub2);
-
-        UserHandler.handler().set(u0);
-        UserHandler.handler().set(u1);
-        UserHandler.handler().set(u2);
-
-        Logger.logMessage("simple user base successfully added.");
-
-        // test1 s -> u0, u2
-        // test1 e -> nobody
-        // test1 s cows -> u0
-        // test0 -> u0, u1, u2
-        // test0 s -> u0, u1, u2
-        // test0 cows -> u0, u2
     }
 
 

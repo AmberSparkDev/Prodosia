@@ -26,6 +26,7 @@ package com.Bluefix.Prodosia.GUI.Managers.ButtonListManager;
 import com.Bluefix.Prodosia.DataHandler.UserHandler;
 import com.Bluefix.Prodosia.DataType.User.User;
 import com.Bluefix.Prodosia.GUI.Managers.ListManager.GuiListManager;
+import com.Bluefix.Prodosia.GUI.Managers.ListManager.LimitedGuiListManager;
 import com.Bluefix.Prodosia.GUI.Navigation.VistaNavigator;
 import com.Bluefix.Prodosia.GUI.User.EditUserWindow;
 import javafx.scene.control.Button;
@@ -36,8 +37,13 @@ import java.util.ArrayList;
 /**
  * A GUI Manager that will keep track of a list of users.
  */
-public class UserListManager extends GuiListManager<Button>
+public class UserListManager extends LimitedGuiListManager<Button>
 {
+    /**
+     * The maximum amount of users that can be visible at a time,
+     * before they need to be filtered.
+     */
+    private static final int MaximumUsersVisible = 50;
 
 
     /**
@@ -48,7 +54,7 @@ public class UserListManager extends GuiListManager<Button>
      */
     public UserListManager(VBox vbox) throws Exception
     {
-        super(vbox);
+        super(vbox, MaximumUsersVisible);
     }
 
 

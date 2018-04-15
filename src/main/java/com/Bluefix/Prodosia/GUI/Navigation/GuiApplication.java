@@ -31,6 +31,7 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 
 import java.io.IOException;
 import java.io.PrintStream;
@@ -86,6 +87,8 @@ public class GuiApplication extends Application
         );
 
         primaryStage.setTitle("Prodosía - by ReGeX");
+        primaryStage.setResizable(false);
+        primaryStage.initStyle(StageStyle.UTILITY);
         Scene scene = new Scene(root, 640, 480);
 
 

@@ -59,7 +59,7 @@
                            <tooltip>
                               <Tooltip text="Look up the API key details or edit them if necessary." />
                            </tooltip></Label>
-                        <Button layoutX="383.0" layoutY="204.0" mnemonicParsing="false" onAction="#test" prefHeight="224.0" prefWidth="236.0" text="Test" />
+                        <Button disable="true" layoutX="383.0" layoutY="204.0" mnemonicParsing="false" onAction="#test" prefHeight="224.0" prefWidth="236.0" text="Test" />
                         <Button layoutX="483.0" layoutY="53.0" maxHeight="29.0" maxWidth="136.0" mnemonicParsing="false" onAction="#gotoPrefix" prefHeight="29.0" prefWidth="136.0" text="Prefix" />
                         <Label layoutX="447.0" layoutY="53.0" styleClass="infomarker" text="?" />
                         <Button layoutX="483.0" layoutY="92.0" maxHeight="29.0" mnemonicParsing="false" onAction="#gotoImportExport" text="Import / Export" />
@@ -176,7 +176,7 @@
                                     <Tooltip text="Empty Tooltip" />
                                 </tooltip></Label>
                             <Button layoutX="517.0" layoutY="61.0" mnemonicParsing="false" onAction="#addUser" prefHeight="50.0" prefWidth="109.0" text="Add User" />
-                            <ScrollPane hbarPolicy="NEVER" layoutX="14.0" layoutY="61.0" maxHeight="364.0" maxWidth="490.0" vbarPolicy="ALWAYS">
+                            <ScrollPane fitToHeight="true" fitToWidth="true" hbarPolicy="NEVER" layoutX="14.0" layoutY="61.0" maxHeight="364.0" maxWidth="490.0" vbarPolicy="ALWAYS">
                                 <content>
                                     <AnchorPane>
                                         <children>

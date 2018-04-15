@@ -24,6 +24,7 @@ package com.Bluefix.Prodosia.GUI.Managers.ListManager;
 
 import javafx.scene.control.Labeled;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.VBox;
 
 import java.util.regex.Pattern;
 
@@ -33,6 +34,7 @@ import java.util.regex.Pattern;
 public abstract class GuiListManager<T extends Labeled> implements AutoCloseable
 {
     protected Pane root;
+    private VBox guiEntries;
     protected T[] items;
 
     protected double itemHeight;
@@ -47,8 +49,35 @@ public abstract class GuiListManager<T extends Labeled> implements AutoCloseable
     public GuiListManager(Pane root) throws Exception
     {
         this.root = root;
+        initializeGraphics();
 
         fill();
+    }
+
+
+    /**
+     * Create a new empty GuiListManager.
+     *
+     * Will start functioning properly after `setRoot` has been set.
+     */
+    protected GuiListManager()
+    {
+
+    }
+
+    protected void setRoot(Pane root) throws Exception
+    {
+        this.root = root;
+        initializeGraphics();
+        fill();
+    }
+
+    private void initializeGraphics()
+    {
+        this.guiEntries = new VBox();
+        this.guiEntries.setMaxWidth(Double.MAX_VALUE);
+        this.root.getChildren().add(this.guiEntries);
+        this.guiEntries.minWidthProperty().bind(this.root.widthProperty());
     }
 
 
@@ -58,10 +87,10 @@ public abstract class GuiListManager<T extends Labeled> implements AutoCloseable
      */
     private void fill() throws Exception
     {
-        if (root == null)
+        if (guiEntries == null)
             return;
 
-        root.getChildren().clear();
+        guiEntries.getChildren().clear();
 
         // retrieve the items.
         items = listItems();
@@ -71,7 +100,8 @@ public abstract class GuiListManager<T extends Labeled> implements AutoCloseable
 
         for (T item : items)
         {
-            root.getChildren().add(item);
+            guiEntries.getChildren().add(item);
+            item.minWidthProperty().bind(this.guiEntries.widthProperty());
         }
 
         // set the default item height
@@ -86,6 +116,7 @@ public abstract class GuiListManager<T extends Labeled> implements AutoCloseable
     protected abstract T[] listItems() throws Exception;
 
 
+    private String lastFilter;
 
     /**
      * Temporarily filter the items in the list based on whether they
@@ -94,10 +125,12 @@ public abstract class GuiListManager<T extends Labeled> implements AutoCloseable
      */
     public void filter(String regexp)
     {
-        if (this.items == null)
+        this.lastFilter = regexp;
+
+        if (this.items == null || this.items.length == 0)
             return;
 
-        Pattern pat = Pattern.compile("(?i).*" + regexp + ".*");
+        Pattern pat = getFilterPattern(regexp);
 
 
         for (T t : items)
@@ -125,21 +158,35 @@ public abstract class GuiListManager<T extends Labeled> implements AutoCloseable
         }
     }
 
+    protected Pattern getFilterPattern(String regexp)
+    {
+        return Pattern.compile("(?i).*" + regexp + ".*");
+    }
+
+
+
     /**
      * Update the list manager by re-initializing its components.
      */
     public void update() throws Exception
     {
+        if (this.root == null || this.guiEntries == null)
+            return;
+
         fill();
+
+        if (this.lastFilter != null)
+            filter(this.lastFilter);
     }
 
 
     @Override
     public void close()
     {
-        if (this.root != null)
-            this.root.getChildren().clear();
+        if (this.guiEntries != null)
+            this.guiEntries.getChildren().clear();
 
         this.root = null;
+        this.guiEntries = null;
     }
 }
