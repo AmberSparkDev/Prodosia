@@ -27,10 +27,13 @@ import com.Bluefix.Prodosia.Prefix.CommandPrefixStorage;
 import com.Bluefix.Prodosia.Prefix.CommandPrefix;
 import com.Bluefix.Prodosia.GUI.Managers.DeletableItemList.EditableReadonlyTextfieldList;
 import com.Bluefix.Prodosia.Prefix.EditablePrefixList;
+import com.Bluefix.Prodosia.Storage.KeyStorage;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.layout.AnchorPane;
 
+import java.io.IOException;
+import java.security.KeyStoreSpi;
 import java.util.LinkedList;
 
 public class PrefixWindow
@@ -47,7 +50,9 @@ public class PrefixWindow
     public void accept(ActionEvent actionEvent) throws Exception
     {
         imgurList.store();
-        discordList.store();
+
+        if (discordList != null)
+            discordList.store();
 
         VistaNavigator.loadVista(VistaNavigator.AppStage.MAIN_MENU);
     }
@@ -63,7 +68,30 @@ public class PrefixWindow
     @FXML
     private void initialize() throws Exception
     {
+        // the imgur-token is obligated for the application to function, and as such we can
+        // initialize it indefinitely.
         this.imgurList = new EditablePrefixList(CommandPrefix.Type.IMGUR, ap_imgur);
-        this.discordList = new EditablePrefixList(CommandPrefix.Type.DISCORD, ap_discord);
+    }
+
+
+    /**
+     * Initialize the Prefix-Window for the components that are allowed to change.
+     */
+    public void init() throws Exception
+    {
+        // if the discord token was unavailable, disable setting up the discord token.
+        CommandPrefix dPrefix = CommandPrefixStorage.getPrefixForType(CommandPrefix.Type.DISCORD);
+
+        if (dPrefix == null)
+        {
+            ap_discord.getChildren().clear();
+            ap_discord.setDisable(true);
+            this.discordList = null;
+        }
+        else
+        {
+            ap_discord.setDisable(false);
+            this.discordList = new EditablePrefixList(CommandPrefix.Type.DISCORD, ap_discord);
+        }
     }
 }

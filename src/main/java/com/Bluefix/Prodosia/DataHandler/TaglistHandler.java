@@ -110,7 +110,7 @@ public class TaglistHandler extends LocalStorageHandler<Taglist>
         String query;
 
         query = "INSERT INTO Taglist " +
-                "(abbreviation, description, hasRatings) " +
+                "(" + (oldTaglist != null ? "id," : "") + "abbreviation,description,hasRatings) " +
                 "VALUES (" + (oldTaglist != null ? "?," : "") + "?,?,?);";
 
         // set the arguments

@@ -28,7 +28,6 @@ import com.Bluefix.Prodosia.GUI.Navigation.VistaNavigator;
 
 public class Main
 {
-
     public static void main(String[] args)
     {
 

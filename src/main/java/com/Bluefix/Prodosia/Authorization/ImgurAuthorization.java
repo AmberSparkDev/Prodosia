@@ -22,17 +22,15 @@
 
 package com.Bluefix.Prodosia.Authorization;
 
+import com.Bluefix.Prodosia.Exception.ExceptionHelper;
 import com.Bluefix.Prodosia.Logger.Logger;
 import com.Bluefix.Prodosia.Storage.CookieStorage;
 import com.github.kskelm.baringo.BaringoClient;
 import com.github.kskelm.baringo.util.BaringoAuthException;
-import com.microsoft.alm.oauth2.useragent.AuthorizationException;
-import com.microsoft.alm.oauth2.useragent.AuthorizationResponse;
-import com.microsoft.alm.oauth2.useragent.UserAgent;
-import com.microsoft.alm.oauth2.useragent.UserAgentImpl;
+import com.microsoft.alm.oauth2.useragent.*;
+import javafx.stage.Stage;
 
 import java.io.IOException;
-import java.net.CookieStore;
 import java.net.URI;
 import java.net.URISyntaxException;
 
@@ -68,13 +66,13 @@ public class ImgurAuthorization
             }
 
         }
-        catch (IOException e)
+        catch (IOException ex)
         {
-            // failure to find a refresh token is insignificant at this point.
+            ex.printStackTrace();
         }
-        catch (BaringoAuthException e)
+        catch (BaringoAuthException ex)
         {
-            // failure to find a refresh token is insignificant at this point.
+            ex.printStackTrace();
         }
 
 
@@ -83,29 +81,37 @@ public class ImgurAuthorization
 
         try
         {
-            // note: the `Microsoft/oauth2-useragent` library relies on the deprecated "code"
-            // authorization.
-            URI authorizationEndpoint = new URI("https://api.imgur.com/oauth2/authorize?" +
-                    "client_id=" + client.authService().getClientId() + "&" +
-                    "response_type=code");
+            URI authorizationEndpoint =
+                    new URI("https://api.imgur.com/oauth2/authorize?" +
+                            "client_id=" + client.authService().getClientId() + "&" +
+                            "response_type=code");
+            //URI tokenEndpoint = new URI("https://api.imgur.com/oauth2/token");
 
-            UserAgent userAgent = new UserAgentImpl();
+            // force the library to use JavaFx as its user agent provider.
+            System.getProperties().setProperty("userAgentProvider", "JavaFx");
 
+            UserAgentImpl userAgent = new UserAgentImpl();
             AuthorizationResponse authorizationResponse =
-                    userAgent.requestAuthorizationCode(authorizationEndpoint,
-                            callback);
+                    userAgent.requestAuthorizationCode(authorizationEndpoint, callback);
+            if (authorizationResponse.getCode() == null ||
+                    authorizationResponse.getCode().trim().isEmpty())
+                return Result.USER_DECLINED;
 
             code = authorizationResponse.getCode();
-
         } catch (URISyntaxException e)
         {
             e.printStackTrace();
+            ExceptionHelper.showWarning(e);
             return Result.ERROR;
         } catch (AuthorizationException e)
         {
-            // the user did not authorize.
             e.printStackTrace();
+
             return Result.USER_DECLINED;
+        } catch (Exception e)
+        {
+            e.printStackTrace();
+            return Result.ERROR;
         }
 
 
@@ -128,6 +134,7 @@ public class ImgurAuthorization
             return Result.SUCCESS;
         }
     }
+
 
 
     /**

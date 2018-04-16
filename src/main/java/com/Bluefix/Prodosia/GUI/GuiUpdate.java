@@ -23,6 +23,7 @@
 package com.Bluefix.Prodosia.GUI;
 
 import com.Bluefix.Prodosia.GUI.Application.ApplicationWindow;
+import com.Bluefix.Prodosia.GUI.Navigation.GuiApplication;
 
 /**
  * A binder class that allows for components to request GUI components to update
@@ -37,22 +38,26 @@ public class GuiUpdate
      */
     public static void updateUsers() throws Exception
     {
-        ApplicationWindow.updateUsers();
+        if (GuiApplication.isInitialized())
+            ApplicationWindow.updateUsers();
     }
 
     public static void updateTaglists()
     {
-        ApplicationWindow.updateTaglists();
+        if (GuiApplication.isInitialized())
+            ApplicationWindow.updateTaglists();
     }
 
     public static void updateTrackers()
     {
-        ApplicationWindow.updateTrackers();
+        if (GuiApplication.isInitialized())
+            ApplicationWindow.updateTrackers();
     }
 
     public static void updateArchives()
     {
-        ApplicationWindow.updateArchives();
+        if (GuiApplication.isInitialized())
+            ApplicationWindow.updateArchives();
     }
 
 }

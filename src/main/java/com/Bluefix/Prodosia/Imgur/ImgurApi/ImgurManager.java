@@ -25,6 +25,7 @@ package com.Bluefix.Prodosia.Imgur.ImgurApi;
 
 import com.Bluefix.Prodosia.Authorization.ImgurAuthorization;
 import com.Bluefix.Prodosia.DataType.ImgurKey;
+import com.Bluefix.Prodosia.Exception.ExceptionHelper;
 import com.Bluefix.Prodosia.Module.ModuleManager;
 import com.Bluefix.Prodosia.Storage.KeyStorage;
 import com.github.kskelm.baringo.BaringoClient;
@@ -63,7 +64,14 @@ public class ImgurManager
             // heavy use of authorized api access it expected and immediate authorization
             // determines when the user is prompted, so it can be done on startup.
             if (client != null)
-                ImgurAuthorization.authorize(client, new URI(KeyStorage.getImgurKey().getCallback()));
+            {
+                ImgurAuthorization.Result res;
+
+                do
+                {
+                    res = ImgurAuthorization.authorize(client, new URI(KeyStorage.getImgurKey().getCallback()));
+                } while (res != ImgurAuthorization.Result.SUCCESS);
+            }
 
             // start the imgur dependencies
             ModuleManager.startImgurDependencies();
@@ -78,11 +86,20 @@ public class ImgurManager
         if (key == null)
             return null;
 
-        BaringoClient client = new BaringoClient.Builder()
-                .clientAuth(key.getClientId(), key.getClientSecret())
-                .build();
+        BaringoClient bClient = null;
 
-        return client;
+        try
+        {
+            bClient = new BaringoClient.Builder()
+                    .clientAuth(key.getClientId(), key.getClientSecret())
+                    .build();
+        } catch (Exception e)
+        {
+            ExceptionHelper.showWarning(e);
+        }
+
+
+        return bClient;
     }
 
     //endregion
@@ -130,7 +147,14 @@ public class ImgurManager
         // heavy use of authorized api access it expected and immediate authorization
         // determines when the user is prompted, so it can be done on startup.
         if (client != null)
-            ImgurAuthorization.authorize(client, new URI(KeyStorage.getImgurKey().getCallback()));
+        {
+            ImgurAuthorization.Result res;
+            do
+            {
+                res = ImgurAuthorization.authorize(client, new URI(KeyStorage.getImgurKey().getCallback()));
+            } while (res != ImgurAuthorization.Result.SUCCESS);
+
+        }
 
         // if the client itself wasn't initialized yet, start the imgur dependencies.
         if (!clientWasInitialized)

@@ -69,4 +69,13 @@ public class ExceptionHelper
         alert.showAndWait();
     }
 
+
+    public static void showMessage(String message)
+    {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Info");
+        alert.setContentText(message);
+        alert.showAndWait();
+    }
+
 }

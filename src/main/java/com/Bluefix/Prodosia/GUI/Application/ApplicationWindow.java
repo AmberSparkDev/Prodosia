@@ -106,9 +106,10 @@ public class ApplicationWindow
         ApiKeysWindow akw = VistaNavigator.loadVista(VistaNavigator.AppStage.API_KEYS);
     }
 
-    public void gotoPrefix(ActionEvent actionEvent)
+    public void gotoPrefix(ActionEvent actionEvent) throws Exception
     {
         PrefixWindow pfw = VistaNavigator.loadVista(VistaNavigator.AppStage.PREFIX);
+        pfw.init();
     }
 
     public void gotoImportExport(ActionEvent actionEvent)

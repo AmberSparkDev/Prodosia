@@ -61,7 +61,7 @@ public abstract class LimitedGuiListManager<T extends Labeled> extends GuiListMa
         initializeGraphics();
 
         super.setRoot(this.content);
-        this.selectedLabel.setText("x selected");
+        this.selectedLabel.setText("0 selected");
         this.infoLabel.setText("Use filter to show.");
 
         // initialize our filter method with an empty filter.
@@ -108,7 +108,6 @@ public abstract class LimitedGuiListManager<T extends Labeled> extends GuiListMa
 
 
     private String lastFilter;
-    private double lastContentMinHeight;
 
     @Override
     public void filter(String regexp)
@@ -116,7 +115,10 @@ public abstract class LimitedGuiListManager<T extends Labeled> extends GuiListMa
         this.lastFilter = regexp;
 
         if (super.items == null || super.items.length == 0)
+        {
+            hideInfoLabel();
             return;
+        }
 
         Pattern pat = super.getFilterPattern(regexp);
 
@@ -142,22 +144,31 @@ public abstract class LimitedGuiListManager<T extends Labeled> extends GuiListMa
         // if the counter exceeded the maximum amount of allowed users, return
         if (counter > this.maximumItems)
         {
-            this.infoLabel.setMinHeight(this.selectedLabel.getMinHeight());
-            this.infoLabel.prefHeightProperty().bind(this.selectedLabel.heightProperty());
-            this.infoLabel.setVisible(true);
-
-            this.lastContentMinHeight = this.content.getMinHeight();
+            showInfoLabel();
         }
         else
         {
-            this.infoLabel.prefHeightProperty().unbind();
-            this.infoLabel.setMinHeight(0.0);
-            this.infoLabel.setPrefHeight(0.0);
-            this.infoLabel.setVisible(false);
+            hideInfoLabel();
 
             // let the super-class filter the items.
             super.filter(regexp);
         }
+    }
+
+
+    private void hideInfoLabel()
+    {
+        this.infoLabel.prefHeightProperty().unbind();
+        this.infoLabel.setMinHeight(0.0);
+        this.infoLabel.setPrefHeight(0.0);
+        this.infoLabel.setVisible(false);
+    }
+
+    private void showInfoLabel()
+    {
+        this.infoLabel.setMinHeight(this.selectedLabel.getMinHeight());
+        this.infoLabel.prefHeightProperty().bind(this.selectedLabel.heightProperty());
+        this.infoLabel.setVisible(true);
     }
 
     @Override

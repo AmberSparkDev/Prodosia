@@ -24,6 +24,7 @@ package com.Bluefix.Prodosia.GUI.ApiKeys;
 
 import com.Bluefix.Prodosia.DataType.ImgurKey;
 import com.Bluefix.Prodosia.Discord.DiscordManager;
+import com.Bluefix.Prodosia.Exception.ExceptionHelper;
 import com.Bluefix.Prodosia.GUI.Navigation.VistaNavigator;
 import com.Bluefix.Prodosia.Imgur.ImgurApi.ImgurManager;
 import com.Bluefix.Prodosia.Storage.CookieStorage;
@@ -141,7 +142,6 @@ public class ApiKeysWindow
         // check to see if the credentials were all valid.
         ValidationCheck imgurKeyValidation = imgurKeyIsValid();
         ValidationCheck discordTokenValidation = discordTokenIsValid();
-
         // Show the error message
         //
         // If only the discord token was invalid, give the user the option to continue anyways.

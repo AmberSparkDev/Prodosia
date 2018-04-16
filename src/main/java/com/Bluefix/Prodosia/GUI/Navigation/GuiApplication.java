@@ -38,6 +38,13 @@ import java.io.PrintStream;
 
 public class GuiApplication extends Application
 {
+    private static boolean initialized = false;
+
+    public static boolean isInitialized()
+    {
+        return GuiApplication.initialized;
+    }
+
     public static String cssSheet;
 
     //region Load FXML window.
@@ -75,7 +82,8 @@ public class GuiApplication extends Application
     @Override
     public void start(Stage primaryStage) throws Exception
     {
-        // setup the application singleton.
+        // set the application variable to initialized.
+        GuiApplication.initialized = true;
 
         // load the application window
         FXMLLoader loader = new FXMLLoader();
@@ -88,7 +96,7 @@ public class GuiApplication extends Application
 
         primaryStage.setTitle("Prodosía - by ReGeX");
         primaryStage.setResizable(false);
-        primaryStage.initStyle(StageStyle.UTILITY);
+        //primaryStage.initStyle(StageStyle.UTILITY);
         Scene scene = new Scene(root, 640, 480);
 
 

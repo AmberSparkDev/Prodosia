@@ -75,19 +75,9 @@
         </dependency>
 
 
-        <!-- https://mvnrepository.com/artifact/org.slf4j/slf4j-api -->
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-            <version>1.7.25</version>
-        </dependency>
 
 
-        <dependency>
-            <groupId>com.microsoft.alm</groupId>
-            <artifactId>oauth2-useragent</artifactId>
-            <version>0.11.2</version>
-        </dependency>
+
 
 
 
@@ -98,6 +88,25 @@
             <scope>system</scope>
             <systemPath>${project.basedir}/Dependencies/baringo.jar</systemPath>
         </dependency>
+
+
+
+
+
+
+
+
+
+        <!-- https://mvnrepository.com/artifact/com.microsoft.alm/oauth2-useragent -->
+        <dependency>
+            <groupId>com.microsoft.alm</groupId>
+            <artifactId>oauth2-useragent</artifactId>
+            <version>0.11.3</version>
+        </dependency>
+
+
+
+
 
 
 
