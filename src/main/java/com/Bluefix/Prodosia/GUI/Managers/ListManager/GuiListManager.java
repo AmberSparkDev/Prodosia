@@ -78,6 +78,7 @@ public abstract class GuiListManager<T extends Labeled> implements AutoCloseable
         this.guiEntries.setMaxWidth(Double.MAX_VALUE);
         this.root.getChildren().add(this.guiEntries);
         this.guiEntries.minWidthProperty().bind(this.root.widthProperty());
+        this.guiEntries.maxWidthProperty().bind(this.root.maxWidthProperty());
     }
 
 

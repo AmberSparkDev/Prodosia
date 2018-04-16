@@ -33,7 +33,9 @@ import com.Bluefix.Prodosia.Imgur.Tagging.SimpleCommentRequestStorage;
 import com.Bluefix.Prodosia.Imgur.Tagging.TagRequestComments;
 import com.Bluefix.Prodosia.Imgur.Tagging.TagRequestStorage;
 import com.Bluefix.Prodosia.Logger.Logger;
+import com.github.kskelm.baringo.model.Album;
 import com.github.kskelm.baringo.model.Comment;
+import com.github.kskelm.baringo.model.Image;
 import com.github.kskelm.baringo.util.BaringoApiException;
 
 import java.io.IOException;
@@ -234,6 +236,27 @@ public class TagRequest extends BaseTagRequest implements ICommentRequest
         try
         {
             lastKnownComments = ImgurManager.client().galleryService().getItemComments(this.getImgurId(), Comment.Sort.Best);
+
+            // if you really want to, it is possible to filter out the poster account as well.
+            // The only issue is that it's 1 whole GET request for just 1 person.
+            // I myself can't really justify that cost and have disabled it.
+            //
+            /*
+            try
+            {
+                Album album = ImgurManager.client().albumService().getAlbum(this.getImgurId());
+                String posterOp = album.getUserName();
+            }
+            catch (BaringoApiException ex)
+            {
+                ex.printStackTrace();
+            }
+            catch (Exception ex)
+            {
+                ex.printStackTrace();
+            }
+            */
+
 
             LinkedList<String> trComments = TagRequestComments.parseCommentsForTagRequest(this, lastKnownComments);
 
