@@ -91,6 +91,16 @@
 
 
 
+        <dependency>
+            <groupId>com.Baringo</groupId>
+            <artifactId>Baringo</artifactId>
+            <version>1.0.1</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/Dependencies/baringo.jar</systemPath>
+        </dependency>
+
+
+
 
 
 
