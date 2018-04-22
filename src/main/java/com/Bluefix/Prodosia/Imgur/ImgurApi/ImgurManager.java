@@ -67,7 +67,7 @@ public class ImgurManager
             String envClientSecret = System.getenv(EnvVarImgurClientSecret);
             String envCallback = System.getenv(EnvVarImgurCallback);
 
-            ImgurKey key = null;
+            ImgurKey key;
 
             if (envClientId != null && envClientSecret != null)
             {
@@ -75,36 +75,15 @@ public class ImgurManager
                     envCallback = DefaultImgurCallback;
 
                 key = new ImgurKey(envClientId, envClientSecret, envCallback);
+                ImgurManager.client = createClient(key);
+                return ImgurManager.client;
             }
-            else
-                key = KeyStorage.getImgurKey();
+
+
+            key = KeyStorage.getImgurKey();
 
             BaringoClient tmpClient = createClient(key);
-
-            // immediately authorize the client if the key was stored locally.
-            // if the key is not stored locally, it is most likely used for testing.
-            // note: for anonymous usage it is not necessary to authorize. However,
-            // heavy use of authorized api access it expected and immediate authorization
-            // determines when the user is prompted, so it can be done on startup.
-            if (tmpClient != null && KeyStorage.getImgurKey() != null)
-            {
-                ImgurAuthorization.Result res = ImgurAuthorization.authorize(tmpClient, new URI(KeyStorage.getImgurKey().getCallback()));
-
-                // if the authorization doesn't complete successfully, redirect
-                // the user to the Imgur API keys window and don't remove client
-                // initialization.
-                if (res == ImgurAuthorization.Result.SUCCESS)
-                {
-                    ImgurManager.client = tmpClient;
-                }
-                else
-                {
-                    ImgurManager.client = null;
-                }
-            }
-
-            // start the imgur dependencies
-            //ModuleManager.startImgurDependencies();
+            initializeClient(tmpClient);
         }
 
         return client;
@@ -132,33 +111,33 @@ public class ImgurManager
         return bClient;
     }
 
+    private static void initializeClient(BaringoClient client) throws IOException, URISyntaxException
+    {
+        if (client == null)
+            return;
+
+        // immediately authorize the client if the key was stored locally.
+        // note: for anonymous usage it is not necessary to authorize. However,
+        // heavy use of authorized api access it expected and immediate authorization
+        // determines when the user is prompted, so it can be done on startup.
+        ImgurAuthorization.Result res = ImgurAuthorization.authorize(client, new URI(KeyStorage.getImgurKey().getCallback()));
+
+        // if the authorization doesn't complete successfully, redirect
+        // the user to the Imgur API keys window and don't remove client
+        // initialization.
+        if (res == ImgurAuthorization.Result.SUCCESS)
+        {
+            ImgurManager.client = client;
+        }
+        else
+        {
+            ImgurManager.client = null;
+        }
+    }
+
     //endregion
 
     //region Sanitation check
-
-    /**
-     * Check if the supplied Imgur key is valid. This does *not* update the imgur key of the system.
-     * @param key
-     * @return
-     */
-    public static boolean checkValidity(ImgurKey key) throws Exception
-    {
-        // checks on whether the strings are empty are already done pre-emptively before this.
-        // current functionality is commented out because it serves no real purpose.
-        return true;
-        /*
-
-        BaringoClient client = createClient(key);
-
-        // TODO: it is possible to expand this a little bit by forcing the user to
-        // authorize on these credentials to check its validity.
-
-        if (client != null)
-            return true;
-
-        throw new Exception("Could not init the Imgur client");
-        */
-    }
 
 
     /**
@@ -172,24 +151,7 @@ public class ImgurManager
 
         BaringoClient tmpClient = createClient(key);
 
-        // immediately authorize the client.
-        // note: for anonymous usage it is not necessary to authorize. However,
-        // heavy use of authorized api access it expected and immediate authorization
-        // determines when the user is prompted, so it can be done on startup.
-        if (tmpClient != null)
-        {
-            ImgurAuthorization.Result res = ImgurAuthorization.authorize(tmpClient, new URI(KeyStorage.getImgurKey().getCallback()));
-
-            if (res == ImgurAuthorization.Result.SUCCESS)
-            {
-                ImgurManager.client = tmpClient;
-            }
-            else
-            {
-                ImgurManager.client = null;
-            }
-
-        }
+        initializeClient(tmpClient);
 
         // if the client itself wasn't initialized yet, start the imgur dependencies.
         if (!clientWasInitialized && client != null)

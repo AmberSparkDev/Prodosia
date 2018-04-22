@@ -28,6 +28,7 @@ import com.Bluefix.Prodosia.Discord.DiscordManager;
 import com.Bluefix.Prodosia.Exception.ExceptionHelper;
 import com.Bluefix.Prodosia.GUI.Navigation.VistaNavigator;
 import com.Bluefix.Prodosia.Imgur.ImgurApi.ImgurManager;
+import com.Bluefix.Prodosia.Module.ModuleManager;
 import com.Bluefix.Prodosia.Storage.CookieStorage;
 import com.Bluefix.Prodosia.Storage.KeyStorage;
 import javafx.event.ActionEvent;
@@ -248,6 +249,9 @@ public class ApiKeysWindow
             ImgurManager.update();
         }
 
+        // always make sure that the services that rely on imgur are started.
+        ModuleManager.startImgurDependencies();
+
         KeyStorage.setDiscordToken(acceptDiscordToken);
         DiscordManager.update();
     }
@@ -330,26 +334,29 @@ public class ApiKeysWindow
         }
     }
 
+    /**
+     * This method is a bit of a mess because there's no good way to check if
+     * Imgur credentials are valid than to see if you can login with them.
+     * @return
+     */
     private ValidationCheck imgurKeyIsValid()
     {
         // if the data was incomplete, return false
         if (acceptImgurKey == null)
             return new ValidationCheck(false, "The Imgur credentials were incomplete.");
 
+        /*
         try
-        {
-            boolean v = ImgurManager.checkValidity(acceptImgurKey);
-
-            if (!v)
-                markImgurValues();
-
-            return new ValidationCheck(v, "");
+        {*/
+        return new ValidationCheck(true, "");
+        /*
         }
         catch (Exception e)
         {
             markImgurValues();
             return new ValidationCheck(false, e.getMessage());
         }
+        */
     }
 
     /**
