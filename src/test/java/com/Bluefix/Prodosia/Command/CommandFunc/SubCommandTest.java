@@ -22,6 +22,7 @@
 
 package com.Bluefix.Prodosia.Command.CommandFunc;
 
+import com.Bluefix.Prodosia.Command.CommandFunc.Subscription.SubCommand;
 import com.Bluefix.Prodosia.Command.CommandRecognition;
 import com.Bluefix.Prodosia.Prefix.CommandPrefixStorage;
 import com.Bluefix.Prodosia.DataHandler.TaglistHandler;
@@ -39,20 +40,23 @@ import com.Bluefix.Prodosia.DataType.User.UserSubscription;
 import com.Bluefix.Prodosia.Imgur.ImgurApi.ImgurManager;
 import com.github.kskelm.baringo.model.Comment;
 import com.github.kskelm.baringo.util.BaringoApiException;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.*;
+import org.junit.rules.ExpectedException;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashSet;
 
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 public class SubCommandTest
 {
-    private String prefix;
-    private CommandPrefix cPrefix;
+    private ICommandFunc subCommand;
 
     private Taglist tlTest0;
     private Taglist tlTest1;
@@ -71,25 +75,25 @@ public class SubCommandTest
     private User u1;
     private User u2;
 
-    private static final long imgurId = 33641050;
-    private Tracker myTracker;
-    private static final long parentId = 1301573497;
-
     private long u0Id;
     private long u1Id;
     private long u2Id;
 
 
+    @Mock
+    CommandInformation commandInformation;
+
+    @Mock
+    Tracker tracker;
+
+    @Rule
+    public MockitoRule mockitoRule = MockitoJUnit.rule();
+
+
     @Before
     public void setUp() throws Exception
     {
-        prefix = "!testPrefix ";
-
-        cPrefix = new CommandPrefix(
-                CommandPrefix.Type.TEST,
-                CommandPrefix.parsePatternForItems(prefix));
-
-        CommandPrefixStorage.handler().set(cPrefix);
+        subCommand = new SubCommand();
 
 
         tlTest0 = new Taglist("test0", "test0 taglist", false);
@@ -131,118 +135,243 @@ public class SubCommandTest
         u1 = new User(uName1, u1Id, sub1);
         u2 = new User(uName2, u2Id, sub2);
 
-        //UserHandler.handler().set(u0);
-        //UserHandler.handler().set(u1);
-        //UserHandler.handler().set(u2);
-
-
-        TrackerPermissions perm = new TrackerPermissions(TrackerPermissions.TrackerType.ADMIN);
-        myTracker = new Tracker(uName0, u0Id, null, "0000", "", perm);
-        TrackerHandler.handler().set(myTracker);
-    }
-
-    @After
-    public void tearDown() throws Exception
-    {
-        CommandPrefixStorage.handler().remove(cPrefix);
-
-        TaglistHandler.handler().remove(tlTest0);
-        TaglistHandler.handler().remove(tlTest1);
-
         UserHandler.handler().remove(u0);
         UserHandler.handler().remove(u1);
         UserHandler.handler().remove(u2);
     }
 
-    @Test
-    public void test0() throws Exception
+    @After
+    public void tearDown() throws Exception
     {
-        String command = prefix + "sub mashedstew test0";
-
         UserHandler.handler().remove(u0);
+        UserHandler.handler().remove(u1);
+        UserHandler.handler().remove(u2);
 
-        User u = UserHandler.getUserByImgurId(u0Id);
-        Assert.assertEquals(null, u);
+        TaglistHandler.handler().remove(tlTest0);
+        TaglistHandler.handler().remove(tlTest1);
+    }
 
-        executeCommand(command, parentId);
 
-        // the command is threaded so it's assumed to take a short while before the
-        // subscription actually comes through
-        Thread.sleep(1000);
+    //region Bad Weather tests
 
-        u = UserHandler.getUserByImgurId(u0Id);
-
-        Assert.assertNotEquals(null, u);
-
-        UserSubscription us = u.getSubscription(tlTest0.getId());
-        Assert.assertNotEquals(null, us);
-        Assert.assertEquals(tlTest0, us.getTaglist());
-        Assert.assertEquals("", us.getFilters());
+    @Test(expected = IllegalArgumentException.class)
+    public void testNoTracker() throws Exception
+    {
+        subCommand.execute(commandInformation, new String[0]);
     }
 
     @Test
-    public void test1() throws Exception
+    public void testNoArguments() throws Exception
     {
-        String command = prefix + "sub mashedstew test1";
+        when(commandInformation.getTracker()).thenReturn(tracker);
 
-        UserHandler.handler().remove(u0);
+        subCommand.execute(commandInformation, new String[0]);
 
-        User u = UserHandler.getUserByImgurId(u0Id);
-        Assert.assertEquals(null, u);
-
-        executeCommand(command, parentId);
-
-        // the command is threaded so it's assumed to take a short while before the
-        // subscription actually comes through
-        Thread.sleep(1000);
-
-        u = UserHandler.getUserByImgurId(u0Id);
-
-        Assert.assertEquals(null, u);
+        verify(commandInformation).reply("Error! The username was not provided.");
     }
 
     @Test
-    public void test2() throws Exception
+    public void testNoSubscriptionData() throws Exception
     {
-        String command = prefix + "sub mashedstew test1 s";
+        when(commandInformation.getTracker()).thenReturn(tracker);
+        String[] arguments = new String[]{"mashedstew"};
 
-        UserHandler.handler().remove(u0);
+        subCommand.execute(commandInformation, arguments);
 
-        User u = UserHandler.getUserByImgurId(u0Id);
-        Assert.assertEquals(null, u);
+        verify(commandInformation).reply("Error! There was no subscription data detected.");
+    }
 
-        executeCommand(command, parentId);
+    @Test
+    public void testEmptyUsername() throws Exception
+    {
+        when(commandInformation.getTracker()).thenReturn(tracker);
+        String[] arguments = new String[]{"@", "test0"};
 
-        // the command is threaded so it's assumed to take a short while before the
-        // subscription actually comes through
-        Thread.sleep(1000);
+        subCommand.execute(commandInformation, arguments);
 
-        ArrayList<User> allUsers = UserHandler.handler().getAll();
+        verify(commandInformation).reply("Error! The username was not provided.");
+    }
 
-        u = UserHandler.getUserByImgurId(u0Id);
+    @Test
+    public void testNoPermissions() throws Exception
+    {
+        when(commandInformation.getTracker()).thenReturn(tracker);
+        String[] arguments = new String[]{"mashedstew", "test0"};
 
-        Assert.assertNotEquals(null, u);
+        subCommand.execute(commandInformation, arguments);
 
-        UserSubscription us = u.getSubscription(tlTest1.getId());
-        Assert.assertNotEquals(null, us);
-        Assert.assertEquals(tlTest1, us.getTaglist());
-        Assert.assertEquals("", us.getFilters());
+        verify(commandInformation).reply(
+                "Error! The tracker has no permissions for any of the indicated lists (test0).");
+    }
+
+
+    @Test
+    public void testNoRatings() throws Exception
+    {
+        when(commandInformation.getTracker()).thenReturn(tracker);
+        when(tracker.hasPermission(tlTest1)).thenReturn(true);
+        String[] arguments = new String[]{"mashedstew", "test1"};
+
+        subCommand.execute(commandInformation, arguments);
+
+        verify(commandInformation).reply(
+                "The following taglists require ratings: (test1)");
+    }
+
+    @Test
+    public void testNoTaglists() throws Exception
+    {
+        when(commandInformation.getTracker()).thenReturn(tracker);
+        String[] arguments = new String[]{"mashedstew", "NotATaglist"};
+
+        subCommand.execute(commandInformation, arguments);
+
+        verify(commandInformation).reply(
+                "Error! There was no subscription data detected.");
+    }
+
+
+    @Test
+    public void testIncorrectUsername() throws Exception
+    {
+        when(commandInformation.getTracker()).thenReturn(tracker);
+        when(tracker.hasPermission(tlTest0)).thenReturn(true);
+        String[] arguments = new String[]{"all", "test0"};
+
+        subCommand.execute(commandInformation, arguments);
+
+        verify(commandInformation).reply(
+                "Error! User \"all\" could not be stored. Please check the username.");
+    }
+
+    //endregion
+
+    //region Foggy weather tests
+    // tests that aren't entirely erroneous (they still pass), but partially incorrect.
+
+    @Test
+    public void testFwNoRatingSupplied() throws Exception
+    {
+        User user = UserHandler.getUserByImgurName("mashedstew");
+
+        Assert.assertTrue(
+                user == null ||
+                            (user.getSubscription(tlTest0.getId()) == null &&
+                             user.getSubscription(tlTest1.getId()) == null));
+
+        when(commandInformation.getTracker()).thenReturn(tracker);
+        when(tracker.hasPermission(tlTest0)).thenReturn(true);
+        when(tracker.hasPermission(tlTest1)).thenReturn(true);
+        String[] arguments = new String[]{"mashedstew", "test1", "test0"};
+
+        subCommand.execute(commandInformation, arguments);
+
+        verify(commandInformation).reply(
+                "Successfully subscribed user \"mashedstew\" to taglists (test0).");
+
+        if (user == null)
+            user = UserHandler.getUserByImgurName("mashedstew");
+
+        Assert.assertNotNull(user.getSubscription(tlTest0.getId()));
+        Assert.assertNull(user.getSubscription(tlTest1.getId()));
     }
 
 
 
+    //endregion
 
-    private void executeCommand(String command, long parentId) throws BaringoApiException, IOException, URISyntaxException
+    //region Good weather tests
+
+    @Test
+    public void testNoRatingTaglist() throws Exception
     {
-        Comment comment = ImgurManager.client().commentService().getComment(parentId);
+        User user = UserHandler.getUserByImgurName("mashedstew");
 
-        //TODO: for a proper test I should mock CommandInformation and check if the reply method is properly called.
+        Assert.assertTrue(
+                user == null ||
+                        user.getSubscription(tlTest0.getId()) == null
+        );
 
-        CommandInformation ci =
-                new ImgurCommandInformation(myTracker, comment);
+        when(commandInformation.getTracker()).thenReturn(tracker);
+        when(tracker.hasPermission(tlTest0)).thenReturn(true);
+        String[] arguments = new String[]{"mashedstew", "test0"};
 
-        CommandRecognition.executeEntry(CommandPrefix.Type.TEST, ci, command);
+        subCommand.execute(commandInformation, arguments);
+
+        verify(commandInformation).reply(
+                "Successfully subscribed user \"mashedstew\" to taglists (test0).");
+
+        if (user == null)
+            user = UserHandler.getUserByImgurName("mashedstew");
+
+        Assert.assertTrue(user.getSubscription(tlTest0.getId()) != null);
     }
+
+
+    @Test
+    public void testRatingTaglist() throws Exception
+    {
+        User user = UserHandler.getUserByImgurName("mashedstew");
+
+        Assert.assertTrue(
+                user == null ||
+                        user.getSubscription(tlTest1.getId()) == null
+        );
+
+        when(commandInformation.getTracker()).thenReturn(tracker);
+        when(tracker.hasPermission(tlTest1)).thenReturn(true);
+        String[] arguments = new String[]{"mashedstew", "test1", "s", "q", "e"};
+
+        subCommand.execute(commandInformation, arguments);
+
+        verify(commandInformation).reply(
+                "Successfully subscribed user \"mashedstew\" to taglists (test1).");
+
+        if (user == null)
+            user = UserHandler.getUserByImgurName("mashedstew");
+
+        UserSubscription us = user.getSubscription(tlTest1.getId());
+
+        Assert.assertNotNull(us);
+        Assert.assertTrue(us.hasRating(Rating.SAFE));
+        Assert.assertTrue(us.hasRating(Rating.QUESTIONABLE));
+        Assert.assertTrue(us.hasRating(Rating.EXPLICIT));
+        Assert.assertTrue(us.getFilters() == null || us.getFilters().isEmpty());
+    }
+
+    @Test
+    public void testFilter() throws Exception
+    {
+        User user = UserHandler.getUserByImgurName("mashedstew");
+
+        Assert.assertTrue(
+                user == null ||
+                        user.getSubscription(tlTest0.getId()) == null
+        );
+
+        when(commandInformation.getTracker()).thenReturn(tracker);
+        when(tracker.hasPermission(tlTest0)).thenReturn(true);
+        String[] arguments = new String[]{"mashedstew", "test0", "filter"};
+
+        subCommand.execute(commandInformation, arguments);
+
+        verify(commandInformation).reply(
+                "Successfully subscribed user \"mashedstew\" to taglists (test0).");
+
+        if (user == null)
+            user = UserHandler.getUserByImgurName("mashedstew");
+
+        UserSubscription us = user.getSubscription(tlTest0.getId());
+        Assert.assertNotNull(us);
+        Assert.assertTrue(us.getFilters().toLowerCase().contains("filter"));
+    }
+
+
+
+    //endregion
+
+
+
 
 
 

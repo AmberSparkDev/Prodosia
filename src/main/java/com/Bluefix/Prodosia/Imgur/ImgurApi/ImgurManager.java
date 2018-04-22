@@ -40,6 +40,12 @@ import java.net.URISyntaxException;
  */
 public class ImgurManager
 {
+    public static final String EnvVarImgurClientId = "ENV_IMGUR_CLIENT_ID";
+    public static final String EnvVarImgurClientSecret = "ENV_IMGUR_CLIENT_SECRET";
+    public static final String EnvVarImgurCallback = "ENV_IMGUR_CALLBACK";
+
+    public static final String DefaultImgurCallback = "https://imgur.com";
+
     //region Singleton
 
     private static BaringoClient client;
@@ -55,7 +61,22 @@ public class ImgurManager
     {
         if (client == null)
         {
-            ImgurKey key = KeyStorage.getImgurKey();
+            // first check if there are environment variables for this.
+            String envClientId = System.getenv(EnvVarImgurClientId);
+            String envClientSecret = System.getenv(EnvVarImgurClientSecret);
+            String envCallback = System.getenv(EnvVarImgurCallback);
+
+            ImgurKey key = null;
+
+            if (envClientId != null && envClientSecret != null)
+            {
+                if (envCallback == null)
+                    envCallback = DefaultImgurCallback;
+
+                key = new ImgurKey(envClientId, envClientSecret, envCallback);
+            }
+            else
+                key = KeyStorage.getImgurKey();
 
             client = createClient(key);
 

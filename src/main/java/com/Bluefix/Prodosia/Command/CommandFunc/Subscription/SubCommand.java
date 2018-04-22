@@ -110,7 +110,7 @@ public class SubCommand implements ICommandFunc
                 UserSubscription us = parseUserSubscription(curTaglist, curRatings, filters);
 
                 if (us == null && curTaglist != null)
-                    needsRatings.add(curArg);
+                    needsRatings.add(curTaglist.getAbbreviation());
 
                 if (us != null)
                     subData.add(us);
@@ -145,6 +145,10 @@ public class SubCommand implements ICommandFunc
 
         // finally, parse the last known usersubscription
         UserSubscription us = parseUserSubscription(curTaglist, curRatings, filters);
+
+        // if the subscription could not be parsed but it did have a taglist, the ratings are missing.
+        if (us == null && curTaglist != null)
+            needsRatings.add(curTaglist.getAbbreviation());
 
         if (us != null)
             subData.add(us);
