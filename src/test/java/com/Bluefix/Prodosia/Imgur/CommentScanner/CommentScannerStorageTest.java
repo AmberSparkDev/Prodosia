@@ -22,15 +22,14 @@
 
 package com.Bluefix.Prodosia.Imgur.CommentScanner;
 
+import com.Bluefix.Prodosia.DataHandler.CommentScannerStorage;
 import com.Bluefix.Prodosia.DataHandler.TrackerHandler;
-import com.Bluefix.Prodosia.DataType.Taglist.Taglist;
 import com.Bluefix.Prodosia.DataType.Tracker.Tracker;
 import com.Bluefix.Prodosia.DataType.Tracker.TrackerBookmark;
 import com.Bluefix.Prodosia.DataType.Tracker.TrackerPermissions;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import sun.util.calendar.BaseCalendar;
 
 import java.util.ArrayList;
 import java.util.Date;

@@ -189,26 +189,20 @@ public class Tracker
 
     //region Comparison methods
 
-    /**
-     * Compare the object to see if it is equal.
-     * @param o
-     * @return
-     */
     @Override
     public boolean equals(Object o)
     {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Tracker tracker = (Tracker) o;
-        return imgurId == tracker.imgurId &&
-                discordId == tracker.discordId;
+        return id == tracker.id;
     }
 
     @Override
     public int hashCode()
     {
 
-        return Objects.hash(imgurId, discordId);
+        return Objects.hash(id);
     }
 
 

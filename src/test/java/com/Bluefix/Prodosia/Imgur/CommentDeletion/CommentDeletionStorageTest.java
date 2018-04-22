@@ -22,6 +22,7 @@
 
 package com.Bluefix.Prodosia.Imgur.CommentDeletion;
 
+import com.Bluefix.Prodosia.DataHandler.CommentDeletionStorage;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

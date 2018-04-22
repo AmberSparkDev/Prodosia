@@ -25,9 +25,8 @@ package com.Bluefix.Prodosia.DataType.Command;
 import com.Bluefix.Prodosia.DataType.Comments.SimpleCommentRequest;
 import com.Bluefix.Prodosia.DataType.Comments.StatComment;
 import com.Bluefix.Prodosia.DataType.Tracker.Tracker;
-import com.Bluefix.Prodosia.Imgur.Tagging.SimpleCommentRequestStorage;
+import com.Bluefix.Prodosia.DataHandler.SimpleCommentRequestStorage;
 import com.github.kskelm.baringo.model.Comment;
-import com.sun.javafx.image.BytePixelSetter;
 
 import java.util.LinkedList;
 

@@ -30,6 +30,7 @@ import com.Bluefix.Prodosia.Imgur.ImgurApi.ImgurManager;
 import com.github.kskelm.baringo.model.Account;
 import com.github.kskelm.baringo.util.BaringoApiException;
 
+import java.sql.SQLException;
 import java.util.*;
 
 public class User
@@ -56,7 +57,7 @@ public class User
      * @param subscriptionData The subscription-data for the user.
      * @throws Exception
      */
-    public User(String imgurName, long imgurId, HashSet<UserSubscription> subscriptionData) throws Exception
+    public User(String imgurName, long imgurId, HashSet<UserSubscription> subscriptionData) throws SQLException
     {
         if (imgurName == null || imgurName.trim().isEmpty())
             throw new IllegalArgumentException("The imgur name was empty");

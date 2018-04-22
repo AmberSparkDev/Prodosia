@@ -27,6 +27,7 @@ import com.Bluefix.Prodosia.DataType.Comments.TagRequest.BaseTagRequest;
 import com.Bluefix.Prodosia.DataType.Taglist.Rating;
 import com.Bluefix.Prodosia.DataType.Taglist.Taglist;
 
+import java.sql.SQLException;
 import java.util.HashSet;
 import java.util.Objects;
 
@@ -58,7 +59,7 @@ public class UserSubscription
      * @param ratings The parsed rating values
      * @param filters The filters
      */
-    public UserSubscription(long taglistId, String ratings, String filters) throws Exception
+    public UserSubscription(long taglistId, String ratings, String filters) throws SQLException
     {
         this.taglist = TaglistHandler.getTaglistById(taglistId);
 

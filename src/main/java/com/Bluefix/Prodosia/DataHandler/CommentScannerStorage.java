@@ -20,10 +20,8 @@
  * SOFTWARE.
  */
 
-package com.Bluefix.Prodosia.Imgur.CommentScanner;
+package com.Bluefix.Prodosia.DataHandler;
 
-import com.Bluefix.Prodosia.DataHandler.LocalStorageHandler;
-import com.Bluefix.Prodosia.DataHandler.TrackerHandler;
 import com.Bluefix.Prodosia.DataType.Tracker.Tracker;
 import com.Bluefix.Prodosia.DataType.Tracker.TrackerBookmark;
 import com.Bluefix.Prodosia.SQLite.SqlDatabase;
@@ -64,7 +62,7 @@ public class CommentScannerStorage extends LocalStorageHandler<TrackerBookmark>
      * @param trackerBookmark
      */
     @Override
-    protected TrackerBookmark setItem(TrackerBookmark trackerBookmark) throws Exception
+    protected TrackerBookmark setItem(TrackerBookmark trackerBookmark) throws SQLException
     {
         return dbSetBookmark(trackerBookmark);
     }
@@ -75,7 +73,7 @@ public class CommentScannerStorage extends LocalStorageHandler<TrackerBookmark>
      * @param trackerBookmark
      */
     @Override
-    protected void removeItem(TrackerBookmark trackerBookmark) throws Exception
+    protected void removeItem(TrackerBookmark trackerBookmark) throws SQLException
     {
         dbRemoveBookmark(trackerBookmark);
     }
@@ -86,7 +84,7 @@ public class CommentScannerStorage extends LocalStorageHandler<TrackerBookmark>
      * @return
      */
     @Override
-    protected ArrayList<TrackerBookmark> getAllItems() throws Exception
+    protected ArrayList<TrackerBookmark> getAllItems() throws SQLException
     {
         return dbGetBookmarks();
     }
@@ -95,7 +93,7 @@ public class CommentScannerStorage extends LocalStorageHandler<TrackerBookmark>
 
     //region Database management
 
-    private synchronized static TrackerBookmark dbSetBookmark(TrackerBookmark tb) throws Exception
+    private synchronized static TrackerBookmark dbSetBookmark(TrackerBookmark tb) throws SQLException
     {
         if (tb == null)
             return null;
@@ -136,7 +134,7 @@ public class CommentScannerStorage extends LocalStorageHandler<TrackerBookmark>
         SqlDatabase.execute(prep);
     }
 
-    private synchronized static TrackerBookmark dbGetBookmark(long imgurId) throws Exception
+    private synchronized static TrackerBookmark dbGetBookmark(long imgurId) throws SQLException
     {
         String query =
                 "SELECT imgurId, lastCommentId, lastCommentTime " +
@@ -148,7 +146,7 @@ public class CommentScannerStorage extends LocalStorageHandler<TrackerBookmark>
         ArrayList<ResultSet> result = SqlDatabase.query(prep);
 
         if (result.size() != 1)
-            throw new Exception("SqlDatabase exception: Expected result size did not match (was " + result.size() + ")");
+            throw new SQLException("SqlDatabase exception: Expected result size did not match (was " + result.size() + ")");
 
         ResultSet rs = result.get(0);
 
@@ -161,7 +159,7 @@ public class CommentScannerStorage extends LocalStorageHandler<TrackerBookmark>
         return parsedResult.get(0);
     }
 
-    private synchronized static ArrayList<TrackerBookmark> dbGetBookmarks() throws Exception
+    private synchronized static ArrayList<TrackerBookmark> dbGetBookmarks() throws SQLException
     {
         String query =
                 "SELECT imgurId, lastCommentId, lastCommentTime " +
@@ -171,14 +169,14 @@ public class CommentScannerStorage extends LocalStorageHandler<TrackerBookmark>
         ArrayList<ResultSet> result = SqlDatabase.query(prep);
 
         if (result.size() != 1)
-            throw new Exception("SqlDatabase exception: Expected result size did not match (was " + result.size() + ")");
+            throw new SQLException("SqlDatabase exception: Expected result size did not match (was " + result.size() + ")");
 
         ResultSet rs = result.get(0);
 
         return parseBookmarks(rs);
     }
 
-    private static ArrayList<TrackerBookmark> parseBookmarks(ResultSet rs) throws Exception
+    private static ArrayList<TrackerBookmark> parseBookmarks(ResultSet rs) throws SQLException
     {
         ArrayList<TrackerBookmark> output = new ArrayList<>();
 
@@ -205,7 +203,7 @@ public class CommentScannerStorage extends LocalStorageHandler<TrackerBookmark>
      * @param imgurId The user to retrieve the bookmark for.
      * @return The bookmark for the specified user if it existed, null otherwise.
      */
-    public static TrackerBookmark getBookmarkByImgurId(long imgurId) throws Exception
+    public static TrackerBookmark getBookmarkByImgurId(long imgurId) throws SQLException
     {
         // ignore for an invalid imgur id
         if (imgurId < 0)

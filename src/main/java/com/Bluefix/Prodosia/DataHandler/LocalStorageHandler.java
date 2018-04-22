@@ -24,8 +24,13 @@ package com.Bluefix.Prodosia.DataHandler;
 
 import com.Bluefix.Prodosia.SQLite.SqlBuilder;
 import com.Bluefix.Prodosia.SQLite.SqlDatabase;
+import com.github.kskelm.baringo.util.BaringoApiException;
 
+import javax.security.auth.login.LoginException;
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.ArrayList;
 
 /**
@@ -83,7 +88,7 @@ public abstract class LocalStorageHandler <T>
     //region Data handling
 
 
-    public void set(T t) throws Exception
+    public void set(T t) throws SQLException, BaringoApiException, IOException, URISyntaxException, LoginException
     {
         // if t did not exist, skip this phase.
         if (t == null)
@@ -114,7 +119,7 @@ public abstract class LocalStorageHandler <T>
      * Remove an item from the collection.
      * @param t The item to be removed.
      */
-    public void remove(T t) throws Exception
+    public void remove(T t) throws SQLException, BaringoApiException, IOException, URISyntaxException
     {
         // if t did not exist, skip this phase.
         if (t == null)
@@ -135,7 +140,7 @@ public abstract class LocalStorageHandler <T>
      * @param newT The new replacement item.
      * @throws Exception
      */
-    public void update(T oldT, T newT) throws Exception
+    public void update(T oldT, T newT) throws SQLException, BaringoApiException, IOException, URISyntaxException, LoginException
     {
         remove(oldT);
         set(newT);
@@ -148,7 +153,7 @@ public abstract class LocalStorageHandler <T>
      * Retrieve all items from the list.
      * @return An arraylist with all items currently stored by the handler.
      */
-    public ArrayList<T> getAll() throws Exception
+    public ArrayList<T> getAll() throws SQLException
     {
         // if the local storage is used,
         if (useLocalStorage)
@@ -173,7 +178,7 @@ public abstract class LocalStorageHandler <T>
      * Remove an item from the storage.
      * @param t
      */
-    protected abstract void removeItem(T t) throws Exception;
+    abstract void removeItem(T t) throws SQLException, BaringoApiException, IOException, URISyntaxException;
 
     /**
      * Set the item, replacing the existing item if applicable.
@@ -181,13 +186,13 @@ public abstract class LocalStorageHandler <T>
      * @return The old item that was replaced, or null if no item had to be replaced.
      * @throws Exception
      */
-    protected abstract T setItem(T t) throws Exception;
+    abstract T setItem(T t) throws SQLException, BaringoApiException, IOException, URISyntaxException;
 
     /**
      * Retrieve all items from the storage in no particular order.
      * @return
      */
-    protected abstract ArrayList<T> getAllItems() throws Exception;
+    abstract ArrayList<T> getAllItems() throws SQLException;
 
     //endregion
 }

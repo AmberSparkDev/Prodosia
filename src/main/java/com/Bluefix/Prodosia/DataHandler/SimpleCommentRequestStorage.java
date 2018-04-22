@@ -20,10 +20,10 @@
  * SOFTWARE.
  */
 
-package com.Bluefix.Prodosia.Imgur.Tagging;
+package com.Bluefix.Prodosia.DataHandler;
 
-import com.Bluefix.Prodosia.DataHandler.LocalStorageHandler;
 import com.Bluefix.Prodosia.DataType.Comments.SimpleCommentRequest;
+import com.Bluefix.Prodosia.Imgur.Tagging.CommentExecution;
 import com.Bluefix.Prodosia.SQLite.SqlBuilder;
 import com.Bluefix.Prodosia.SQLite.SqlDatabase;
 import com.github.kskelm.baringo.util.BaringoApiException;
@@ -76,7 +76,7 @@ public class SimpleCommentRequestStorage extends LocalStorageHandler<SimpleComme
      * @param tagRequest
      */
     @Override
-    protected SimpleCommentRequest setItem(SimpleCommentRequest tagRequest) throws Exception
+    protected SimpleCommentRequest setItem(SimpleCommentRequest tagRequest) throws SQLException
     {
         return dbSetCommentRequest(tagRequest);
     }
@@ -87,7 +87,7 @@ public class SimpleCommentRequestStorage extends LocalStorageHandler<SimpleComme
      * @param tagRequest
      */
     @Override
-    protected void removeItem(SimpleCommentRequest tagRequest) throws Exception
+    protected void removeItem(SimpleCommentRequest tagRequest) throws SQLException
     {
         dbRemoveCommentRequest(tagRequest);
     }
@@ -98,7 +98,7 @@ public class SimpleCommentRequestStorage extends LocalStorageHandler<SimpleComme
      * @return
      */
     @Override
-    protected ArrayList<SimpleCommentRequest> getAllItems() throws Exception
+    protected ArrayList<SimpleCommentRequest> getAllItems() throws SQLException
     {
         return dbGetCommentRequests();
     }
@@ -107,7 +107,7 @@ public class SimpleCommentRequestStorage extends LocalStorageHandler<SimpleComme
 
     //region Database Management
 
-    private synchronized static SimpleCommentRequest dbSetCommentRequest(SimpleCommentRequest t) throws Exception
+    private synchronized static SimpleCommentRequest dbSetCommentRequest(SimpleCommentRequest t) throws SQLException
     {
         if (t == null)
             return null;
@@ -156,7 +156,7 @@ public class SimpleCommentRequestStorage extends LocalStorageHandler<SimpleComme
         return oldRequest;
     }
 
-    private synchronized static void dbRemoveCommentRequest(SimpleCommentRequest t) throws SQLException, BaringoApiException, IOException, URISyntaxException
+    private synchronized static void dbRemoveCommentRequest(SimpleCommentRequest t) throws SQLException
     {
         // if the request is null, skip
         if (t == null)
@@ -171,7 +171,7 @@ public class SimpleCommentRequestStorage extends LocalStorageHandler<SimpleComme
         SqlDatabase.execute(prep);
     }
 
-    private synchronized static SimpleCommentRequest dbGetCommentRequest(String imgurId, long parentId) throws Exception
+    private synchronized static SimpleCommentRequest dbGetCommentRequest(String imgurId, long parentId) throws SQLException
     {
         String query =
                 "SELECT id, imgurId, parentId, lines " +
@@ -184,7 +184,7 @@ public class SimpleCommentRequestStorage extends LocalStorageHandler<SimpleComme
         ArrayList<ResultSet> result = SqlDatabase.query(prep);
 
         if (result.size() != 1)
-            throw new Exception("SqlDatabase exception: Expected result size did not match (was " + result.size() + ")");
+            throw new SQLException("SqlDatabase exception: Expected result size did not match (was " + result.size() + ")");
 
         ResultSet rs = result.get(0);
 
@@ -198,7 +198,7 @@ public class SimpleCommentRequestStorage extends LocalStorageHandler<SimpleComme
     }
 
 
-    private synchronized static ArrayList<SimpleCommentRequest> dbGetCommentRequests() throws Exception
+    private synchronized static ArrayList<SimpleCommentRequest> dbGetCommentRequests() throws SQLException
     {
         String query =
                 "SELECT id, imgurId, parentId, lines " +
@@ -208,7 +208,7 @@ public class SimpleCommentRequestStorage extends LocalStorageHandler<SimpleComme
         ArrayList<ResultSet> result = SqlDatabase.query(prep);
 
         if (result.size() != 1)
-            throw new Exception("SqlDatabase exception: Expected result size did not match (was " + result.size() + ")");
+            throw new SQLException("SqlDatabase exception: Expected result size did not match (was " + result.size() + ")");
 
         ResultSet rs = result.get(0);
 

@@ -25,32 +25,55 @@ package com.Bluefix.Prodosia.DataHandler;
 import com.Bluefix.Prodosia.DataType.Tracker.Tracker;
 import com.Bluefix.Prodosia.DataType.Tracker.TrackerPermissions;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 
 import static org.junit.Assert.*;
 
+@RunWith(Parameterized.class)
 public class TrackerHandlerTest
 {
+    private static final String TestImgurName = "mashedstew";
+    private static final long TestImgurId = 33641050;
+
     private TrackerHandler handler;
     private Tracker tracker;
 
     private TrackerPermissions perm;
 
-    @Before
-    public void setUp() throws Exception
+
+    @Parameterized.Parameters
+    public static Collection localStorage()
+    {
+        return Arrays.asList(new Boolean[]{ true, false});
+    }
+
+    public TrackerHandlerTest(boolean useLocalStorage)
     {
         handler = TrackerHandler.handler();
 
+        handler.setLocalStorage(useLocalStorage);
+    }
+
+
+
+    @Before
+    public void setUp()
+    {
         perm = new TrackerPermissions(TrackerPermissions.TrackerType.ADMIN);
 
         tracker = new Tracker(
-                "imgurname",
-                1,
-                "discordname",
-                "1234",
+                TestImgurName,
+                TestImgurId,
+                "",
+                "",
                 "",
                 perm);
 
@@ -60,54 +83,116 @@ public class TrackerHandlerTest
     @After
     public void tearDown() throws Exception
     {
+        ArrayList<Tracker> trackers = new ArrayList<>(handler.getAll());
+
+        for (Tracker t : trackers)
+        {
+            if (t.getImgurName().equals(TestImgurName))
+                handler.remove(t);
+        }
 
     }
 
-    @Test
-    public void testFunctionalityWithLocalStorage() throws Exception
-    {
-        handler.setLocalStorage(true);
+    //region Bad weather tests
 
+    @Test
+    public void testSetNullTracker() throws Exception
+    {
+        ArrayList<Tracker> trackers = handler.getAll();
+        int size = trackers.size();
+
+        handler.set(null);
+
+        Assert.assertEquals(size, handler.getAll().size());
+    }
+
+    @Test
+    public void testDeleteNullTracker() throws Exception
+    {
+        ArrayList<Tracker> trackers = handler.getAll();
+        int size = trackers.size();
+
+        handler.remove(null);
+
+        Assert.assertEquals(size, handler.getAll().size());
+    }
+
+
+    //endregion
+
+
+    //region Good weather tests
+
+    @Test
+    public void testAddItem() throws Exception
+    {
         ArrayList<Tracker> trackers = handler.getAll();
 
-        if (trackers.contains(tracker))
-            fail();
+        Assert.assertFalse(trackers.contains(tracker));
 
         handler.set(tracker);
         trackers = handler.getAll();
 
-        if (!trackers.contains(tracker))
-            fail();
-
-        handler.remove(tracker);
-        trackers = handler.getAll();
-
-        if (trackers.contains(tracker))
-            fail();
-
-
+        Assert.assertTrue(trackers.contains(tracker));
     }
 
     @Test
-    public void testFunctionalityWithoutLocalStorage() throws Exception
+    public void testAddAndRemoveItem() throws Exception
     {
-        handler.setLocalStorage(false);
-
         ArrayList<Tracker> trackers = handler.getAll();
 
-        if (trackers.contains(tracker))
-            fail();
+        Assert.assertFalse(trackers.contains(tracker));
 
         handler.set(tracker);
         trackers = handler.getAll();
 
-        if (!trackers.contains(tracker))
-            fail();
+        Assert.assertTrue(trackers.contains(tracker));
 
         handler.remove(tracker);
         trackers = handler.getAll();
 
-        if (trackers.contains(tracker))
-            fail();
+        Assert.assertFalse(trackers.contains(tracker));
+
+
     }
+
+
+    @Test
+    public void testReplaceTracker() throws Exception
+    {
+        ArrayList<Tracker> trackers = handler.getAll();
+        int size = trackers.size();
+
+        Assert.assertFalse(trackers.contains(tracker));
+
+        handler.set(tracker);
+        trackers = handler.getAll();
+
+        Assert.assertTrue(trackers.contains(tracker));
+        Assert.assertEquals(size+1, trackers.size());
+
+        handler.set(tracker);
+        trackers = handler.getAll();
+
+        Assert.assertTrue(trackers.contains(tracker));
+        Assert.assertEquals(size+1, trackers.size());
+    }
+
+
+    @Test
+    public void testGetTrackerByImgurId() throws Exception
+    {
+        Tracker t = TrackerHandler.getTrackerByImgurId(TestImgurId);
+
+        Assert.assertNull(t);
+
+        handler.set(tracker);
+
+        t = TrackerHandler.getTrackerByImgurId(TestImgurId);
+        Assert.assertNotNull(t);
+        Assert.assertEquals(TestImgurName, t.getImgurName());
+        Assert.assertEquals(TestImgurId, t.getImgurId());
+    }
+
+    //endregion
 }

@@ -22,6 +22,7 @@
 
 package com.Bluefix.Prodosia.Imgur.CommentDeletion;
 
+import com.Bluefix.Prodosia.DataHandler.CommentDeletionStorage;
 import com.Bluefix.Prodosia.Exception.BaringoExceptionHelper;
 import com.Bluefix.Prodosia.Imgur.ImgurApi.ApiDistribution;
 import com.Bluefix.Prodosia.Imgur.ImgurApi.ImgurManager;

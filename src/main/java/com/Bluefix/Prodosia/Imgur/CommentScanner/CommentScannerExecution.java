@@ -23,6 +23,7 @@
 package com.Bluefix.Prodosia.Imgur.CommentScanner;
 
 import com.Bluefix.Prodosia.Command.CommandRecognition;
+import com.Bluefix.Prodosia.DataHandler.CommentScannerStorage;
 import com.Bluefix.Prodosia.DataHandler.TrackerHandler;
 import com.Bluefix.Prodosia.DataType.Command.CommandInformation;
 import com.Bluefix.Prodosia.Prefix.CommandPrefix;
@@ -34,7 +35,6 @@ import com.Bluefix.Prodosia.Imgur.ImgurApi.ImgurManager;
 import com.Bluefix.Prodosia.Module.ImgurIntervalRunner;
 import com.github.kskelm.baringo.model.Comment;
 import com.github.kskelm.baringo.util.BaringoApiException;
-import com.sun.corba.se.spi.legacy.interceptor.RequestInfoExt;
 
 import java.io.IOException;
 import java.net.URISyntaxException;

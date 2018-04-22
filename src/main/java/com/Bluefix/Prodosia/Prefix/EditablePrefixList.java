@@ -22,6 +22,7 @@
 
 package com.Bluefix.Prodosia.Prefix;
 
+import com.Bluefix.Prodosia.DataHandler.CommandPrefixStorage;
 import com.Bluefix.Prodosia.GUI.Managers.DeletableItemList.EditableReadonlyTextfieldList;
 import javafx.scene.layout.Pane;
 

@@ -20,14 +20,15 @@
  * SOFTWARE.
  */
 
-package com.Bluefix.Prodosia.Imgur.Tagging;
+package com.Bluefix.Prodosia.DataHandler;
 
-import com.Bluefix.Prodosia.DataHandler.LocalStorageHandler;
 import com.Bluefix.Prodosia.DataType.Comments.TagRequest.TagRequest;
 import com.Bluefix.Prodosia.Discord.Archive.ArchiveManager;
+import com.Bluefix.Prodosia.Imgur.Tagging.CommentExecution;
 import com.Bluefix.Prodosia.SQLite.SqlDatabase;
 import com.github.kskelm.baringo.util.BaringoApiException;
 
+import javax.security.auth.login.LoginException;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.sql.PreparedStatement;
@@ -75,7 +76,7 @@ public class TagRequestStorage extends LocalStorageHandler<TagRequest>
      * @param tagRequest The item to be added.
      */
     @Override
-    public void set(TagRequest tagRequest) throws Exception
+    public void set(TagRequest tagRequest) throws SQLException, BaringoApiException, IOException, URISyntaxException, LoginException
     {
         // this method is overridden to check for items that can be merged together.
 
@@ -112,7 +113,7 @@ public class TagRequestStorage extends LocalStorageHandler<TagRequest>
      * @param tagRequest
      */
     @Override
-    protected TagRequest setItem(TagRequest tagRequest) throws Exception
+    protected TagRequest setItem(TagRequest tagRequest) throws SQLException, BaringoApiException, IOException, URISyntaxException
     {
         return dbSetTagrequest(tagRequest);
     }
@@ -123,7 +124,7 @@ public class TagRequestStorage extends LocalStorageHandler<TagRequest>
      * @param tagRequest
      */
     @Override
-    protected void removeItem(TagRequest tagRequest) throws Exception
+    protected void removeItem(TagRequest tagRequest) throws SQLException, BaringoApiException, IOException, URISyntaxException
     {
         dbRemoveTagrequest(tagRequest);
     }
@@ -134,7 +135,7 @@ public class TagRequestStorage extends LocalStorageHandler<TagRequest>
      * @return
      */
     @Override
-    protected ArrayList<TagRequest> getAllItems() throws Exception
+    protected ArrayList<TagRequest> getAllItems() throws SQLException
     {
         return dbGetTagrequests();
     }
@@ -143,7 +144,7 @@ public class TagRequestStorage extends LocalStorageHandler<TagRequest>
 
     //region Database Management
 
-    private synchronized static TagRequest dbSetTagrequest(TagRequest t) throws Exception
+    private synchronized static TagRequest dbSetTagrequest(TagRequest t) throws SQLException, BaringoApiException, IOException, URISyntaxException
     {
         if (t == null)
             return null;
@@ -188,7 +189,7 @@ public class TagRequestStorage extends LocalStorageHandler<TagRequest>
         SqlDatabase.execute(prep);
     }
 
-    private synchronized static TagRequest dbGetTagrequest(String imgurId, long parentId) throws Exception
+    private synchronized static TagRequest dbGetTagrequest(String imgurId, long parentId) throws SQLException
     {
         String query =
                 "SELECT imgurId, parentComment, taglists, rating, filters, cleanComments " +
@@ -201,7 +202,7 @@ public class TagRequestStorage extends LocalStorageHandler<TagRequest>
         ArrayList<ResultSet> result = SqlDatabase.query(prep);
 
         if (result.size() != 1)
-            throw new Exception("SqlDatabase exception: Expected result size did not match (was " + result.size() + ")");
+            throw new SQLException("SqlDatabase exception: Expected result size did not match (was " + result.size() + ")");
 
         ResultSet rs = result.get(0);
 
@@ -214,7 +215,7 @@ public class TagRequestStorage extends LocalStorageHandler<TagRequest>
         return parsedRequests.get(0);
     }
 
-    private synchronized static ArrayList<TagRequest> dbGetTagrequests() throws Exception
+    private synchronized static ArrayList<TagRequest> dbGetTagrequests() throws SQLException
     {
         String query =
                 "SELECT imgurId, parentComment, taglists, rating, filters, cleanComments " +
@@ -224,14 +225,14 @@ public class TagRequestStorage extends LocalStorageHandler<TagRequest>
         ArrayList<ResultSet> result = SqlDatabase.query(prep);
 
         if (result.size() != 1)
-            throw new Exception("SqlDatabase exception: Expected result size did not match (was " + result.size() + ")");
+            throw new SQLException("SqlDatabase exception: Expected result size did not match (was " + result.size() + ")");
 
         ResultSet rs = result.get(0);
 
         return parseTagrequests(rs);
     }
 
-    private static ArrayList<TagRequest> parseTagrequests(ResultSet rs) throws Exception
+    private static ArrayList<TagRequest> parseTagrequests(ResultSet rs) throws SQLException
     {
         ArrayList<TagRequest> output = new ArrayList<>();
 

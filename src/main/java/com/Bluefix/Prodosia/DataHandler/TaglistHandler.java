@@ -63,7 +63,7 @@ public class TaglistHandler extends LocalStorageHandler<Taglist>
      * @param t
      */
     @Override
-    protected Taglist setItem(Taglist t) throws Exception
+    Taglist setItem(Taglist t) throws SQLException
     {
         return dbSetTaglist(t);
     }
@@ -74,7 +74,7 @@ public class TaglistHandler extends LocalStorageHandler<Taglist>
      * @param t
      */
     @Override
-    protected void removeItem(Taglist t) throws Exception
+    void removeItem(Taglist t) throws SQLException
     {
         dbRemoveTaglist(t);
     }
@@ -85,7 +85,7 @@ public class TaglistHandler extends LocalStorageHandler<Taglist>
      * @return
      */
     @Override
-    protected ArrayList<Taglist> getAllItems() throws Exception
+    ArrayList<Taglist> getAllItems() throws SQLException
     {
         return dbGetTaglists();
     }
@@ -94,7 +94,7 @@ public class TaglistHandler extends LocalStorageHandler<Taglist>
 
     //region Database management
 
-    private synchronized static Taglist dbSetTaglist(Taglist t) throws Exception
+    private synchronized static Taglist dbSetTaglist(Taglist t) throws SQLException
     {
         if (t == null)
             return null;
@@ -148,7 +148,7 @@ public class TaglistHandler extends LocalStorageHandler<Taglist>
         SqlDatabase.execute(prep);
     }
 
-    private synchronized static ArrayList<Taglist> dbGetTaglists() throws Exception
+    private synchronized static ArrayList<Taglist> dbGetTaglists() throws SQLException
     {
         String query =
                 "SELECT id, abbreviation, description, hasRatings " +
@@ -158,14 +158,14 @@ public class TaglistHandler extends LocalStorageHandler<Taglist>
         ArrayList<ResultSet> result = SqlDatabase.query(prep);
 
         if (result.size() != 1)
-            throw new Exception("SqlDatabase exception: Expected result size did not match (was " + result.size() + ")");
+            throw new SQLException("SqlDatabase exception: Expected result size did not match (was " + result.size() + ")");
 
         ResultSet rs = result.get(0);
 
         return parseTaglists(rs);
     }
 
-    private synchronized static Taglist dbGetTaglist(String abbreviation) throws Exception
+    private synchronized static Taglist dbGetTaglist(String abbreviation) throws SQLException
     {
         String query =
                 "SELECT id, abbreviation, description, hasRatings " +
@@ -177,7 +177,7 @@ public class TaglistHandler extends LocalStorageHandler<Taglist>
         ArrayList<ResultSet> result = SqlDatabase.query(prep);
 
         if (result.size() != 1)
-            throw new Exception("SqlDatabase exception: Expected result size did not match (was " + result.size() + ")");
+            throw new SQLException("SqlDatabase exception: Expected result size did not match (was " + result.size() + ")");
 
         ResultSet rs = result.get(0);
 
@@ -217,7 +217,7 @@ public class TaglistHandler extends LocalStorageHandler<Taglist>
      * @param taglistId
      * @return
      */
-    public static synchronized Taglist getTaglistById(long taglistId) throws Exception
+    public static synchronized Taglist getTaglistById(long taglistId) throws SQLException
     {
         // TODO: if this methods is used frequently, it might be worth making a HashMap<long, Taglist>
         ArrayList<Taglist> taglists = handler().getAll();
@@ -237,7 +237,7 @@ public class TaglistHandler extends LocalStorageHandler<Taglist>
      * @return The taglist if it existed, or null otherwise.
      * @throws Exception
      */
-    public static synchronized Taglist getTaglistByAbbreviation(String abbreviation) throws Exception
+    public static synchronized Taglist getTaglistByAbbreviation(String abbreviation) throws SQLException
     {
         if (abbreviation == null || abbreviation.isEmpty())
             return null;

@@ -22,6 +22,7 @@
 
 package com.Bluefix.Prodosia.Imgur.Tagging;
 
+import com.Bluefix.Prodosia.DataHandler.SimpleCommentRequestStorage;
 import com.Bluefix.Prodosia.DataType.Comments.SimpleCommentRequest;
 import org.junit.After;
 import org.junit.Before;

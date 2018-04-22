@@ -25,6 +25,7 @@ package com.Bluefix.Prodosia.DataType.Tracker;
 import com.Bluefix.Prodosia.DataHandler.TaglistHandler;
 import com.Bluefix.Prodosia.DataType.Taglist.Taglist;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Objects;
@@ -90,7 +91,7 @@ public class TrackerPermissions
      * @param type The type of tracker
      * @param taglists The taglists, split by separators.
      */
-    public TrackerPermissions(int type, String taglists) throws Exception
+    public TrackerPermissions(int type, String taglists) throws SQLException
     {
         switch (type)
         {
@@ -102,7 +103,7 @@ public class TrackerPermissions
                 break;
 
             default:
-                throw new Exception("The type was not recognized");
+                throw new IllegalArgumentException("The type was not recognized");
         }
 
         String[] split = taglists.split(";");
@@ -138,7 +139,7 @@ public class TrackerPermissions
         return this.type.getValue();
     }
 
-    public String dbGetTaglists() throws Exception
+    public String dbGetTaglists() throws SQLException
     {
         StringBuilder sb = new StringBuilder();
 

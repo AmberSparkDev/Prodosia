@@ -25,7 +25,7 @@ package com.Bluefix.Prodosia.GUI.Archive;
 import com.Bluefix.Prodosia.DataType.Archive.Archive;
 import com.Bluefix.Prodosia.DataType.Taglist.Rating;
 import com.Bluefix.Prodosia.DataType.Taglist.Taglist;
-import com.Bluefix.Prodosia.Discord.Archive.ArchiveHandler;
+import com.Bluefix.Prodosia.DataHandler.ArchiveHandler;
 import com.Bluefix.Prodosia.Discord.DiscordManager;
 import com.Bluefix.Prodosia.GUI.Helpers.DataFieldStorage;
 import com.Bluefix.Prodosia.GUI.Helpers.EditableWindowPane;

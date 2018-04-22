@@ -20,9 +20,8 @@
  * SOFTWARE.
  */
 
-package com.Bluefix.Prodosia.Imgur.CommentDeletion;
+package com.Bluefix.Prodosia.DataHandler;
 
-import com.Bluefix.Prodosia.DataHandler.LocalStorageHandler;
 import com.Bluefix.Prodosia.SQLite.SqlDatabase;
 
 import java.sql.PreparedStatement;
@@ -65,7 +64,7 @@ public class CommentDeletionStorage extends LocalStorageHandler<Long>
      * @param aLong
      */
     @Override
-    protected Long setItem(Long aLong) throws Exception
+    protected Long setItem(Long aLong) throws SQLException
     {
         return dbSetDeletion(aLong);
     }
@@ -76,7 +75,7 @@ public class CommentDeletionStorage extends LocalStorageHandler<Long>
      * @param aLong
      */
     @Override
-    protected void removeItem(Long aLong) throws Exception
+    protected void removeItem(Long aLong) throws SQLException
     {
         dbRemoveDeletion(aLong);
     }
@@ -87,7 +86,7 @@ public class CommentDeletionStorage extends LocalStorageHandler<Long>
      * @return
      */
     @Override
-    protected ArrayList<Long> getAllItems() throws Exception
+    protected ArrayList<Long> getAllItems() throws SQLException
     {
         return dbGetDeletions();
     }
@@ -96,7 +95,7 @@ public class CommentDeletionStorage extends LocalStorageHandler<Long>
 
     //region Database management
 
-    private synchronized static Long dbSetDeletion(Long d) throws Exception
+    private synchronized static Long dbSetDeletion(Long d) throws SQLException
     {
         if (d < 0)
             return d;
@@ -129,7 +128,7 @@ public class CommentDeletionStorage extends LocalStorageHandler<Long>
         SqlDatabase.execute(prep);
     }
 
-    private synchronized ArrayList<Long> dbGetDeletions() throws Exception
+    private synchronized ArrayList<Long> dbGetDeletions() throws SQLException
     {
         String query =
                 "SELECT id FROM CommentDeletion;";
@@ -138,7 +137,7 @@ public class CommentDeletionStorage extends LocalStorageHandler<Long>
         ArrayList<ResultSet> result = SqlDatabase.query(prep);
 
         if (result.size() != 1)
-            throw new Exception("SqlDatabase exception: Expected result size did not match (was " + result.size() + ")");
+            throw new SQLException("SqlDatabase exception: Expected result size did not match (was " + result.size() + ")");
 
         ResultSet rs = result.get(0);
         ArrayList<Long> output = new ArrayList<>();

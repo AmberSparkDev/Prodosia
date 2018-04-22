@@ -24,11 +24,10 @@ package com.Bluefix.Prodosia.GUI.Application;
 
 import com.Bluefix.Prodosia.DataType.Archive.Archive;
 import com.Bluefix.Prodosia.DataType.Taglist.Taglist;
-import com.Bluefix.Prodosia.Discord.Archive.ArchiveHandler;
+import com.Bluefix.Prodosia.DataHandler.ArchiveHandler;
 import com.Bluefix.Prodosia.GUI.Archive.EditArchiveWindow;
 import com.Bluefix.Prodosia.GUI.Managers.ButtonListManager.ButtonListManager;
 import com.Bluefix.Prodosia.GUI.Managers.ButtonListManager.TaglistListManager;
-import com.Bluefix.Prodosia.GUI.Managers.ListManager.GuiListManager;
 import com.Bluefix.Prodosia.GUI.Navigation.VistaNavigator;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;

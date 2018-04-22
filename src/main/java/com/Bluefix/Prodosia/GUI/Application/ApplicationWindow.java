@@ -22,19 +22,8 @@
 
 package com.Bluefix.Prodosia.GUI.Application;
 
-import com.Bluefix.Prodosia.Prefix.CommandPrefixStorage;
-import com.Bluefix.Prodosia.DataHandler.TaglistHandler;
-import com.Bluefix.Prodosia.DataHandler.TrackerHandler;
-import com.Bluefix.Prodosia.DataHandler.UserHandler;
-import com.Bluefix.Prodosia.Prefix.CommandPrefix;
 import com.Bluefix.Prodosia.DataType.Data;
 import com.Bluefix.Prodosia.DataType.Taglist.Rating;
-import com.Bluefix.Prodosia.DataType.Taglist.Taglist;
-import com.Bluefix.Prodosia.DataType.Tracker.Tracker;
-import com.Bluefix.Prodosia.DataType.Tracker.TrackerBuilder;
-import com.Bluefix.Prodosia.DataType.Tracker.TrackerPermissions;
-import com.Bluefix.Prodosia.DataType.User.User;
-import com.Bluefix.Prodosia.DataType.User.UserSubscription;
 import com.Bluefix.Prodosia.Exception.ExceptionHelper;
 import com.Bluefix.Prodosia.GUI.ApiKeys.ApiKeysWindow;
 import com.Bluefix.Prodosia.GUI.Managers.CheckboxListManager.GuiCheckboxListManager;
@@ -48,16 +37,11 @@ import com.Bluefix.Prodosia.GUI.Taglist.EditTaglistWindow;
 import com.Bluefix.Prodosia.GUI.Tracker.EditTrackerWindow;
 import com.Bluefix.Prodosia.GUI.User.EditUserWindow;
 import com.Bluefix.Prodosia.Logger.Logger;
-import com.Bluefix.Prodosia.Module.TestModule;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
-
-import java.util.HashSet;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 
 public class ApplicationWindow

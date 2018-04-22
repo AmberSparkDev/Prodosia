@@ -23,34 +23,18 @@
 package com.Bluefix.Prodosia.Command.CommandFunc.Subscription;
 
 import com.Bluefix.Prodosia.Command.CommandFunc.ICommandFunc;
-import com.Bluefix.Prodosia.Command.CommandFunc.Subscription.SubCommand;
-import com.Bluefix.Prodosia.Command.CommandRecognition;
-import com.Bluefix.Prodosia.Prefix.CommandPrefixStorage;
 import com.Bluefix.Prodosia.DataHandler.TaglistHandler;
-import com.Bluefix.Prodosia.DataHandler.TrackerHandler;
 import com.Bluefix.Prodosia.DataHandler.UserHandler;
 import com.Bluefix.Prodosia.DataType.Command.CommandInformation;
-import com.Bluefix.Prodosia.Prefix.CommandPrefix;
-import com.Bluefix.Prodosia.DataType.Command.ImgurCommandInformation;
 import com.Bluefix.Prodosia.DataType.Taglist.Rating;
 import com.Bluefix.Prodosia.DataType.Taglist.Taglist;
 import com.Bluefix.Prodosia.DataType.Tracker.Tracker;
-import com.Bluefix.Prodosia.DataType.Tracker.TrackerPermissions;
 import com.Bluefix.Prodosia.DataType.User.User;
 import com.Bluefix.Prodosia.DataType.User.UserSubscription;
-import com.Bluefix.Prodosia.Imgur.ImgurApi.ImgurManager;
-import com.github.kskelm.baringo.model.Comment;
-import com.github.kskelm.baringo.util.BaringoApiException;
 import org.junit.*;
-import org.junit.rules.ExpectedException;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
-
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.HashSet;
 
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;

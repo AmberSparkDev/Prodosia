@@ -23,13 +23,12 @@
 package com.Bluefix.Prodosia.DataType.Comments;
 
 import com.Bluefix.Prodosia.Imgur.ImgurApi.ImgurManager;
-import com.Bluefix.Prodosia.Imgur.Tagging.SimpleCommentRequestStorage;
+import com.Bluefix.Prodosia.DataHandler.SimpleCommentRequestStorage;
 import com.github.kskelm.baringo.model.Comment;
 import com.github.kskelm.baringo.util.BaringoApiException;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Objects;
 

@@ -20,9 +20,8 @@
  * SOFTWARE.
  */
 
-package com.Bluefix.Prodosia.Discord.Archive;
+package com.Bluefix.Prodosia.DataHandler;
 
-import com.Bluefix.Prodosia.DataHandler.LocalStorageHandler;
 import com.Bluefix.Prodosia.DataType.Archive.Archive;
 import com.Bluefix.Prodosia.DataType.Taglist.Taglist;
 import com.Bluefix.Prodosia.SQLite.SqlDatabase;
@@ -64,7 +63,7 @@ public class ArchiveHandler extends LocalStorageHandler<Archive>
      * @param archive
      */
     @Override
-    protected void removeItem(Archive archive) throws Exception
+    protected void removeItem(Archive archive) throws SQLException
     {
         dbRemoveArchive(archive);
     }
@@ -77,7 +76,7 @@ public class ArchiveHandler extends LocalStorageHandler<Archive>
      * @throws Exception
      */
     @Override
-    protected Archive setItem(Archive archive) throws Exception
+    protected Archive setItem(Archive archive) throws SQLException
     {
         return dbSetArchive(archive);
     }
@@ -88,7 +87,7 @@ public class ArchiveHandler extends LocalStorageHandler<Archive>
      * @return
      */
     @Override
-    protected ArrayList<Archive> getAllItems() throws Exception
+    protected ArrayList<Archive> getAllItems() throws SQLException
     {
         return dbGetArchives();
     }
@@ -103,7 +102,7 @@ public class ArchiveHandler extends LocalStorageHandler<Archive>
      * @param archive
      * @return
      */
-    private static synchronized Archive dbSetArchive(Archive archive) throws Exception
+    private static synchronized Archive dbSetArchive(Archive archive) throws SQLException
     {
         if (archive == null)
             return null;
@@ -134,7 +133,7 @@ public class ArchiveHandler extends LocalStorageHandler<Archive>
 
 
 
-    private static synchronized void dbRemoveArchive(Archive archive) throws Exception
+    private static synchronized void dbRemoveArchive(Archive archive) throws SQLException
     {
         if (archive == null)
             return;
@@ -152,7 +151,7 @@ public class ArchiveHandler extends LocalStorageHandler<Archive>
         SqlDatabase.execute(prep);
     }
 
-    private static synchronized ArrayList<Archive> dbGetArchives() throws Exception
+    private static synchronized ArrayList<Archive> dbGetArchives() throws SQLException
     {
         String query =
                 "SELECT taglistId, description, channel, ratings, filters " +
@@ -162,7 +161,7 @@ public class ArchiveHandler extends LocalStorageHandler<Archive>
         ArrayList<ResultSet> result = SqlDatabase.query(prep);
 
         if (result.size() != 1)
-            throw new Exception("SqlDatabase exception: Expected result size did not match (was " + result.size() + ")");
+            throw new SQLException("SqlDatabase exception: Expected result size did not match (was " + result.size() + ")");
 
         ResultSet rs = result.get(0);
 
@@ -176,7 +175,7 @@ public class ArchiveHandler extends LocalStorageHandler<Archive>
      * @param channelId
      * @return
      */
-    private static synchronized Archive dbGetArchive(long taglistId, String channelId) throws Exception
+    private static synchronized Archive dbGetArchive(long taglistId, String channelId) throws SQLException
     {
         String query =
                 "SELECT taglistId, description, channel, ratings, filters " +
@@ -189,7 +188,7 @@ public class ArchiveHandler extends LocalStorageHandler<Archive>
         ArrayList<ResultSet> result = SqlDatabase.query(prep);
 
         if (result.size() != 1)
-            throw new Exception("SqlDatabase exception: Expected result size did not match (was " + result.size() + ")");
+            throw new SQLException("SqlDatabase exception: Expected result size did not match (was " + result.size() + ")");
 
         ResultSet rs = result.get(0);
 
@@ -204,7 +203,7 @@ public class ArchiveHandler extends LocalStorageHandler<Archive>
 
 
 
-    private static ArrayList<Archive> parseArchives(ResultSet rs) throws Exception
+    private static ArrayList<Archive> parseArchives(ResultSet rs) throws SQLException
     {
         ArrayList<Archive> archives = new ArrayList<>();
 

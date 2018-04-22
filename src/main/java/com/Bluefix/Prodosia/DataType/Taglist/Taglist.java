@@ -26,6 +26,7 @@ import com.Bluefix.Prodosia.SQLite.SqlDatabase;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Objects;
 
@@ -57,7 +58,7 @@ public class Taglist
         return hasRatings;
     }
 
-    public long getId() throws Exception
+    public long getId() throws SQLException
     {
         if (id < 0)
         {
@@ -69,12 +70,12 @@ public class Taglist
             ArrayList<ResultSet> result = SqlDatabase.query(prep);
 
             if (result.size() != 1)
-                throw new Exception("SqlDatabase exception: Expected result size did not match (was " + result.size() + ")");
+                throw new SQLException("SqlDatabase exception: Expected result size did not match (was " + result.size() + ")");
 
             ResultSet rs = result.get(0);
 
             if (!rs.next())
-                throw new Exception("This Taglist was not stored in the database. Make sure you have added it first.");
+                throw new SQLException("This Taglist was not stored in the database. Make sure you have added it first.");
 
             this.id = rs.getLong(1);
         }

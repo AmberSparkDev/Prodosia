@@ -23,18 +23,12 @@
 package com.Bluefix.Prodosia.GUI.Prefix;
 
 import com.Bluefix.Prodosia.GUI.Navigation.VistaNavigator;
-import com.Bluefix.Prodosia.Prefix.CommandPrefixStorage;
+import com.Bluefix.Prodosia.DataHandler.CommandPrefixStorage;
 import com.Bluefix.Prodosia.Prefix.CommandPrefix;
-import com.Bluefix.Prodosia.GUI.Managers.DeletableItemList.EditableReadonlyTextfieldList;
 import com.Bluefix.Prodosia.Prefix.EditablePrefixList;
-import com.Bluefix.Prodosia.Storage.KeyStorage;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.layout.AnchorPane;
-
-import java.io.IOException;
-import java.security.KeyStoreSpi;
-import java.util.LinkedList;
 
 public class PrefixWindow
 {

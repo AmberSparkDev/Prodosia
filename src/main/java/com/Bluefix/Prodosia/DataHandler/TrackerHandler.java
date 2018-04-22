@@ -68,19 +68,19 @@ public class TrackerHandler extends LocalStorageHandler<Tracker>
     //region Local Storage Handler implementation
 
     @Override
-    protected Tracker setItem(Tracker t) throws Exception
+    Tracker setItem(Tracker t) throws SQLException
     {
         return dbSetTracker(t);
     }
 
     @Override
-    protected void removeItem(Tracker t) throws Exception
+    void removeItem(Tracker t) throws SQLException
     {
         dbRemoveTracker(t);
     }
 
     @Override
-    protected ArrayList<Tracker> getAllItems() throws Exception
+    ArrayList<Tracker> getAllItems() throws SQLException
     {
         return dbGetTrackers();
     }
@@ -90,7 +90,7 @@ public class TrackerHandler extends LocalStorageHandler<Tracker>
 
     //region Database management
 
-    private synchronized static Tracker dbSetTracker(Tracker t) throws Exception
+    private synchronized static Tracker dbSetTracker(Tracker t) throws SQLException
     {
         if (t == null)
             return null;
@@ -166,7 +166,7 @@ public class TrackerHandler extends LocalStorageHandler<Tracker>
         return oldTracker;
     }
 
-    private synchronized static void dbRemoveTracker(Tracker t) throws Exception
+    private synchronized static void dbRemoveTracker(Tracker t) throws SQLException
     {
         // if the item did not exist, skip
         if (t == null)
@@ -219,7 +219,7 @@ public class TrackerHandler extends LocalStorageHandler<Tracker>
     }
 
 
-    private synchronized static Tracker dbGetTracker(long imgurId, String discordId) throws Exception
+    private synchronized static Tracker dbGetTracker(long imgurId, String discordId) throws SQLException
     {
         String query =
                 "SELECT " +
@@ -241,7 +241,7 @@ public class TrackerHandler extends LocalStorageHandler<Tracker>
         ArrayList<ResultSet> result = SqlDatabase.query(prep);
 
         if (result.size() != 1)
-            throw new Exception("SqlDatabase exception: Expected result size did not match (was " + result.size() + ")");
+            throw new SQLException("SqlDatabase exception: Expected result size did not match (was " + result.size() + ")");
 
         ResultSet rs = result.get(0);
 
@@ -254,7 +254,7 @@ public class TrackerHandler extends LocalStorageHandler<Tracker>
         return parsedTrackers.get(0);
     }
 
-    private synchronized static ArrayList<Tracker> dbGetTrackers() throws Exception
+    private synchronized static ArrayList<Tracker> dbGetTrackers() throws SQLException
     {
         String query =
                 "SELECT " +
@@ -273,14 +273,14 @@ public class TrackerHandler extends LocalStorageHandler<Tracker>
         ArrayList<ResultSet> result = SqlDatabase.query(prep);
 
         if (result.size() != 1)
-            throw new Exception("SqlDatabase exception: Expected result size did not match (was " + result.size() + ")");
+            throw new SQLException("SqlDatabase exception: Expected result size did not match (was " + result.size() + ")");
 
         ResultSet rs = result.get(0);
 
         return parseTrackers(rs);
     }
 
-    private static ArrayList<Tracker> parseTrackers(ResultSet rs) throws Exception
+    private static ArrayList<Tracker> parseTrackers(ResultSet rs) throws SQLException
     {
         ArrayList<Tracker> trackers = new ArrayList<>();
 
@@ -315,7 +315,7 @@ public class TrackerHandler extends LocalStorageHandler<Tracker>
      * @param imgurId
      * @return
      */
-    public static Tracker getTrackerByImgurId(long imgurId) throws Exception
+    public static Tracker getTrackerByImgurId(long imgurId) throws SQLException
     {
         // return null on invalid imgur id.
         if (imgurId < 0)
@@ -340,7 +340,7 @@ public class TrackerHandler extends LocalStorageHandler<Tracker>
      * @param discordId The discord id of the user.
      * @return The tracker that corresponds with the discordId, or null otherwise.
      */
-    public static Tracker getTrackerByDiscordId(String discordId) throws Exception
+    public static Tracker getTrackerByDiscordId(String discordId) throws SQLException
     {
         // return null on invalid imgur id.
         if (discordId == null || discordId.trim().isEmpty())

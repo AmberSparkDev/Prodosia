@@ -20,9 +20,9 @@
  * SOFTWARE.
  */
 
-package com.Bluefix.Prodosia.Prefix;
+package com.Bluefix.Prodosia.DataHandler;
 
-import com.Bluefix.Prodosia.DataHandler.LocalStorageHandler;
+import com.Bluefix.Prodosia.Prefix.CommandPrefix;
 import com.Bluefix.Prodosia.SQLite.SqlDatabase;
 
 import java.sql.PreparedStatement;
@@ -61,10 +61,14 @@ public class CommandPrefixStorage extends LocalStorageHandler<CommandPrefix>
      * @param commandPrefix
      */
     @Override
-    protected CommandPrefix setItem(CommandPrefix commandPrefix) throws Exception
+    CommandPrefix setItem(CommandPrefix commandPrefix) throws SQLException
     {
         return dbSetCPrefix(commandPrefix);
     }
+
+
+
+
 
     /**
      * Remove an item from the storage.
@@ -72,7 +76,7 @@ public class CommandPrefixStorage extends LocalStorageHandler<CommandPrefix>
      * @param commandPrefix
      */
     @Override
-    protected void removeItem(CommandPrefix commandPrefix) throws Exception
+    void removeItem(CommandPrefix commandPrefix) throws SQLException
     {
         dbRemoveCPrefix(commandPrefix);
     }
@@ -83,7 +87,7 @@ public class CommandPrefixStorage extends LocalStorageHandler<CommandPrefix>
      * @return
      */
     @Override
-    protected ArrayList<CommandPrefix> getAllItems() throws Exception
+    ArrayList<CommandPrefix> getAllItems() throws SQLException
     {
         return dbGetCPrefixes();
     }
@@ -92,7 +96,7 @@ public class CommandPrefixStorage extends LocalStorageHandler<CommandPrefix>
 
     //region Database management
 
-    private static synchronized CommandPrefix dbSetCPrefix(CommandPrefix cp) throws Exception
+    private static synchronized CommandPrefix dbSetCPrefix(CommandPrefix cp) throws SQLException
     {
         // skip if the command prefix is null
         if (cp == null)
@@ -133,7 +137,7 @@ public class CommandPrefixStorage extends LocalStorageHandler<CommandPrefix>
         SqlDatabase.execute(prep);
     }
 
-    private static synchronized CommandPrefix dbGetCPrefix(CommandPrefix.Type type) throws Exception
+    private static synchronized CommandPrefix dbGetCPrefix(CommandPrefix.Type type) throws SQLException
     {
         String query =
                 "SELECT type, regex " +
@@ -145,7 +149,7 @@ public class CommandPrefixStorage extends LocalStorageHandler<CommandPrefix>
         ArrayList<ResultSet> result = SqlDatabase.query(prep);
 
         if (result.size() != 1)
-            throw new Exception("SqlDatabase exception: Expected result size did not match (was " + result.size() + ")");
+            throw new SQLException("SqlDatabase exception: Expected result size did not match (was " + result.size() + ")");
 
         ResultSet rs = result.get(0);
 
@@ -158,7 +162,7 @@ public class CommandPrefixStorage extends LocalStorageHandler<CommandPrefix>
         return parseResult.get(0);
     }
 
-    private static synchronized ArrayList<CommandPrefix> dbGetCPrefixes() throws Exception
+    private static synchronized ArrayList<CommandPrefix> dbGetCPrefixes() throws SQLException
     {
         String query =
                 "SELECT type, regex " +
@@ -168,7 +172,7 @@ public class CommandPrefixStorage extends LocalStorageHandler<CommandPrefix>
         ArrayList<ResultSet> result = SqlDatabase.query(prep);
 
         if (result.size() != 1)
-            throw new Exception("SqlDatabase exception: Expected result size did not match (was " + result.size() + ")");
+            throw new SQLException("SqlDatabase exception: Expected result size did not match (was " + result.size() + ")");
 
         ResultSet rs = result.get(0);
 
@@ -201,7 +205,7 @@ public class CommandPrefixStorage extends LocalStorageHandler<CommandPrefix>
      * @return The commandprefix corresponding to the type if it existed, or null otherwise.
      * @throws Exception
      */
-    public static CommandPrefix getPrefixForType(CommandPrefix.Type type) throws Exception
+    public static CommandPrefix getPrefixForType(CommandPrefix.Type type) throws SQLException
     {
         ArrayList<CommandPrefix> items = handler().getAll();
 

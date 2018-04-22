@@ -36,7 +36,7 @@ public class GuiUpdate
     /**
      * Update any collections pertaining to the users.
      */
-    public static void updateUsers() throws Exception
+    public static void updateUsers()
     {
         if (GuiApplication.isInitialized())
             ApplicationWindow.updateUsers();

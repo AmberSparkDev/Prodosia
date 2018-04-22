@@ -22,13 +22,19 @@
 
 package com.Bluefix.Prodosia.Discord.Archive;
 
+import com.Bluefix.Prodosia.DataHandler.ArchiveHandler;
 import com.Bluefix.Prodosia.DataType.Archive.Archive;
 import com.Bluefix.Prodosia.DataType.Comments.TagRequest.TagRequest;
 import com.Bluefix.Prodosia.Discord.DiscordManager;
+import com.github.kskelm.baringo.util.BaringoApiException;
 import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.MessageHistory;
 import net.dv8tion.jda.core.entities.TextChannel;
 
+import javax.security.auth.login.LoginException;
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.sql.SQLException;
 import java.util.*;
 
 /**
@@ -87,7 +93,7 @@ public class ArchiveManager
         /**
          * Create a new channel-info object.
          */
-        private ChannelInfo(String channelId) throws Exception
+        private ChannelInfo(String channelId) throws IOException, LoginException
         {
             // retrieve the message history from the comments.
             this.textChannel = DiscordManager.manager().getTextChannelById(channelId);
@@ -129,7 +135,7 @@ public class ArchiveManager
      * Posts a tag request item to the specified archive channels if applicable.
      * @param tagRequest
      */
-    public static void handleTagRequest(TagRequest tagRequest) throws Exception
+    public static void handleTagRequest(TagRequest tagRequest) throws SQLException, BaringoApiException, IOException, URISyntaxException, LoginException
     {
         // update the channel-list according to the archives.
         manager().update();
@@ -148,7 +154,7 @@ public class ArchiveManager
     /**
      * Update the channel-list based on the archives available.
      */
-    private void update() throws Exception
+    private void update() throws SQLException, IOException, LoginException
     {
         ArrayList<Archive> archives = ArchiveHandler.handler().getAll();
 

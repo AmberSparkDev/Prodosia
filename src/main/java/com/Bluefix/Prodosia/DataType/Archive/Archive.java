@@ -27,6 +27,7 @@ import com.Bluefix.Prodosia.DataType.Comments.TagRequest.TagRequest;
 import com.Bluefix.Prodosia.DataType.Taglist.Rating;
 import com.Bluefix.Prodosia.DataType.Taglist.Taglist;
 
+import java.sql.SQLException;
 import java.util.HashSet;
 import java.util.Objects;
 
@@ -65,7 +66,7 @@ public class Archive
      * @param ratings
      * @param filters
      */
-    public Archive(long taglistId, String description, String channelId, String ratings, String filters) throws Exception
+    public Archive(long taglistId, String description, String channelId, String ratings, String filters) throws SQLException
     {
         this.taglist = TaglistHandler.getTaglistById(taglistId);
         this.description = description;
@@ -152,7 +153,7 @@ public class Archive
      * @param tagRequest
      * @return true iff the Tag-request was part of this archive, false otherwise.
      */
-    public boolean isPartOf(TagRequest tagRequest) throws Exception
+    public boolean isPartOf(TagRequest tagRequest)
     {
         // first check to see if the taglist is correct.
         if (!tagRequest.getTaglists().contains(this.taglist))

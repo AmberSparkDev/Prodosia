@@ -28,17 +28,14 @@ import com.Bluefix.Prodosia.DataType.Comments.FeedbackRequest;
 import com.Bluefix.Prodosia.DataType.Comments.ICommentRequest;
 import com.Bluefix.Prodosia.DataType.Comments.TagRequest.BaseTagRequest;
 import com.Bluefix.Prodosia.DataType.Comments.TagRequest.TagRequest;
-import com.Bluefix.Prodosia.DataType.Taglist.Rating;
-import com.Bluefix.Prodosia.DataType.Taglist.Taglist;
 import com.Bluefix.Prodosia.Imgur.ImgurApi.ImgurManager;
 import com.Bluefix.Prodosia.Imgur.Tagging.CommentExecution;
-import com.Bluefix.Prodosia.Imgur.Tagging.TagRequestStorage;
+import com.Bluefix.Prodosia.DataHandler.TagRequestStorage;
 import com.github.kskelm.baringo.model.Comment;
 import com.github.kskelm.baringo.util.BaringoApiException;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Objects;
 

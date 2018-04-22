@@ -28,7 +28,11 @@ import com.Bluefix.Prodosia.DataType.User.UserSubscription;
 import com.Bluefix.Prodosia.GUI.GuiUpdate;
 import com.Bluefix.Prodosia.SQLite.SqlBuilder;
 import com.Bluefix.Prodosia.SQLite.SqlDatabase;
+import com.github.kskelm.baringo.util.BaringoApiException;
 
+import javax.security.auth.login.LoginException;
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -69,14 +73,14 @@ public class UserHandler extends LocalStorageHandler<User>
 
 
     @Override
-    public void set(User user) throws Exception
+    public void set(User user) throws SQLException, URISyntaxException, IOException, LoginException, BaringoApiException
     {
         super.set(user);
         GuiUpdate.updateUsers();
     }
 
     @Override
-    public void remove(User user) throws Exception
+    public void remove(User user) throws SQLException, BaringoApiException, IOException, URISyntaxException
     {
         super.remove(user);
         GuiUpdate.updateUsers();
@@ -88,7 +92,7 @@ public class UserHandler extends LocalStorageHandler<User>
      * @param user
      */
     @Override
-    protected User setItem(User user) throws Exception
+    User setItem(User user) throws SQLException
     {
         return dbSetUser(user);
     }
@@ -99,7 +103,7 @@ public class UserHandler extends LocalStorageHandler<User>
      * @param user
      */
     @Override
-    protected void removeItem(User user) throws Exception
+    void removeItem(User user) throws SQLException
     {
         dbRemoveUser(user);
     }
@@ -110,7 +114,7 @@ public class UserHandler extends LocalStorageHandler<User>
      * @return
      */
     @Override
-    protected ArrayList<User> getAllItems() throws Exception
+    ArrayList<User> getAllItems() throws SQLException
     {
         return dbGetUsers();
     }
@@ -119,7 +123,7 @@ public class UserHandler extends LocalStorageHandler<User>
 
     //region Database management.
 
-    private synchronized static User dbSetUser(User u) throws Exception
+    private synchronized static User dbSetUser(User u) throws SQLException
     {
         // if there was no user, return null
         if (u == null)
@@ -162,7 +166,7 @@ public class UserHandler extends LocalStorageHandler<User>
         return oldUser;
     }
 
-    private synchronized static void dbRemoveUser(User u) throws Exception
+    private synchronized static void dbRemoveUser(User u) throws SQLException
     {
         if (u == null)
             return;
@@ -192,7 +196,7 @@ public class UserHandler extends LocalStorageHandler<User>
      * @param imgurId
      * @return
      */
-    private synchronized static User dbGetUser(long imgurId) throws Exception
+    private synchronized static User dbGetUser(long imgurId) throws SQLException
     {
         // select the specified user with its respective usersubscription data.
         String query =
@@ -211,7 +215,7 @@ public class UserHandler extends LocalStorageHandler<User>
         ArrayList<ResultSet> result = SqlDatabase.query(prep);
 
         if (result.size() != 1)
-            throw new Exception("SqlDatabase exception: Expected result size did not match (was " + result.size() + ")");
+            throw new SQLException("SqlDatabase exception: Expected result size did not match (was " + result.size() + ")");
 
         ResultSet rs = result.get(0);
 
@@ -224,7 +228,7 @@ public class UserHandler extends LocalStorageHandler<User>
         return parsedUsers.get(0);
     }
 
-    private synchronized static ArrayList<User> dbGetUsers() throws Exception
+    private synchronized static ArrayList<User> dbGetUsers() throws SQLException
     {
         // select all users with their respective usersubscription data.
         String query =
@@ -241,14 +245,14 @@ public class UserHandler extends LocalStorageHandler<User>
         ArrayList<ResultSet> result = SqlDatabase.query(prep);
 
         if (result.size() != 1)
-            throw new Exception("SqlDatabase exception: Expected result size did not match (was " + result.size() + ")");
+            throw new SQLException("SqlDatabase exception: Expected result size did not match (was " + result.size() + ")");
 
         ResultSet rs = result.get(0);
 
         return parseUsers(rs);
     }
 
-    private static ArrayList<User> parseUsers(ResultSet rs) throws Exception
+    private static ArrayList<User> parseUsers(ResultSet rs) throws SQLException
     {
         HashMap<Long, HashSet<UserSubscription>> subMap = new HashMap<>();
         HashMap<Long, DbUserData> userMap = new HashMap<>();
@@ -344,7 +348,7 @@ public class UserHandler extends LocalStorageHandler<User>
      * @return The imgur id for the specified user, or -1 if it did not exist in the database.
      * @throws SQLException
      */
-    private synchronized static long getUserId(User u) throws Exception
+    private synchronized static long getUserId(User u) throws SQLException
     {
         // only the imgur id needs to be unique.
         String query =
@@ -356,10 +360,10 @@ public class UserHandler extends LocalStorageHandler<User>
         ArrayList<ResultSet> result = SqlDatabase.query(prep);
 
         if (result == null)
-            throw new Exception("SqlDatabase exception: query result was null");
+            throw new SQLException("SqlDatabase exception: query result was null");
 
         if (result.size() != 1)
-            throw new Exception("SqlDatabase exception: Expected result size did not match (was " + result.size() + ")");
+            throw new SQLException("SqlDatabase exception: Expected result size did not match (was " + result.size() + ")");
 
         ResultSet rs = result.get(0);
 
@@ -381,7 +385,7 @@ public class UserHandler extends LocalStorageHandler<User>
      * @return The corresponding user if it existed, otherwise null
      * @throws Exception
      */
-    public static User getUserByImgurId(long imgurId) throws Exception
+    public static User getUserByImgurId(long imgurId) throws SQLException
     {
         ArrayList<User> users = handler().getAll();
 
@@ -400,7 +404,7 @@ public class UserHandler extends LocalStorageHandler<User>
      * @return The Imgur User object, or null if it could not be found.
      * @throws Exception
      */
-    public static User getUserByImgurName(String name) throws Exception
+    public static User getUserByImgurName(String name) throws SQLException
     {
         ArrayList<User> users = handler().getAll();
 

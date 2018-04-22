@@ -23,7 +23,7 @@
 package com.Bluefix.Prodosia.Discord;
 
 import com.Bluefix.Prodosia.Command.CommandRecognition;
-import com.Bluefix.Prodosia.Prefix.CommandPrefixStorage;
+import com.Bluefix.Prodosia.DataHandler.CommandPrefixStorage;
 import com.Bluefix.Prodosia.DataHandler.TrackerHandler;
 import com.Bluefix.Prodosia.DataType.Command.CommandInformation;
 import com.Bluefix.Prodosia.Prefix.CommandPrefix;
@@ -42,6 +42,7 @@ import net.dv8tion.jda.core.hooks.EventListener;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
 
 import javax.security.auth.login.LoginException;
+import java.io.IOException;
 import java.util.LinkedList;
 
 public class DiscordManager
@@ -57,7 +58,7 @@ public class DiscordManager
      * @return
      * @throws LoginException
      */
-    public synchronized static JDA manager() throws Exception
+    public synchronized static JDA manager() throws IOException, LoginException
     {
         if (me == null)
         {
@@ -67,7 +68,7 @@ public class DiscordManager
         return me;
     }
 
-    private static JDA createJDA() throws Exception
+    private static JDA createJDA() throws IOException, LoginException
     {
         // retrieve the stored token
         String discordToken = KeyStorage.getDiscordToken();

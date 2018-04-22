@@ -27,6 +27,7 @@ import com.Bluefix.Prodosia.DataType.Taglist.Rating;
 import com.Bluefix.Prodosia.DataType.Taglist.Taglist;
 import com.github.kskelm.baringo.model.Comment;
 
+import java.sql.SQLException;
 import java.util.HashSet;
 import java.util.Objects;
 
@@ -63,7 +64,7 @@ public class BaseTagRequest
     }
 
 
-    public BaseTagRequest(String taglists, int rating, String filter, boolean cleanComments) throws Exception
+    public BaseTagRequest(String taglists, int rating, String filter, boolean cleanComments) throws SQLException
     {
         this.taglists = new HashSet<>();
         String[] tlArr = taglists.split(";");
@@ -87,7 +88,7 @@ public class BaseTagRequest
         return taglists;
     }
 
-    public String getDbTaglists() throws Exception
+    public String getDbTaglists() throws SQLException
     {
         StringBuilder sb = new StringBuilder();
 
