@@ -22,6 +22,7 @@
 
 package com.Bluefix.Prodosia.Command.CommandFunc;
 
+import com.Bluefix.Prodosia.Command.CommandFunc.Subscription.UnsubCommand;
 import com.Bluefix.Prodosia.Command.CommandRecognition;
 import com.Bluefix.Prodosia.Prefix.CommandPrefixStorage;
 import com.Bluefix.Prodosia.DataHandler.TaglistHandler;
@@ -37,58 +38,51 @@ import com.Bluefix.Prodosia.DataType.Tracker.TrackerPermissions;
 import com.Bluefix.Prodosia.DataType.User.User;
 import com.Bluefix.Prodosia.DataType.User.UserSubscription;
 import com.Bluefix.Prodosia.Imgur.ImgurApi.ImgurManager;
+import com.github.kskelm.baringo.model.Account;
 import com.github.kskelm.baringo.model.Comment;
 import com.github.kskelm.baringo.util.BaringoApiException;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.*;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.HashSet;
 
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 public class UnsubCommandTest
 {
-    private String prefix;
-    private CommandPrefix cPrefix;
+    private static final String TestImgurName = "mashedstew";
+    private static final long TestImgurId = 33641050;
+
+    private ICommandFunc unsubCommand;
 
     private Taglist tlTest0;
     private Taglist tlTest1;
 
-    private UserSubscription us0;
-    private UserSubscription us1;
-    private UserSubscription us2;
-    private UserSubscription us3;
-    private UserSubscription us4;
+    // some useful usersubscriptions for us
+    UserSubscription us0;
+    UserSubscription us1;
 
-    private String uName0;
-    private String uName1;
-    private String uName2;
 
-    private User u0;
-    private User u1;
-    private User u2;
+    @Mock
+    CommandInformation commandInformation;
 
-    private static final long imgurId = 33641050;
-    private Tracker myTracker;
-    private static final long parentId = 1301573497;
+    @Mock
+    Tracker tracker;
 
-    private long u0Id;
-    private long u1Id;
-    private long u2Id;
+    @Rule
+    public MockitoRule mockitoRule = MockitoJUnit.rule();
+
+
 
     @Before
     public void setUp() throws Exception
     {
-        prefix = "!testPrefix ";
-
-        cPrefix = new CommandPrefix(
-                CommandPrefix.Type.TEST,
-                CommandPrefix.parsePatternForItems(prefix));
-
-        CommandPrefixStorage.handler().set(cPrefix);
-
+        unsubCommand = new UnsubCommand();
 
         tlTest0 = new Taglist("test0", "test0 taglist", false);
         tlTest1 = new Taglist("test1", "test1 taglist", true);
@@ -96,127 +90,208 @@ public class UnsubCommandTest
         TaglistHandler.handler().set(tlTest0);
         TaglistHandler.handler().set(tlTest1);
 
-        HashSet<UserSubscription> sub0 = new HashSet<>();
-        HashSet<UserSubscription> sub1 = new HashSet<>();
-        HashSet<UserSubscription> sub2 = new HashSet<>();
+        HashSet<Rating> nonRatingRatings = new HashSet<>();
+        nonRatingRatings.add(Rating.ALL);
 
         HashSet<Rating> ratings = new HashSet<>();
         ratings.add(Rating.SAFE);
+        ratings.add(Rating.QUESTIONABLE);
+        ratings.add(Rating.EXPLICIT);
 
-        UserSubscription us0 = new UserSubscription(tlTest0, null, null);
-        UserSubscription us1 = new UserSubscription(tlTest0, null, "cows");
-        UserSubscription us2 = new UserSubscription(tlTest0, ratings, null);
-        UserSubscription us3 = new UserSubscription(tlTest1, ratings, null);
-        UserSubscription us4 = new UserSubscription(tlTest1, null, null);
-        UserSubscription us5 = new UserSubscription(tlTest1, ratings, "cows");
-
-        sub0.add(us0);
-        sub0.add(us3);
-        sub1.add(us1);
-        sub1.add(us4);
-        sub2.add(us2);
-        sub2.add(us5);
-
-        uName0 = "mashedstew";
-        uName1 = "BloomingRose";
-        uName2 = "MisterThree";
-
-        u0Id = 33641050;
-        u1Id = 58590281;
-        u2Id = 13920225;
-
-        u0 = new User(uName0, u0Id, sub0);
-        u1 = new User(uName1, u1Id, sub1);
-        u2 = new User(uName2, u2Id, sub2);
-
-        //UserHandler.handler().set(u0);
-        //UserHandler.handler().set(u1);
-        //UserHandler.handler().set(u2);
-
-
-        TrackerPermissions perm = new TrackerPermissions(TrackerPermissions.TrackerType.ADMIN);
-        myTracker = new Tracker(uName0, u0Id, null, "0000", "", perm);
-        TrackerHandler.handler().set(myTracker);
+        us0 = new UserSubscription(tlTest0, nonRatingRatings, null);
+        us1 = new UserSubscription(tlTest1, ratings, null);
     }
 
     @After
     public void tearDown() throws Exception
     {
-        CommandPrefixStorage.handler().remove(cPrefix);
-
         TaglistHandler.handler().remove(tlTest0);
         TaglistHandler.handler().remove(tlTest1);
 
-        UserHandler.handler().remove(u0);
-        UserHandler.handler().remove(u1);
-        UserHandler.handler().remove(u2);
+
+        User u = UserHandler.getUserByImgurName(TestImgurName);
+
+        if (u != null)
+            UserHandler.handler().remove(u);
     }
 
 
-    /**
-     * Complete deletion
-     * @throws Exception
-     */
-    @Test
-    public void test0() throws Exception
+    //region Bad Weather
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testNoTracker() throws Exception
     {
-        String command = prefix + "unsub mashedstew";
-
-
-        UserHandler.handler().set(u0);
-
-        User u = UserHandler.getUserByImgurId(u0Id);
-        Assert.assertEquals(u0, u);
-
-        executeCommand(command, parentId);
-
-        // the command is threaded so it's assumed to take a short while before the
-        // subscription actually comes through
-        Thread.sleep(1000);
-
-        u = UserHandler.getUserByImgurId(u0Id);
-
-        Assert.assertEquals(null, u);
+        unsubCommand.execute(commandInformation, new String[0]);
     }
-
 
     @Test
-    public void test1() throws Exception
+    public void testNoUsernameProvided() throws Exception
     {
-        String command = prefix + "unsub mashedstew test0";
+        when(commandInformation.getTracker()).thenReturn(tracker);
 
-        UserHandler.handler().set(u0);
+        unsubCommand.execute(commandInformation, new String[0]);
 
-        User u = UserHandler.getUserByImgurId(u0Id);
-        Assert.assertEquals(u0, u);
-        Assert.assertEquals(2, u.getSubscriptions().size());
+        verify(commandInformation).reply("Error! No username was given.");
+    }
 
-        executeCommand(command, parentId);
+    @Test
+    public void testUserNotFound() throws Exception
+    {
+        when(commandInformation.getTracker()).thenReturn(tracker);
 
-        // the command is threaded so it's assumed to take a short while before the
-        // subscription actually comes through
-        Thread.sleep(1000);
+        // the name should by default not be part of the system.
+        // if it is, the error lies most likely elsewhere. Perhaps a test that doesn't
+        // properly clean it up after itself.
+        unsubCommand.execute(commandInformation, new String[] {TestImgurName});
 
-        u = UserHandler.getUserByImgurId(u0Id);
+        verify(commandInformation).reply("Error! The user was not found in any taglist.");
+    }
 
-        Assert.assertNotEquals(null, u);
-        Assert.assertEquals(1, u.getSubscriptions().size());
+    @Test
+    public void testNoPermission() throws Exception
+    {
+        User u = UserHandler.getUserByImgurName(TestImgurName);
+        Assert.assertNull(u);
+
+        HashSet<UserSubscription> subs = new HashSet<>();
+        subs.add(us0);
+        u = new User(TestImgurName, TestImgurId, subs);
+
+        UserHandler.handler().set(u);
+
+        // ---
+
+        when(commandInformation.getTracker()).thenReturn(tracker);
+
+        unsubCommand.execute(commandInformation, new String[] {TestImgurName});
+
+        verify(commandInformation).reply("Error! The user was not allowed to unsubscribe from these taglists.");
+
+        // ---
+
+        u = UserHandler.getUserByImgurName(TestImgurName);
+        Assert.assertNotNull(u);
+        Assert.assertNotNull(u.getSubscription(tlTest0.getId()));
     }
 
 
-
-
-    private void executeCommand(String command, long parentId) throws BaringoApiException, IOException, URISyntaxException
+    @Test
+    public void testNoTaglistIntersection() throws Exception
     {
-        Comment comment = ImgurManager.client().commentService().getComment(parentId);
+        User u = UserHandler.getUserByImgurName(TestImgurName);
+        Assert.assertNull(u);
 
-        //TODO: for a proper test I should mock CommandInformation and check if the reply method is properly called.
+        HashSet<UserSubscription> subs = new HashSet<>();
+        subs.add(us0);
+        u = new User(TestImgurName, TestImgurId, subs);
 
-        CommandInformation ci =
-                new ImgurCommandInformation(myTracker, comment);
+        UserHandler.handler().set(u);
 
-        CommandRecognition.executeEntry(CommandPrefix.Type.TEST, ci, command);
+        // ---
+
+        when(commandInformation.getTracker()).thenReturn(tracker);
+        when(tracker.hasPermission(tlTest0)).thenReturn(true);
+        when(tracker.hasPermission(tlTest1)).thenReturn(true);
+
+        unsubCommand.execute(commandInformation, new String[] {TestImgurName, "test1"});
+
+        verify(commandInformation).reply("Notice: The user was not part of any of these taglists.");
+
+        // ---
+
+        Assert.assertNotNull(UserHandler.getUserByImgurName(TestImgurName));
     }
+
+
+    //endregion
+
+    //region Good Weather
+
+    @Test
+    public void testUnsubscribeUserPlainly() throws Exception
+    {
+        User u = UserHandler.getUserByImgurName(TestImgurName);
+        Assert.assertNull(u);
+
+        HashSet<UserSubscription> subs = new HashSet<>();
+        subs.add(us0);
+        u = new User(TestImgurName, TestImgurId, subs);
+
+        UserHandler.handler().set(u);
+
+        // ---
+
+        when(commandInformation.getTracker()).thenReturn(tracker);
+        when(tracker.hasPermission(tlTest0)).thenReturn(true);
+
+        unsubCommand.execute(commandInformation, new String[] {TestImgurName});
+
+        verify(commandInformation).reply("Successfully unsubscribed user \"" + TestImgurName + "\" from taglists (test0).");
+
+        // ---
+
+        Assert.assertNull(UserHandler.getUserByImgurName(TestImgurName));
+    }
+
+    @Test
+    public void testUnsubscribeAndRetainUser() throws Exception
+    {
+        User u = UserHandler.getUserByImgurName(TestImgurName);
+        Assert.assertNull(u);
+
+        HashSet<UserSubscription> subs = new HashSet<>();
+        subs.add(us0);
+        subs.add(us1);
+        u = new User(TestImgurName, TestImgurId, subs);
+
+        UserHandler.handler().set(u);
+
+        // ---
+
+        when(commandInformation.getTracker()).thenReturn(tracker);
+        when(tracker.hasPermission(tlTest0)).thenReturn(true);
+        when(tracker.hasPermission(tlTest1)).thenReturn(true);
+
+        unsubCommand.execute(commandInformation, new String[] {TestImgurName, "test1"});
+
+        verify(commandInformation).reply("Successfully unsubscribed user \"" + TestImgurName + "\" from taglists (test1).");
+
+        // ---
+
+        u = UserHandler.getUserByImgurName(TestImgurName);
+        Assert.assertNotNull(u);
+        Assert.assertNotNull(u.getSubscription(tlTest0.getId()));
+        Assert.assertNull(u.getSubscription(tlTest1.getId()));
+    }
+
+    @Test
+    public void testUnsubscribeUserExplicitly() throws Exception
+    {
+        User u = UserHandler.getUserByImgurName(TestImgurName);
+        Assert.assertNull(u);
+
+        HashSet<UserSubscription> subs = new HashSet<>();
+        subs.add(us0);
+        subs.add(us1);
+        u = new User(TestImgurName, TestImgurId, subs);
+
+        UserHandler.handler().set(u);
+
+        // ---
+
+        when(commandInformation.getTracker()).thenReturn(tracker);
+        when(tracker.hasPermission(tlTest0)).thenReturn(true);
+        when(tracker.hasPermission(tlTest1)).thenReturn(true);
+
+        unsubCommand.execute(commandInformation, new String[]{TestImgurName, "test0", "test1"});
+
+        verify(commandInformation).reply("Successfully unsubscribed user \"" + TestImgurName + "\" from taglists (test0, test1).");
+
+        // ---
+
+        Assert.assertNull(UserHandler.getUserByImgurName(TestImgurName));
+    }
+    //endregion
 
 
 

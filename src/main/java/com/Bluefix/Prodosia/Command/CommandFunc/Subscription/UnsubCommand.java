@@ -68,6 +68,8 @@ public class UnsubCommand implements ICommandFunc
         // if no taglists were supplied, notify the user.
         if (!taglists.hasNext())
         {
+            // NOTE: this should *never* happen, but just in case it does,
+            // I would rather have the application keep functioning.
             if (arguments.length == 1)
             {
                 msgNoTaglistsSetup(ci);
@@ -86,7 +88,7 @@ public class UnsubCommand implements ICommandFunc
         {
             Taglist cur = taglists.next();
 
-            if (ci.getTracker().getPermissions().hasPermission(cur))
+            if (ci.getTracker().hasPermission(cur))
                 allowedLists.add(cur);
         }
 
