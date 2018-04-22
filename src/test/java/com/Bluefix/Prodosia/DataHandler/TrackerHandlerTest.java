@@ -37,30 +37,39 @@ import java.util.Collection;
 
 import static org.junit.Assert.*;
 
-@RunWith(Parameterized.class)
-public class TrackerHandlerTest
+
+public class TrackerHandlerTest extends DataHandlerTest<Tracker>
 {
     private static final String TestImgurName = "mashedstew";
     private static final long TestImgurId = 33641050;
 
-    private TrackerHandler handler;
     private Tracker tracker;
 
     private TrackerPermissions perm;
 
 
-    @Parameterized.Parameters
-    public static Collection localStorage()
-    {
-        return Arrays.asList(new Boolean[]{ true, false});
-    }
+
+
+    //region abstract method implementation
 
     public TrackerHandlerTest(boolean useLocalStorage)
     {
-        handler = TrackerHandler.handler();
-
-        handler.setLocalStorage(useLocalStorage);
+        super(useLocalStorage);
     }
+
+    @Override
+    protected LocalStorageHandler<Tracker> getHandler()
+    {
+        return TrackerHandler.handler();
+    }
+
+    @Override
+    protected Tracker getItem()
+    {
+        return this.tracker;
+    }
+
+    //endregion
 
 
 
@@ -83,100 +92,16 @@ public class TrackerHandlerTest
     @After
     public void tearDown() throws Exception
     {
-        ArrayList<Tracker> trackers = new ArrayList<>(handler.getAll());
+        ArrayList<Tracker> trackers = new ArrayList<>(getHandler().getAll());
 
         for (Tracker t : trackers)
         {
             if (t.getImgurName().equals(TestImgurName))
-                handler.remove(t);
+                getHandler().remove(t);
         }
-
-    }
-
-    //region Bad weather tests
-
-    @Test
-    public void testSetNullTracker() throws Exception
-    {
-        ArrayList<Tracker> trackers = handler.getAll();
-        int size = trackers.size();
-
-        handler.set(null);
-
-        Assert.assertEquals(size, handler.getAll().size());
-    }
-
-    @Test
-    public void testDeleteNullTracker() throws Exception
-    {
-        ArrayList<Tracker> trackers = handler.getAll();
-        int size = trackers.size();
-
-        handler.remove(null);
-
-        Assert.assertEquals(size, handler.getAll().size());
     }
 
 
-    //endregion
-
-
-    //region Good weather tests
-
-    @Test
-    public void testAddItem() throws Exception
-    {
-        ArrayList<Tracker> trackers = handler.getAll();
-
-        Assert.assertFalse(trackers.contains(tracker));
-
-        handler.set(tracker);
-        trackers = handler.getAll();
-
-        Assert.assertTrue(trackers.contains(tracker));
-    }
-
-    @Test
-    public void testAddAndRemoveItem() throws Exception
-    {
-        ArrayList<Tracker> trackers = handler.getAll();
-
-        Assert.assertFalse(trackers.contains(tracker));
-
-        handler.set(tracker);
-        trackers = handler.getAll();
-
-        Assert.assertTrue(trackers.contains(tracker));
-
-        handler.remove(tracker);
-        trackers = handler.getAll();
-
-        Assert.assertFalse(trackers.contains(tracker));
-
-
-    }
-
-
-    @Test
-    public void testReplaceTracker() throws Exception
-    {
-        ArrayList<Tracker> trackers = handler.getAll();
-        int size = trackers.size();
-
-        Assert.assertFalse(trackers.contains(tracker));
-
-        handler.set(tracker);
-        trackers = handler.getAll();
-
-        Assert.assertTrue(trackers.contains(tracker));
-        Assert.assertEquals(size+1, trackers.size());
-
-        handler.set(tracker);
-        trackers = handler.getAll();
-
-        Assert.assertTrue(trackers.contains(tracker));
-        Assert.assertEquals(size+1, trackers.size());
-    }
 
 
     @Test
@@ -186,13 +111,11 @@ public class TrackerHandlerTest
 
         Assert.assertNull(t);
 
-        handler.set(tracker);
+        getHandler().set(tracker);
 
         t = TrackerHandler.getTrackerByImgurId(TestImgurId);
         Assert.assertNotNull(t);
         Assert.assertEquals(TestImgurName, t.getImgurName());
         Assert.assertEquals(TestImgurId, t.getImgurId());
     }
-
-    //endregion
 }

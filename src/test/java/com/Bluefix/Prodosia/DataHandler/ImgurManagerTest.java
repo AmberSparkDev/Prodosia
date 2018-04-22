@@ -20,28 +20,29 @@
  * SOFTWARE.
  */
 
-package com.Bluefix.Prodosia.Imgur.CommentDeletion;
+package com.Bluefix.Prodosia.DataHandler;
 
-import com.Bluefix.Prodosia.DataHandler.CommentDeletionStorage;
+import com.Bluefix.Prodosia.Imgur.ImgurApi.ImgurManager;
+import com.github.kskelm.baringo.BaringoClient;
+import com.github.kskelm.baringo.util.BaringoApiException;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.ArrayList;
+import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 
 import static org.junit.Assert.*;
 
-public class CommentDeletionStorageTest
+public class ImgurManagerTest
 {
-    private CommentDeletionStorage handler;
-
-    private long value;
+    private BaringoClient client;
 
     @Before
     public void setUp() throws Exception
     {
-        handler = CommentDeletionStorage.handler();
-        value = 0;
+        client = ImgurManager.client();
     }
 
     @After
@@ -50,51 +51,11 @@ public class CommentDeletionStorageTest
     }
 
 
+
     @Test
-    public void testFunctionalityWithLocalStorage() throws Exception
+    public void test() throws BaringoApiException
     {
-        handler.setLocalStorage(true);
-
-        ArrayList<Long> deletions = handler.getAll();
-
-        if (deletions.contains(value))
-            fail();
-
-        handler.set(value);
-        deletions = handler.getAll();
-
-        if (!deletions.contains(value))
-            fail();
-
-        handler.remove(value);
-        deletions = handler.getAll();
-
-        if (deletions.contains(value))
-            fail();
-
 
     }
 
-    @Test
-    public void testFunctionalityWithoutLocalStorage() throws Exception
-    {
-        handler.setLocalStorage(false);
-
-        ArrayList<Long> deletions = handler.getAll();
-
-        if (deletions.contains(value))
-            fail();
-
-        handler.set(value);
-        deletions = handler.getAll();
-
-        if (!deletions.contains(value))
-            fail();
-
-        handler.remove(value);
-        deletions = handler.getAll();
-
-        if (deletions.contains(value))
-            fail();
-    }
 }

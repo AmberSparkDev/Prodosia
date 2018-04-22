@@ -20,7 +20,7 @@
  * SOFTWARE.
  */
 
-package com.Bluefix.Prodosia.Imgur.Tagging;
+package com.Bluefix.Prodosia.DataHandler;
 
 import com.Bluefix.Prodosia.DataHandler.TagRequestStorage;
 import com.Bluefix.Prodosia.DataHandler.TaglistHandler;

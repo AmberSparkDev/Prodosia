@@ -20,35 +20,64 @@
  * SOFTWARE.
  */
 
-package com.Bluefix.Prodosia.Discord.Archive;
+package com.Bluefix.Prodosia.DataHandler;
 
 import com.Bluefix.Prodosia.DataHandler.ArchiveHandler;
 import com.Bluefix.Prodosia.DataHandler.TaglistHandler;
 import com.Bluefix.Prodosia.DataType.Archive.Archive;
 import com.Bluefix.Prodosia.DataType.Taglist.Taglist;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashSet;
 
 import static org.junit.Assert.*;
 
-public class ArchiveHandlerTest
-{
-    private ArchiveHandler handler;
 
+
+public class ArchiveHandlerTest extends DataHandlerTest<Archive>
+{
     private Taglist taglist;
     private Archive archive;
+
+
+
+
+    //region abstract method implementation
+
+    public ArchiveHandlerTest(boolean useLocalStorage)
+    {
+        super(useLocalStorage);
+    }
+
+    @Override
+    protected LocalStorageHandler<Archive> getHandler()
+    {
+        return ArchiveHandler.handler();
+    }
+
+    @Override
+    protected Archive getItem()
+    {
+        return archive;
+    }
+
+    //endregion
 
 
 
     @Before
     public void setUp() throws Exception
     {
-        handler = ArchiveHandler.handler();
-        taglist = new Taglist(-1,"my_abbreviation", "my_description", false);
+
+        taglist = new Taglist("test0", "test0 taglist", false);
         TaglistHandler.handler().set(taglist);
 
         archive = new Archive(taglist, "description", "406473126898171926", new HashSet<>(), "");
@@ -57,55 +86,23 @@ public class ArchiveHandlerTest
     @After
     public void tearDown() throws Exception
     {
+        ArchiveHandler.handler().remove(archive);
         TaglistHandler.handler().remove(taglist);
     }
 
 
     @Test
-    public void testFunctionalityWithLocalStorage() throws Exception
+    public void testGetArchiveForTaglist() throws Exception
     {
-        handler.setLocalStorage(true);
+        ArrayList<Archive> archives = ArchiveHandler.getArchivesForTaglist(taglist);
+        Assert.assertTrue(archives.isEmpty());
 
-        ArrayList<Archive> archives = handler.getAll();
+        ArchiveHandler.handler().set(archive);
 
-        if (archives.contains(archive))
-            fail();
-
-        handler.set(archive);
-        archives = handler.getAll();
-
-        if (!archives.contains(archive))
-            fail();
-
-        handler.remove(archive);
-        archives = handler.getAll();
-
-        if (archives.contains(archive))
-            fail();
-
-
+        archives = ArchiveHandler.getArchivesForTaglist(taglist);
+        Assert.assertEquals(1, archives.size());
     }
 
-    @Test
-    public void testFunctionalityWithoutLocalStorage() throws Exception
-    {
-        handler.setLocalStorage(false);
 
-        ArrayList<Archive> archives = handler.getAll();
 
-        if (archives.contains(archive))
-            fail();
-
-        handler.set(archive);
-        archives = handler.getAll();
-
-        if (!archives.contains(archive))
-            fail();
-
-        handler.remove(archive);
-        archives = handler.getAll();
-
-        if (archives.contains(archive))
-            fail();
-    }
 }

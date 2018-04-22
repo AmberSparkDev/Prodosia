@@ -20,28 +20,28 @@
  * SOFTWARE.
  */
 
-package com.Bluefix.Prodosia.Imgur.ImgurApi;
+package com.Bluefix.Prodosia.DataHandler;
 
-import com.github.kskelm.baringo.BaringoClient;
-import com.github.kskelm.baringo.util.BaringoApiException;
+import com.Bluefix.Prodosia.DataHandler.CommentDeletionStorage;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.time.LocalDateTime;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 
 import static org.junit.Assert.*;
 
-public class ImgurManagerTest
+public class CommentDeletionStorageTest
 {
-    private BaringoClient client;
+    private CommentDeletionStorage handler;
+
+    private long value;
 
     @Before
     public void setUp() throws Exception
     {
-        client = ImgurManager.client();
+        handler = CommentDeletionStorage.handler();
+        value = 0;
     }
 
     @After
@@ -50,11 +50,51 @@ public class ImgurManagerTest
     }
 
 
-
     @Test
-    public void test() throws BaringoApiException
+    public void testFunctionalityWithLocalStorage() throws Exception
     {
+        handler.setLocalStorage(true);
+
+        ArrayList<Long> deletions = handler.getAll();
+
+        if (deletions.contains(value))
+            fail();
+
+        handler.set(value);
+        deletions = handler.getAll();
+
+        if (!deletions.contains(value))
+            fail();
+
+        handler.remove(value);
+        deletions = handler.getAll();
+
+        if (deletions.contains(value))
+            fail();
+
 
     }
 
+    @Test
+    public void testFunctionalityWithoutLocalStorage() throws Exception
+    {
+        handler.setLocalStorage(false);
+
+        ArrayList<Long> deletions = handler.getAll();
+
+        if (deletions.contains(value))
+            fail();
+
+        handler.set(value);
+        deletions = handler.getAll();
+
+        if (!deletions.contains(value))
+            fail();
+
+        handler.remove(value);
+        deletions = handler.getAll();
+
+        if (deletions.contains(value))
+            fail();
+    }
 }

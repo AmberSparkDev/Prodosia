@@ -23,91 +23,78 @@
 package com.Bluefix.Prodosia.DataHandler;
 
 import com.Bluefix.Prodosia.Prefix.CommandPrefix;
+import com.github.kskelm.baringo.util.BaringoApiException;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import javax.security.auth.login.LoginException;
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.sql.SQLException;
 import java.util.ArrayList;
 
 import static org.junit.Assert.*;
 
-public class CommandPrefixStorageTest
+public class CommandPrefixStorageTest extends DataHandlerTest<CommandPrefix>
 {
     /**
      * Keep track of the old prefix item in the database, and restore it at the end.
      */
-    private CommandPrefix oldPrefix;
+    private CommandPrefix prefix;
 
-    private CommandPrefixStorage handler;
 
-    private CommandPrefix tempPrefix;
+
+
+    //region abstract method implementation
+
+    public CommandPrefixStorageTest(boolean useLocalStorage)
+    {
+        super(useLocalStorage);
+    }
+
+    @Override
+    protected LocalStorageHandler<CommandPrefix> getHandler()
+    {
+        return CommandPrefixStorage.handler();
+    }
+
+    @Override
+    protected CommandPrefix getItem()
+    {
+        return this.prefix;
+    }
+
+    //endregion
 
 
     @Before
-    public void setUp() throws Exception
+    public void setUp()
     {
-        oldPrefix = CommandPrefixStorage.getPrefixForType(CommandPrefix.Type.IMGUR);
-
-
-        handler = CommandPrefixStorage.handler();
-        handler.remove(oldPrefix);
-
-        tempPrefix = new CommandPrefix(CommandPrefix.Type.IMGUR, "");
+        prefix = new CommandPrefix(CommandPrefix.Type.TEST, "testPrefix");
 
     }
 
     @After
     public void tearDown() throws Exception
     {
-        handler.set(oldPrefix);
+        CommandPrefixStorage.handler().remove(prefix);
     }
 
 
     @Test
-    public void testFunctionalityWithLocalStorage() throws Exception
+    public void testGetCommandPrefixForType() throws SQLException, URISyntaxException, IOException, LoginException, BaringoApiException
     {
-        handler.setLocalStorage(true);
+        CommandPrefix myPrefix = CommandPrefixStorage.getPrefixForType(CommandPrefix.Type.TEST);
+        Assert.assertNull(myPrefix);
 
-        ArrayList<CommandPrefix> prefixes = handler.getAll();
+        CommandPrefixStorage.handler().set(prefix);
 
-        if (prefixes.contains(tempPrefix))
-            fail();
-
-        handler.set(tempPrefix);
-        prefixes = handler.getAll();
-
-        if (!prefixes.contains(tempPrefix))
-            fail();
-
-        handler.remove(tempPrefix);
-        prefixes = handler.getAll();
-
-        if (prefixes.contains(tempPrefix))
-            fail();
+        myPrefix = CommandPrefixStorage.getPrefixForType(CommandPrefix.Type.TEST);
+        Assert.assertNotNull(myPrefix);
+        Assert.assertEquals("testPrefix", myPrefix.getRegex());
     }
 
-    @Test
-    public void testFunctionalityWithoutLocalStorage() throws Exception
-    {
 
-        handler.setLocalStorage(false);
-
-        ArrayList<CommandPrefix> prefixes = handler.getAll();
-
-        if (prefixes.contains(tempPrefix))
-            fail();
-
-        handler.set(tempPrefix);
-        prefixes = handler.getAll();
-
-        if (!prefixes.contains(tempPrefix))
-            fail();
-
-        handler.remove(tempPrefix);
-        prefixes = handler.getAll();
-
-        if (prefixes.contains(tempPrefix))
-            fail();
-
-    }
 }

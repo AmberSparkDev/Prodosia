@@ -230,20 +230,12 @@ public class ArchiveHandler extends LocalStorageHandler<Archive>
      * @param t The specified taglist.
      * @return An arraylist with the archives that correspond to the taglist.
      */
-    public static ArrayList<Archive> getArchivesForTaglist(Taglist t) throws Exception
+    public static ArrayList<Archive> getArchivesForTaglist(Taglist t) throws SQLException
     {
         ArrayList<Archive> archives = new ArrayList<>(handler().getAll());
 
         archives.removeIf(a ->
-        {
-            try
-            {
-                return !a.getTaglist().equals(t);
-            } catch (Exception e)
-            {
-                return true;
-            }
-        });
+                !a.getTaglist().equals(t));
 
         return archives;
     }

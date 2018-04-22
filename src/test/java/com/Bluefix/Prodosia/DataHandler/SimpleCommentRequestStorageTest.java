@@ -20,50 +20,36 @@
  * SOFTWARE.
  */
 
-package com.Bluefix.Prodosia.Imgur.CommentScanner;
+package com.Bluefix.Prodosia.DataHandler;
 
-import com.Bluefix.Prodosia.DataHandler.CommentScannerStorage;
-import com.Bluefix.Prodosia.DataHandler.TrackerHandler;
-import com.Bluefix.Prodosia.DataType.Tracker.Tracker;
-import com.Bluefix.Prodosia.DataType.Tracker.TrackerBookmark;
-import com.Bluefix.Prodosia.DataType.Tracker.TrackerPermissions;
+import com.Bluefix.Prodosia.DataHandler.SimpleCommentRequestStorage;
+import com.Bluefix.Prodosia.DataType.Comments.SimpleCommentRequest;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.util.ArrayList;
-import java.util.Date;
 
 import static org.junit.Assert.*;
 
-public class CommentScannerStorageTest
+public class SimpleCommentRequestStorageTest
 {
-    private CommentScannerStorage handler;
-    private TrackerBookmark value;
 
-    private Tracker tracker;
+
+    private SimpleCommentRequestStorage handler;
+    private SimpleCommentRequest request;
+
 
     @Before
     public void setUp() throws Exception
     {
-        handler = CommentScannerStorage.handler();
-
-
-        // create a new Tracker
-        TrackerPermissions perm = new TrackerPermissions(TrackerPermissions.TrackerType.ADMIN);
-
-        tracker = new Tracker("mashedstew", 1, null, "0000", "", perm);
-
-        TrackerHandler.handler().set(tracker);
-
-        value = new TrackerBookmark(0, new Date(Long.MAX_VALUE), tracker);
-
+        this.handler = SimpleCommentRequestStorage.handler();
+        this.request = new SimpleCommentRequest(1301573497, "five");
     }
 
     @After
     public void tearDown() throws Exception
     {
-        TrackerHandler.handler().remove(tracker);
     }
 
 
@@ -72,46 +58,45 @@ public class CommentScannerStorageTest
     {
         handler.setLocalStorage(true);
 
-        ArrayList<TrackerBookmark> bookmarks = handler.getAll();
+        ArrayList<SimpleCommentRequest> requests = handler.getAll();
 
-        if (bookmarks.contains(value))
+        if (requests.contains(request))
             fail();
 
-        handler.set(value);
-        bookmarks = handler.getAll();
+        handler.set(request);
+        requests = handler.getAll();
 
-        if (!bookmarks.contains(value))
+        if (!requests.contains(request))
             fail();
 
-        handler.remove(value);
-        bookmarks = handler.getAll();
+        handler.remove(request);
+        requests = handler.getAll();
 
-        if (bookmarks.contains(value))
+        if (requests.contains(request))
             fail();
-
-
     }
 
     @Test
     public void testFunctionalityWithoutLocalStorage() throws Exception
     {
+
         handler.setLocalStorage(false);
 
-        ArrayList<TrackerBookmark> bookmarks = handler.getAll();
+        ArrayList<SimpleCommentRequest> requests = handler.getAll();
 
-        if (bookmarks.contains(value))
+        if (requests.contains(request))
             fail();
 
-        handler.set(value);
-        bookmarks = handler.getAll();
+        handler.set(request);
+        requests = handler.getAll();
 
-        if (!bookmarks.contains(value))
+        if (!requests.contains(request))
             fail();
 
-        handler.remove(value);
-        bookmarks = handler.getAll();
+        handler.remove(request);
+        requests = handler.getAll();
 
-        if (bookmarks.contains(value))
+        if (requests.contains(request))
             fail();
     }
 }
