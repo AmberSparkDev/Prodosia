@@ -24,7 +24,9 @@ package com.Bluefix.Prodosia.GUI.Navigation;
 
 import com.Bluefix.Prodosia.Discord.DiscordManager;
 import com.Bluefix.Prodosia.Imgur.ImgurApi.ImgurManager;
+import com.Bluefix.Prodosia.Module.ModuleManager;
 import com.Bluefix.Prodosia.Storage.KeyStorage;
+import com.github.kskelm.baringo.BaringoClient;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
@@ -33,6 +35,7 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
+import javax.security.auth.login.LoginException;
 import java.io.IOException;
 import java.io.PrintStream;
 
@@ -108,25 +111,45 @@ public class GuiApplication extends Application
         primaryStage.setScene(scene);
         VistaNavigator.setVistaHolder(loader.getController());
 
-        // if the imgur key was not setup, first go to the API keys window.
+        // finish the necessary initialization now that the GUI is ready.
+        initializationFinished();
+        primaryStage.show();
+    }
+
+
+    private void initializationFinished() throws IOException, LoginException
+    {
+        // start the discord manager.
+        DiscordManager.manager();
+
+        // initialize the Imgur dependencies if applicable.
         if (KeyStorage.getImgurKey() == null)
         {
             VistaNavigator.loadVista(VistaNavigator.AppStage.API_KEYS);
         }
         else
         {
-            // start the imgur manager.
-            ImgurManager.client();
 
-            // start the discord manager.
-            DiscordManager.manager();
+            try
+            {
+                BaringoClient client = ImgurManager.client();
 
-            VistaNavigator.loadVista(VistaNavigator.AppStage.MAIN_MENU);
+                if (client != null)
+                {
+                    ModuleManager.startImgurDependencies();
+                    VistaNavigator.loadVista(VistaNavigator.AppStage.MAIN_MENU);
+                } else
+                {
+                    VistaNavigator.loadVista(VistaNavigator.AppStage.API_KEYS);
+                }
+
+            } catch (Exception e)
+            {
+                // on any exception, we will direct to the API keys
+                // to ensure they are valid.
+                VistaNavigator.loadVista(VistaNavigator.AppStage.API_KEYS);
+            }
         }
-
-
-
-        primaryStage.show();
     }
 
 

@@ -40,22 +40,7 @@ public class Main
 
         System.out.println("com.Bluefix.Prodosia.Application started");
 
-        // initialize the Imgur dependencies if applicable.
-        try
-        {
-            BaringoClient client = ImgurManager.client();
-
-            if (client != null)
-                ModuleManager.startImgurDependencies();
-
-        } catch (Exception e)
-        {
-            // ignore
-        }
-
         // launch the VistaNavigator
         VistaNavigator.initialize();
-
-
     }
 }

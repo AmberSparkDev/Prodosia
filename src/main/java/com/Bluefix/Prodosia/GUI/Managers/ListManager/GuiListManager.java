@@ -95,9 +95,6 @@ public abstract class GuiListManager<T extends Labeled> implements AutoCloseable
         dereference();
 
         this.guiEntries = null;
-
-        if (this.root != null)
-            this.root.getChildren().clear();
     }
 
 
@@ -136,8 +133,6 @@ public abstract class GuiListManager<T extends Labeled> implements AutoCloseable
 
         guiEntries.layout();
         root.layout();
-
-        //ExceptionHelper.showMessage("amount of children = " + guiEntries.getChildren().size());
     }
 
     /**

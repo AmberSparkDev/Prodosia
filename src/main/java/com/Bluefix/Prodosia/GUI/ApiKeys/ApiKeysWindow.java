@@ -162,7 +162,17 @@ public class ApiKeysWindow
                 // set the keys and return.
                 acceptDiscordToken = "";
                 store();
-                VistaNavigator.loadVista(VistaNavigator.AppStage.MAIN_MENU);
+
+
+                // make sure that the user is properly authorized.
+                if (ImgurManager.client() == null)
+                {
+                    ExceptionHelper.showMessage("Not authorized! Please check if your Imgur credentials are valid.");
+                }
+                else
+                {
+                    VistaNavigator.loadVista(VistaNavigator.AppStage.MAIN_MENU);
+                }
             }
             else
             {
@@ -203,7 +213,17 @@ public class ApiKeysWindow
         {
             // both the imgur key and discord key were valid. Return back to the main menu.
             store();
-            VistaNavigator.loadVista(VistaNavigator.AppStage.MAIN_MENU);
+
+
+            // make sure that the user is properly authorized.
+            if (ImgurManager.client() == null)
+            {
+                ExceptionHelper.showMessage("Not authorized! Please check if your Imgur credentials are valid.");
+            }
+            else
+            {
+                VistaNavigator.loadVista(VistaNavigator.AppStage.MAIN_MENU);
+            }
         }
     }
 

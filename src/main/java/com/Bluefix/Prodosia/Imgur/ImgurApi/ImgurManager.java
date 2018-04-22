@@ -26,6 +26,7 @@ package com.Bluefix.Prodosia.Imgur.ImgurApi;
 import com.Bluefix.Prodosia.Authorization.ImgurAuthorization;
 import com.Bluefix.Prodosia.DataType.ImgurKey;
 import com.Bluefix.Prodosia.Exception.ExceptionHelper;
+import com.Bluefix.Prodosia.GUI.Navigation.VistaNavigator;
 import com.Bluefix.Prodosia.Module.ModuleManager;
 import com.Bluefix.Prodosia.Storage.KeyStorage;
 import com.github.kskelm.baringo.BaringoClient;
@@ -78,21 +79,28 @@ public class ImgurManager
             else
                 key = KeyStorage.getImgurKey();
 
-            client = createClient(key);
+            BaringoClient tmpClient = createClient(key);
 
             // immediately authorize the client if the key was stored locally.
             // if the key is not stored locally, it is most likely used for testing.
             // note: for anonymous usage it is not necessary to authorize. However,
             // heavy use of authorized api access it expected and immediate authorization
             // determines when the user is prompted, so it can be done on startup.
-            if (client != null && KeyStorage.getImgurKey() != null)
+            if (tmpClient != null && KeyStorage.getImgurKey() != null)
             {
-                ImgurAuthorization.Result res;
+                ImgurAuthorization.Result res = ImgurAuthorization.authorize(tmpClient, new URI(KeyStorage.getImgurKey().getCallback()));
 
-                do
+                // if the authorization doesn't complete successfully, redirect
+                // the user to the Imgur API keys window and don't remove client
+                // initialization.
+                if (res == ImgurAuthorization.Result.SUCCESS)
                 {
-                    res = ImgurAuthorization.authorize(client, new URI(KeyStorage.getImgurKey().getCallback()));
-                } while (res != ImgurAuthorization.Result.SUCCESS);
+                    ImgurManager.client = tmpClient;
+                }
+                else
+                {
+                    ImgurManager.client = null;
+                }
             }
 
             // start the imgur dependencies
@@ -162,24 +170,29 @@ public class ImgurManager
 
         ImgurKey key = KeyStorage.getImgurKey();
 
-        client = createClient(key);
+        BaringoClient tmpClient = createClient(key);
 
         // immediately authorize the client.
         // note: for anonymous usage it is not necessary to authorize. However,
         // heavy use of authorized api access it expected and immediate authorization
         // determines when the user is prompted, so it can be done on startup.
-        if (client != null)
+        if (tmpClient != null)
         {
-            ImgurAuthorization.Result res;
-            do
+            ImgurAuthorization.Result res = ImgurAuthorization.authorize(tmpClient, new URI(KeyStorage.getImgurKey().getCallback()));
+
+            if (res == ImgurAuthorization.Result.SUCCESS)
             {
-                res = ImgurAuthorization.authorize(client, new URI(KeyStorage.getImgurKey().getCallback()));
-            } while (res != ImgurAuthorization.Result.SUCCESS);
+                ImgurManager.client = tmpClient;
+            }
+            else
+            {
+                ImgurManager.client = null;
+            }
 
         }
 
         // if the client itself wasn't initialized yet, start the imgur dependencies.
-        if (!clientWasInitialized)
+        if (!clientWasInitialized && client != null)
             ModuleManager.startImgurDependencies();
     }
 
