@@ -305,7 +305,7 @@ public class CommandHandler
                 }
                 else if ("list".equals(arg))
                 {
-                    bMessage.append("(" + arg + "): " + listInformation());
+                    bMessage.append("(" + arg + "): " + listInformation() + "\n");
                 }
                 else if (func == null)
                 {
@@ -317,6 +317,8 @@ public class CommandHandler
                     bMessage.append("(" + arg + "): " + func.info() + "\n");
                 }
             }
+
+            bMessage.setLength(bMessage.length()-1);
 
 
             message = bMessage.toString();

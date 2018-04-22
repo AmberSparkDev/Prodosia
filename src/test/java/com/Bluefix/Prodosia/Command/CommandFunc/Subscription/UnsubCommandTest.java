@@ -20,8 +20,9 @@
  * SOFTWARE.
  */
 
-package com.Bluefix.Prodosia.Command.CommandFunc;
+package com.Bluefix.Prodosia.Command.CommandFunc.Subscription;
 
+import com.Bluefix.Prodosia.Command.CommandFunc.ICommandFunc;
 import com.Bluefix.Prodosia.Command.CommandFunc.Subscription.UnsubCommand;
 import com.Bluefix.Prodosia.Command.CommandRecognition;
 import com.Bluefix.Prodosia.Prefix.CommandPrefixStorage;
@@ -172,6 +173,29 @@ public class UnsubCommandTest
         u = UserHandler.getUserByImgurName(TestImgurName);
         Assert.assertNotNull(u);
         Assert.assertNotNull(u.getSubscription(tlTest0.getId()));
+    }
+
+
+    @Test
+    public void testArgumentsNotTaglists() throws Exception
+    {
+        User u = UserHandler.getUserByImgurName(TestImgurName);
+        Assert.assertNull(u);
+
+        HashSet<UserSubscription> subs = new HashSet<>();
+        subs.add(us0);
+        u = new User(TestImgurName, TestImgurId, subs);
+
+        UserHandler.handler().set(u);
+
+        // ---
+
+        when(commandInformation.getTracker()).thenReturn(tracker);
+
+        unsubCommand.execute(commandInformation, new String[] {TestImgurName, "NotATaglist"});
+
+        verify(commandInformation).reply("Error! None of the provided taglists were recognized.");
+
     }
 
 

@@ -68,10 +68,11 @@ public class UnsubCommand implements ICommandFunc
         // if no taglists were supplied, notify the user.
         if (!taglists.hasNext())
         {
-            // NOTE: this should *never* happen, but just in case it does,
-            // I would rather have the application keep functioning.
             if (arguments.length == 1)
             {
+                // this should in theory never happen, since a user
+                // shouldn't be able to exist in the system without at least
+                // one UserSubscription
                 msgNoTaglistsSetup(ci);
             }
             else

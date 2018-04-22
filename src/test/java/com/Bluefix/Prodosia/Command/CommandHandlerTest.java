@@ -22,12 +22,31 @@
 
 package com.Bluefix.Prodosia.Command;
 
+import com.Bluefix.Prodosia.DataType.Command.CommandInformation;
+import com.Bluefix.Prodosia.DataType.Tracker.Tracker;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.mockito.Matchers;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
+
+import static org.mockito.Mockito.verify;
 
 public class CommandHandlerTest
 {
+    @Mock
+    CommandInformation commandInformation;
+
+    @Mock
+    Tracker tracker;
+
+    @Rule
+    public MockitoRule mockitoRule = MockitoJUnit.rule();
+
+
 
     @Before
     public void setUp() throws Exception
@@ -42,21 +61,48 @@ public class CommandHandlerTest
     }
 
     @Test
-    public void execute()
+    public void testList() throws Exception
     {
-        CommandHandler.execute(null, "list");
-        //System.out.println(result.getMessage());
+        CommandHandler.execute(commandInformation, "list");
+        verify(commandInformation).reply(Matchers.anyString());
+    }
+
+
+    @Test
+    public void testGenericHelp() throws Exception
+    {
+        CommandHandler.execute(commandInformation, "help");
+        verify(commandInformation).reply(
+                "Use the `list` command to retrieve a list of possible commands.\n" +
+                "Use `help` with the specific command(s) as argument for information.");
     }
 
     @Test
-    public void execute1()
+    public void testNonExistentHelp() throws Exception
     {
-
+        CommandHandler.execute(commandInformation, "help nonexistentcommand");
+        verify(commandInformation).reply(
+                "(nonexistentcommand): The command does not exist.");
     }
 
     @Test
-    public void execute2()
+    public void testExistentHelp() throws Exception
     {
+        CommandHandler.execute(commandInformation, "help sub");
+        verify(commandInformation).reply("(sub): Please visit https://github.com/RoseLaLuna/Prodosia/wiki/Subscription-Command for information");
+    }
 
+    @Test
+    public void testExecuteNonexistentCommand() throws Exception
+    {
+        CommandHandler.execute(commandInformation, "NonexistentCommand");
+        verify(commandInformation).reply("Command \"nonexistentcommand\" was not recognized!");
+    }
+
+    @Test
+    public void testListHelp() throws Exception
+    {
+        CommandHandler.execute(commandInformation, "help list");
+        verify(commandInformation).reply("(list): Will list all of the known commands.");
     }
 }

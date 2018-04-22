@@ -20,8 +20,9 @@
  * SOFTWARE.
  */
 
-package com.Bluefix.Prodosia.Command.CommandFunc;
+package com.Bluefix.Prodosia.Command.CommandFunc.Subscription;
 
+import com.Bluefix.Prodosia.Command.CommandFunc.ICommandFunc;
 import com.Bluefix.Prodosia.Command.CommandFunc.Subscription.SubCommand;
 import com.Bluefix.Prodosia.Command.CommandRecognition;
 import com.Bluefix.Prodosia.Prefix.CommandPrefixStorage;
