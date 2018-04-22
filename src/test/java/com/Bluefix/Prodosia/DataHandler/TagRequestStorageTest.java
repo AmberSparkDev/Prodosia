@@ -46,8 +46,6 @@ public class TagRequestStorageTest extends DataHandlerTest<TagRequest>
     private Taglist taglist;
     private TagRequest request;
 
-    private static Comment parentComment;
-
 
     //region abstract method implementation
 

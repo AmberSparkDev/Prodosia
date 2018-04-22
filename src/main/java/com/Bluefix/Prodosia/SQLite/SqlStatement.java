@@ -80,12 +80,13 @@ public class SqlStatement
                         "filters text); ",
                 /* --- TagQueue --- */
                         "CREATE TABLE IF NOT EXISTS TagQueue (" +
-                        "imgurId text UNIQUE, " +
+                        "imgurId text, " +
                         "parentComment integer, " +
                         "taglists text, " +
                         "rating integer, " +
                         "filters text, " +
-                        "cleanComments integer); ",
+                        "cleanComments integer, " +
+                        "UNIQUE(imgurId, parentComment)); ",
                 /* --- CommentDeletion --- */
                         "CREATE TABLE IF NOT EXISTS CommentDeletion (" +
                         "id integer PRIMARY KEY); ",

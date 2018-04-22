@@ -122,7 +122,7 @@ public abstract class DataHandlerTest<T>
 
 
     @Test
-    public void testReplaceTracker() throws Exception
+    public void testReplaceItem() throws Exception
     {
         ArrayList<T> items = getHandler().getAll();
         int size = items.size();

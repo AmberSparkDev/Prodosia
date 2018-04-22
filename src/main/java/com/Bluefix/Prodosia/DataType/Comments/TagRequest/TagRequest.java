@@ -77,6 +77,7 @@ public class TagRequest extends BaseTagRequest implements ICommentRequest
             this.imgurId = imgurId.trim();
 
         this.parentComment = parentComment;
+        this.parentId = -1;
 
         checkCreationConditions();
         defaultValues();
@@ -111,6 +112,7 @@ public class TagRequest extends BaseTagRequest implements ICommentRequest
             this.imgurId = imgurId.trim();
 
         this.parentComment = parentComment;
+        this.parentId = -1;
 
         checkCreationConditions();
         defaultValues();
@@ -170,7 +172,7 @@ public class TagRequest extends BaseTagRequest implements ICommentRequest
     @Override
     public Comment getParent() throws BaringoApiException, IOException, URISyntaxException
     {
-        if (this.parentComment == null && this.parentId <= 0)
+        if (this.parentComment == null && this.parentId < 0)
             return null;
 
         if (this.parentComment == null)
@@ -235,27 +237,6 @@ public class TagRequest extends BaseTagRequest implements ICommentRequest
         try
         {
             lastKnownComments = ImgurManager.client().galleryService().getItemComments(this.getImgurId(), Comment.Sort.Best);
-
-            // if you really want to, it is possible to filter out the poster account as well.
-            // The only issue is that it's 1 whole GET request for just 1 person.
-            // I myself can't really justify that cost and have disabled it.
-            //
-            /*
-            try
-            {
-                Album album = ImgurManager.client().albumService().getAlbum(this.getImgurId());
-                String posterOp = album.getUserName();
-            }
-            catch (BaringoApiException ex)
-            {
-                ex.printStackTrace();
-            }
-            catch (Exception ex)
-            {
-                ex.printStackTrace();
-            }
-            */
-
 
             LinkedList<String> trComments = TagRequestComments.parseCommentsForTagRequest(this, lastKnownComments);
 
@@ -381,21 +362,30 @@ public class TagRequest extends BaseTagRequest implements ICommentRequest
     {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
         TagRequest that = (TagRequest) o;
-
-        // for a valid parent id, return true if they are equal.
-        if (this.getParentId() == that.getParentId() && this.getParentId() >= 0)
-            return true;
-
-        // if the parent id wasn't specified, return the equality of the imgur id.
-        return Objects.equals(imgurId, that.imgurId);
+        try
+        {
+            return getParentId() == that.getParentId() &&
+                    Objects.equals(getImgurId(), that.getImgurId());
+        } catch (Exception e)
+        {
+            e.printStackTrace();
+            return false;
+        }
     }
 
     @Override
     public int hashCode()
     {
-
-        return Objects.hash(imgurId, parentId);
+        try
+        {
+            return Objects.hash(super.hashCode(), getImgurId(), getParentId());
+        } catch (Exception e)
+        {
+            e.printStackTrace();
+            return Objects.hash(super.hashCode(), getParentId());
+        }
     }
 
 
