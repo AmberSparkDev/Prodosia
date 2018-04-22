@@ -81,7 +81,7 @@ public class ImgurManager
             client = createClient(key);
 
             // immediately authorize the client if the key was stored locally.
-            // if the key is not stored locally, it is most likely used for testing. 
+            // if the key is not stored locally, it is most likely used for testing.
             // note: for anonymous usage it is not necessary to authorize. However,
             // heavy use of authorized api access it expected and immediate authorization
             // determines when the user is prompted, so it can be done on startup.
