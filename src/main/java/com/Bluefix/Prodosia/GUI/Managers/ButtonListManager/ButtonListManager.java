@@ -36,6 +36,7 @@ import java.util.List;
  */
 public abstract class ButtonListManager extends GuiListManager<Button>
 {
+    private Button[] buttonItems;
 
     /**
      * Instantiate a new buttonlistmanager.
@@ -72,9 +73,27 @@ public abstract class ButtonListManager extends GuiListManager<Button>
             buttons.add(button);
         }
 
-        return buttons.toArray(new Button[0]);
+        this.buttonItems = buttons.toArray(new Button[0]);
+
+        return this.buttonItems;
     }
 
+    /**
+     * Requests the underlying subclass to dereference the current items.
+     */
+    @Override
+    protected void dereference()
+    {
+        if (this.buttonItems == null || this.buttonItems.length == 0)
+            return;
+
+        for (Button b : this.buttonItems)
+        {
+            b.setOnAction(null);
+        }
+
+        this.buttonItems = null;
+    }
 
     /**
      * List all the buttons in the collection. Each individual button-item will

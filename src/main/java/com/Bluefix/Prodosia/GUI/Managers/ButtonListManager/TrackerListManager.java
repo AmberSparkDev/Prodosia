@@ -40,7 +40,7 @@ import java.util.Collections;
  */
 public class TrackerListManager extends GuiListManager<Button>
 {
-
+    private Button[] buttonItems;
 
     /**
      * Initialize a new Tracker Manager with a VBox element.
@@ -86,7 +86,26 @@ public class TrackerListManager extends GuiListManager<Button>
             buttons[i] = button;
         }
 
+        this.buttonItems = buttons;
+
         return buttons;
+    }
+
+    /**
+     * Requests the underlying subclass to dereference the current items.
+     */
+    @Override
+    protected void dereference()
+    {
+        if (this.buttonItems == null || this.buttonItems.length == 0)
+            return;
+
+        for (Button b : this.buttonItems)
+        {
+            b.setOnAction(null);
+        }
+
+        this.buttonItems = null;
     }
 
     //endregion

@@ -35,8 +35,6 @@ import java.util.ArrayList;
  */
 public abstract class GuiCheckboxListManager extends GuiListManager<CheckBox>
 {
-
-
     /**
      * Create a new GuiListManager object that is linked to the root pane.
      * This list-manager will instantiate itself by filling the items
@@ -98,6 +96,15 @@ public abstract class GuiCheckboxListManager extends GuiListManager<CheckBox>
         }
 
         return out;
+    }
+
+    /**
+     * Requests the underlying subclass to dereference the current items.
+     */
+    @Override
+    protected void dereference()
+    {
+        // these items have aren't linked and don't need to be dereferenced.
     }
 
     /**

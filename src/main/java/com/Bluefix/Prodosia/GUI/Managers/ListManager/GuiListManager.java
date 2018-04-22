@@ -22,6 +22,7 @@
 
 package com.Bluefix.Prodosia.GUI.Managers.ListManager;
 
+import javafx.scene.Node;
 import javafx.scene.control.Labeled;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
@@ -91,7 +92,12 @@ public abstract class GuiListManager<T extends Labeled> implements AutoCloseable
         if (guiEntries == null)
             return;
 
+        // let the parent dereference the old items
+        dereference();
+
+        // and we as well will clear the entries.
         guiEntries.getChildren().clear();
+
 
         // retrieve the items.
         items = listItems();
@@ -115,6 +121,12 @@ public abstract class GuiListManager<T extends Labeled> implements AutoCloseable
      * the proper order.
      */
     protected abstract T[] listItems() throws Exception;
+
+
+    /**
+     * Requests the underlying subclass to dereference the current items.
+     */
+    protected abstract void dereference();
 
 
     private String lastFilter;

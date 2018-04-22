@@ -39,6 +39,8 @@ import java.util.ArrayList;
  */
 public class UserListManager extends LimitedGuiListManager<Button>
 {
+    private Button[] buttonItems;
+
     /**
      * The maximum amount of users that can be visible at a time,
      * before they need to be filtered.
@@ -91,7 +93,24 @@ public class UserListManager extends LimitedGuiListManager<Button>
             buttons[i] = button;
         }
 
+        this.buttonItems = buttons;
+
         return buttons;
+    }
+
+    /**
+     * Requests the underlying subclass to dereference the current items.
+     */
+    @Override
+    protected void dereference()
+    {
+        if (this.buttonItems == null || this.buttonItems.length == 0)
+            return;
+
+        for (Button b : this.buttonItems)
+            b.setOnAction(null);
+
+        this.buttonItems = null;
     }
 
     //endregion
