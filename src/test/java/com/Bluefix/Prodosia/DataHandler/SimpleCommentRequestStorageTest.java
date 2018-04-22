@@ -32,71 +32,48 @@ import java.util.ArrayList;
 
 import static org.junit.Assert.*;
 
-public class SimpleCommentRequestStorageTest
+public class SimpleCommentRequestStorageTest extends DataHandlerTest<SimpleCommentRequest>
 {
+    private static final long parentCommentId = 1298941393;
 
-
-    private SimpleCommentRequestStorage handler;
     private SimpleCommentRequest request;
+
+
+    //region abstract method implementation
+
+    public SimpleCommentRequestStorageTest(boolean useLocalStorage)
+    {
+        super(useLocalStorage);
+    }
+
+    @Override
+    protected LocalStorageHandler<SimpleCommentRequest> getHandler()
+    {
+        return SimpleCommentRequestStorage.handler();
+    }
+
+    @Override
+    protected SimpleCommentRequest getItem()
+    {
+        return request;
+    }
+
+    //endregion
+
+
+
+
 
 
     @Before
     public void setUp() throws Exception
     {
-        this.handler = SimpleCommentRequestStorage.handler();
-        this.request = new SimpleCommentRequest(1301573497, "five");
+        request = new SimpleCommentRequest(parentCommentId, "test");
     }
 
     @After
     public void tearDown() throws Exception
     {
-    }
-
-
-    @Test
-    public void testFunctionalityWithLocalStorage() throws Exception
-    {
-        handler.setLocalStorage(true);
-
-        ArrayList<SimpleCommentRequest> requests = handler.getAll();
-
-        if (requests.contains(request))
-            fail();
-
-        handler.set(request);
-        requests = handler.getAll();
-
-        if (!requests.contains(request))
-            fail();
-
-        handler.remove(request);
-        requests = handler.getAll();
-
-        if (requests.contains(request))
-            fail();
-    }
-
-    @Test
-    public void testFunctionalityWithoutLocalStorage() throws Exception
-    {
-
-        handler.setLocalStorage(false);
-
-        ArrayList<SimpleCommentRequest> requests = handler.getAll();
-
-        if (requests.contains(request))
-            fail();
-
-        handler.set(request);
-        requests = handler.getAll();
-
-        if (!requests.contains(request))
-            fail();
-
-        handler.remove(request);
-        requests = handler.getAll();
-
-        if (requests.contains(request))
-            fail();
+        SimpleCommentRequestStorage.handler().remove(request);
     }
 }

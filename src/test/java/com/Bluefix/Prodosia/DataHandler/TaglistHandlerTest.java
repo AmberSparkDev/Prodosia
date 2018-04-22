@@ -23,80 +23,84 @@
 package com.Bluefix.Prodosia.DataHandler;
 
 import com.Bluefix.Prodosia.DataType.Taglist.Taglist;
+import com.github.kskelm.baringo.util.BaringoApiException;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import javax.security.auth.login.LoginException;
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.sql.SQLException;
 import java.util.ArrayList;
 
 import static org.junit.Assert.*;
 
-public class TaglistHandlerTest
+public class TaglistHandlerTest extends DataHandlerTest<Taglist>
 {
-    private TaglistHandler handler;
     private Taglist taglist;
+
+
+    //region abstract method implementation
+
+
+    public TaglistHandlerTest(boolean useLocalStorage)
+    {
+        super(useLocalStorage);
+    }
+
+    @Override
+    protected LocalStorageHandler<Taglist> getHandler()
+    {
+        return TaglistHandler.handler();
+    }
+
+    @Override
+    protected Taglist getItem()
+    {
+        return taglist;
+    }
+
+
+    //endregion
+
 
     @Before
     public void setUp() throws Exception
     {
-        handler = TaglistHandler.handler();
-
-        taglist = new Taglist(-1,"my_abbreviation", "my_description", true);
+        taglist = new Taglist("test0", "test0 taglist", false);
     }
 
 
     @After
     public void tearDown() throws Exception
     {
+        TaglistHandler.handler().remove(taglist);
+    }
+
+
+
+    @Test
+    public void testGetTaglistById() throws URISyntaxException, SQLException, IOException, BaringoApiException, LoginException
+    {
+        TaglistHandler.handler().set(taglist);
+
+        Taglist t = TaglistHandler.getTaglistById(taglist.getId());
+        Assert.assertEquals(taglist, t);
     }
 
 
     @Test
-    public void testFunctionalityWithLocalStorage() throws Exception
+    public void testGetTaglistByAbbreviation() throws SQLException, URISyntaxException, IOException, LoginException, BaringoApiException
     {
-        handler.setLocalStorage(true);
+        Taglist t = TaglistHandler.getTaglistByAbbreviation("test0");
+        Assert.assertNull(t);
 
-        ArrayList<Taglist> taglists = handler.getAll();
+        TaglistHandler.handler().set(taglist);
 
-        if (taglists.contains(taglist))
-            fail();
-
-        handler.set(taglist);
-        taglists = handler.getAll();
-
-        if (!taglists.contains(taglist))
-            fail();
-
-        handler.remove(taglist);
-        taglists = handler.getAll();
-
-        if (taglists.contains(taglist))
-            fail();
-
-
-    }
-
-    @Test
-    public void testFunctionalityWithoutLocalStorage() throws Exception
-    {
-        handler.setLocalStorage(false);
-
-        ArrayList<Taglist> taglists = handler.getAll();
-
-        if (taglists.contains(taglist))
-            fail();
-
-        handler.set(taglist);
-        taglists = handler.getAll();
-
-        if (!taglists.contains(taglist))
-            fail();
-
-        handler.remove(taglist);
-        taglists = handler.getAll();
-
-        if (taglists.contains(taglist))
-            fail();
+        t = TaglistHandler.getTaglistByAbbreviation("test0");
+        Assert.assertEquals(taglist, t);
     }
 
 
