@@ -67,7 +67,7 @@
                      </children></AnchorPane>
             </content>
           </Tab>
-          <Tab text="Tag a post">
+          <!--<Tab text="Tag a post">
             <content>
               <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                      <children>
@@ -120,7 +120,7 @@
                         <TextField layoutX="106.0" layoutY="292.0" prefHeight="29.0" prefWidth="500.0" />
                      </children></AnchorPane>
             </content>
-          </Tab>
+          </Tab>-->
             <Tab text="Trackers">
                 <content>
                     <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">

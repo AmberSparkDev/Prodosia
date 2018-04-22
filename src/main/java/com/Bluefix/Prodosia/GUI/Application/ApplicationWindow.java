@@ -111,6 +111,7 @@ public class ApplicationWindow
 
     //region Tag a Post
 
+    /*
     @FXML private TextField tap_url;
 
     @FXML private TextArea tap_parentComment;
@@ -118,6 +119,15 @@ public class ApplicationWindow
     @FXML private MenuButton tap_ratingButton;
 
     @FXML private VBox tap_taglistSelector;
+
+    private void initializeTap()
+    {
+        tap_url.setText("tap_url");
+        tap_parentComment.setText("tap_parentComment");
+        tap_parentComment.setDisable(true);
+        selectRating(Rating.ALL);
+    }
+
 
     @FXML private void tap_ratingA(ActionEvent actionEvent)
     {
@@ -163,6 +173,8 @@ public class ApplicationWindow
 
         System.out.println();
     }
+
+    */
 
     //endregion
 
@@ -229,7 +241,7 @@ public class ApplicationWindow
 
 
         /* Tag a Post */
-        initializeTap();
+        //initializeTap();
 
         // init list managers
         setupListManagers();
@@ -239,13 +251,9 @@ public class ApplicationWindow
 
     }
 
-    private void initializeTap()
-    {
-        tap_url.setText("tap_url");
-        tap_parentComment.setText("tap_parentComment");
-        tap_parentComment.setDisable(true);
-        selectRating(Rating.ALL);
-    }
+
+
+
 
     //endregion
 
@@ -289,6 +297,7 @@ public class ApplicationWindow
             ExceptionHelper.showWarning(e);
         }
 
+        /*
         try
         {
             // setup checkbox gui list managers.
@@ -297,6 +306,7 @@ public class ApplicationWindow
         {
             ExceptionHelper.showWarning(e);
         }
+        */
 
         // setup listeners for their respective filters.
 
