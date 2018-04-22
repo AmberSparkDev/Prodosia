@@ -26,6 +26,7 @@ import com.Bluefix.Prodosia.DataHandler.TaglistHandler;
 import com.Bluefix.Prodosia.DataType.Taglist.Taglist;
 import com.Bluefix.Prodosia.DataType.Taglist.TaglistComparator;
 import com.Bluefix.Prodosia.DataType.Tracker.TrackerPermissions;
+import com.Bluefix.Prodosia.Exception.ExceptionHelper;
 import javafx.scene.control.CheckBox;
 import javafx.scene.layout.Pane;
 

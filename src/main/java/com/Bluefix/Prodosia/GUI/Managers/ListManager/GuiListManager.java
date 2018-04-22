@@ -22,6 +22,7 @@
 
 package com.Bluefix.Prodosia.GUI.Managers.ListManager;
 
+import com.Bluefix.Prodosia.Exception.ExceptionHelper;
 import javafx.scene.Node;
 import javafx.scene.control.Labeled;
 import javafx.scene.layout.Pane;
@@ -50,7 +51,6 @@ public abstract class GuiListManager<T extends Labeled> implements AutoCloseable
     public GuiListManager(Pane root) throws Exception
     {
         this.root = root;
-        initializeGraphics();
 
         fill();
     }
@@ -69,17 +69,35 @@ public abstract class GuiListManager<T extends Labeled> implements AutoCloseable
     protected void setRoot(Pane root) throws Exception
     {
         this.root = root;
-        initializeGraphics();
         fill();
     }
 
-    private void initializeGraphics()
+
+
+
+    private void initializeVbox()
     {
         this.guiEntries = new VBox();
         this.guiEntries.setMaxWidth(Double.MAX_VALUE);
-        this.root.getChildren().add(this.guiEntries);
+
+        if (this.root != null)
+        {
+            this.root.getChildren().clear();
+            this.root.getChildren().add(this.guiEntries);
+        }
         this.guiEntries.minWidthProperty().bind(this.root.widthProperty());
         this.guiEntries.maxWidthProperty().bind(this.root.maxWidthProperty());
+    }
+
+
+    private void myDereference()
+    {
+        dereference();
+
+        this.guiEntries = null;
+
+        if (this.root != null)
+            this.root.getChildren().clear();
     }
 
 
@@ -89,21 +107,23 @@ public abstract class GuiListManager<T extends Labeled> implements AutoCloseable
      */
     private void fill() throws Exception
     {
-        if (guiEntries == null)
-            return;
-
-        // let the parent dereference the old items
-        dereference();
-
-        // and we as well will clear the entries.
-        guiEntries.getChildren().clear();
-
+        if (guiEntries != null)
+        {
+            // dereference the items we had.
+            myDereference();
+        }
 
         // retrieve the items.
         items = listItems();
 
         if (items == null || items.length <= 0)
             return;
+
+        // and we as well will clear the entries.
+        initializeVbox();
+
+
+
 
         for (T item : items)
         {
@@ -113,6 +133,11 @@ public abstract class GuiListManager<T extends Labeled> implements AutoCloseable
 
         // set the default item height
         itemHeight = items[0].getPrefHeight();
+
+        guiEntries.layout();
+        root.layout();
+
+        //ExceptionHelper.showMessage("amount of children = " + guiEntries.getChildren().size());
     }
 
     /**
