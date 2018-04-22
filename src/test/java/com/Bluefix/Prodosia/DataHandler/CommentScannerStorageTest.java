@@ -27,91 +27,84 @@ import com.Bluefix.Prodosia.DataHandler.TrackerHandler;
 import com.Bluefix.Prodosia.DataType.Tracker.Tracker;
 import com.Bluefix.Prodosia.DataType.Tracker.TrackerBookmark;
 import com.Bluefix.Prodosia.DataType.Tracker.TrackerPermissions;
+import com.github.kskelm.baringo.util.BaringoApiException;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import javax.security.auth.login.LoginException;
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
 
 import static org.junit.Assert.*;
 
-public class CommentScannerStorageTest
+public class CommentScannerStorageTest extends DataHandlerTest<TrackerBookmark>
 {
-    private CommentScannerStorage handler;
+    private static final String TestImgurName = "mashedstew";
+    private static final long TestImgurId = 33641050;
+
     private TrackerBookmark value;
 
     private Tracker tracker;
 
+
+
+    //region abstract method implementation
+
+
+    public CommentScannerStorageTest(boolean useLocalStorage)
+    {
+        super(useLocalStorage);
+    }
+
+    @Override
+    protected LocalStorageHandler<TrackerBookmark> getHandler()
+    {
+        return CommentScannerStorage.handler();
+    }
+
+    @Override
+    protected TrackerBookmark getItem()
+    {
+        return value;
+    }
+
+    //endregion
+
     @Before
     public void setUp() throws Exception
     {
-        handler = CommentScannerStorage.handler();
-
-
         // create a new Tracker
         TrackerPermissions perm = new TrackerPermissions(TrackerPermissions.TrackerType.ADMIN);
-
-        tracker = new Tracker("mashedstew", 1, null, "0000", "", perm);
-
+        tracker = new Tracker(TestImgurName, TestImgurId, "", "", "", perm);
         TrackerHandler.handler().set(tracker);
 
         value = new TrackerBookmark(0, new Date(Long.MAX_VALUE), tracker);
-
     }
 
     @After
     public void tearDown() throws Exception
     {
+        CommentScannerStorage.handler().remove(value);
         TrackerHandler.handler().remove(tracker);
     }
 
 
     @Test
-    public void testFunctionalityWithLocalStorage() throws Exception
+    public void testGetBookmarkByImgurId() throws SQLException, URISyntaxException, IOException, LoginException, BaringoApiException
     {
-        handler.setLocalStorage(true);
+        TrackerBookmark tb = CommentScannerStorage.getBookmarkByImgurId(TestImgurId);
+        Assert.assertNull(tb);
 
-        ArrayList<TrackerBookmark> bookmarks = handler.getAll();
+        CommentScannerStorage.handler().set(value);
 
-        if (bookmarks.contains(value))
-            fail();
-
-        handler.set(value);
-        bookmarks = handler.getAll();
-
-        if (!bookmarks.contains(value))
-            fail();
-
-        handler.remove(value);
-        bookmarks = handler.getAll();
-
-        if (bookmarks.contains(value))
-            fail();
-
-
+        tb = CommentScannerStorage.getBookmarkByImgurId(TestImgurId);
+        Assert.assertEquals(value, tb);
     }
 
-    @Test
-    public void testFunctionalityWithoutLocalStorage() throws Exception
-    {
-        handler.setLocalStorage(false);
 
-        ArrayList<TrackerBookmark> bookmarks = handler.getAll();
-
-        if (bookmarks.contains(value))
-            fail();
-
-        handler.set(value);
-        bookmarks = handler.getAll();
-
-        if (!bookmarks.contains(value))
-            fail();
-
-        handler.remove(value);
-        bookmarks = handler.getAll();
-
-        if (bookmarks.contains(value))
-            fail();
-    }
 }

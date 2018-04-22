@@ -68,6 +68,7 @@ public class TrackerBookmark
         return tracker;
     }
 
+
     @Override
     public boolean equals(Object o)
     {

@@ -31,70 +31,50 @@ import java.util.ArrayList;
 
 import static org.junit.Assert.*;
 
-public class CommentDeletionStorageTest
+public class CommentDeletionStorageTest extends DataHandlerTest<Long>
 {
-    private CommentDeletionStorage handler;
-
     private long value;
 
-    @Before
-    public void setUp() throws Exception
+
+
+    //region abstract method implementation
+
+
+    public CommentDeletionStorageTest(boolean useLocalStorage)
     {
-        handler = CommentDeletionStorage.handler();
+        super(useLocalStorage);
+    }
+
+    @Override
+    protected LocalStorageHandler<Long> getHandler()
+    {
+        return CommentDeletionStorage.handler();
+    }
+
+    @Override
+    protected Long getItem()
+    {
+        return value;
+    }
+
+    //endregion
+
+
+
+    @Before
+    public void setUp()
+    {
         value = 0;
     }
 
     @After
     public void tearDown() throws Exception
     {
+        CommentDeletionStorage.handler().remove(value);
     }
 
 
-    @Test
-    public void testFunctionalityWithLocalStorage() throws Exception
-    {
-        handler.setLocalStorage(true);
-
-        ArrayList<Long> deletions = handler.getAll();
-
-        if (deletions.contains(value))
-            fail();
-
-        handler.set(value);
-        deletions = handler.getAll();
-
-        if (!deletions.contains(value))
-            fail();
-
-        handler.remove(value);
-        deletions = handler.getAll();
-
-        if (deletions.contains(value))
-            fail();
 
 
-    }
 
-    @Test
-    public void testFunctionalityWithoutLocalStorage() throws Exception
-    {
-        handler.setLocalStorage(false);
-
-        ArrayList<Long> deletions = handler.getAll();
-
-        if (deletions.contains(value))
-            fail();
-
-        handler.set(value);
-        deletions = handler.getAll();
-
-        if (!deletions.contains(value))
-            fail();
-
-        handler.remove(value);
-        deletions = handler.getAll();
-
-        if (deletions.contains(value))
-            fail();
-    }
 }
