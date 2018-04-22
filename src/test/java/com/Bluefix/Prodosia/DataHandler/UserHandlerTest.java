@@ -26,97 +26,105 @@ import com.Bluefix.Prodosia.DataType.Taglist.Rating;
 import com.Bluefix.Prodosia.DataType.Taglist.Taglist;
 import com.Bluefix.Prodosia.DataType.User.User;
 import com.Bluefix.Prodosia.DataType.User.UserSubscription;
+import com.github.kskelm.baringo.util.BaringoApiException;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import javax.security.auth.login.LoginException;
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashSet;
 
 import static org.junit.Assert.*;
 
-public class UserHandlerTest
+public class UserHandlerTest extends DataHandlerTest<User>
 {
-    private UserHandler handler;
+    private static final String TestImgurName = "mashedstew";
+    private static final long TestImgurId = 33641050;
+
+
     private Taglist taglist;
     private User user;
+
+
+    //region abstract method implementation
+
+
+    public UserHandlerTest(boolean useLocalStorage)
+    {
+        super(useLocalStorage);
+    }
+
+    @Override
+    protected LocalStorageHandler<User> getHandler()
+    {
+        return UserHandler.handler();
+    }
+
+    @Override
+    protected User getItem()
+    {
+        return user;
+    }
+
+
+    //endregion
 
 
 
     @Before
     public void setUp() throws Exception
     {
-        taglist = new Taglist(-1,"my_abbreviation", "my_description", true);
+        taglist = new Taglist("test0", "test0 taglist", false);
         TaglistHandler.handler().set(taglist);
-
-        handler = UserHandler.handler();
 
         HashSet<UserSubscription> subData = new HashSet<>();
 
         HashSet<Rating> ratings = new HashSet<>();
-        ratings.add(Rating.EXPLICIT);
-        ratings.add(Rating.QUESTIONABLE);
-        ratings.add(Rating.SAFE);
+        ratings.add(Rating.ALL);
 
         subData.add(new UserSubscription(taglist, ratings, "filter"));
 
-
-
-        user = new User("4a70ab7a-7966-4c44-93b4-49770b74813d", 1, subData);
+        user = new User(TestImgurName, TestImgurId, subData);
     }
 
     @After
     public void tearDown() throws Exception
     {
         TaglistHandler.handler().remove(taglist);
+        UserHandler.handler().remove(user);
+    }
+
+
+
+    @Test
+    public void testGetUserByImgurId() throws SQLException, LoginException, IOException, BaringoApiException, URISyntaxException
+    {
+        User u = UserHandler.getUserByImgurId(TestImgurId);
+        Assert.assertNull(u);
+
+        UserHandler.handler().set(user);
+
+        u = UserHandler.getUserByImgurName(TestImgurName);
+        Assert.assertEquals(user, u);
     }
 
 
     @Test
-    public void testFunctionalityWithLocalStorage() throws Exception
+    public void testGetUserByImgurName() throws SQLException, LoginException, IOException, BaringoApiException, URISyntaxException
     {
-        handler.setLocalStorage(true);
+        User u = UserHandler.getUserByImgurName(TestImgurName);
+        Assert.assertNull(u);
 
-        ArrayList<User> users = handler.getAll();
+        UserHandler.handler().set(user);
 
-        if (users.contains(user))
-            fail();
-
-        handler.set(user);
-        users = handler.getAll();
-
-        if (!users.contains(user))
-            fail();
-
-        handler.remove(user);
-        users = handler.getAll();
-
-        if (users.contains(user))
-            fail();
-
-
+        u = UserHandler.getUserByImgurName(TestImgurName);
+        Assert.assertEquals(user, u);
     }
 
-    @Test
-    public void testFunctionalityWithoutLocalStorage() throws Exception
-    {
-        handler.setLocalStorage(false);
 
-        ArrayList<User> users = handler.getAll();
-
-        if (users.contains(user))
-            fail();
-
-        handler.set(user);
-        users = handler.getAll();
-
-        if (!users.contains(user))
-            fail();
-
-        handler.remove(user);
-        users = handler.getAll();
-
-        if (users.contains(user))
-            fail();
-    }
 }

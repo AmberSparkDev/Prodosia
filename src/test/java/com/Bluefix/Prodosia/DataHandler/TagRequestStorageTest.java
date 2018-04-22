@@ -39,9 +39,9 @@ import java.util.HashSet;
 
 import static org.junit.Assert.*;
 
-public class TagRequestStorageTest
+public class TagRequestStorageTest extends DataHandlerTest<TagRequest>
 {
-    private TagRequestStorage handler;
+    private static final String TestImgurId = "ZqWMmil";
 
     private Taglist taglist;
     private TagRequest request;
@@ -49,131 +49,48 @@ public class TagRequestStorageTest
     private static Comment parentComment;
 
 
+    //region abstract method implementation
+
+
+    public TagRequestStorageTest(boolean useLocalStorage)
+    {
+        super(useLocalStorage);
+    }
+
+    @Override
+    protected LocalStorageHandler<TagRequest> getHandler()
+    {
+        return TagRequestStorage.handler();
+    }
+
+    @Override
+    protected TagRequest getItem()
+    {
+        return request;
+    }
+
+
+    //endregion
+
+
+
+
     @Before
     public void setUp() throws Exception
     {
-        taglist = new Taglist(-1,"my_abbreviation", "my_description", true);
+        taglist = new Taglist("test0", "test0 taglist", false);
         TaglistHandler.handler().set(taglist);
-
-        this.handler = TagRequestStorage.handler();
 
         HashSet<Taglist> tlSet = new HashSet<>();
         tlSet.add(taglist);
 
-        if (parentComment == null)
-            parentComment = ImgurManager.client().commentService().getComment(1301573497);
-
-        this.request = new TagRequest(null, parentComment, tlSet, Rating.ALL, "filters", true);
+        this.request = new TagRequest(TestImgurId, null, tlSet, Rating.ALL, "filters", true);
     }
 
     @After
     public void tearDown() throws Exception
     {
         TaglistHandler.handler().remove(taglist);
-    }
-
-
-    @Test
-    public void testFunctionalityWithLocalStorage() throws Exception
-    {
-        handler.setLocalStorage(true);
-
-        ArrayList<TagRequest> requests = handler.getAll();
-
-        if (requests.contains(request))
-            fail();
-
-        handler.set(request);
-        requests = handler.getAll();
-
-        if (!requests.contains(request))
-            fail();
-
-        handler.remove(request);
-        requests = handler.getAll();
-
-        if (requests.contains(request))
-            fail();
-
-
-    }
-
-    @Test
-    public void testFunctionalityWithoutLocalStorage() throws Exception
-    {
-        handler.setLocalStorage(false);
-
-        ArrayList<TagRequest> requests = handler.getAll();
-
-        if (requests.contains(request))
-            fail();
-
-        handler.set(request);
-        requests = handler.getAll();
-
-        if (!requests.contains(request))
-            fail();
-
-        handler.remove(request);
-        requests = handler.getAll();
-
-        if (requests.contains(request))
-            fail();
-    }
-
-    @Test
-    public void testMergeWithLocalStorage() throws Exception
-    {
-        handler.setLocalStorage(true);
-
-        ArrayList<TagRequest> requests = handler.getAll();
-        int size = requests.size();
-
-        if (requests.contains(request))
-            fail();
-
-        handler.set(request);
-        requests = handler.getAll();
-
-        Assert.assertEquals(size + 1, requests.size());
-
-        handler.set(request);
-        requests = handler.getAll();
-
-        Assert.assertEquals(size + 1, requests.size());
-
-        handler.remove(request);
-        requests = handler.getAll();
-
-        if (requests.contains(request))
-            fail();
-    }
-
-    @Test
-    public void testMergeWithoutLocalStorage() throws Exception
-    {
-        handler.setLocalStorage(false);
-
-        ArrayList<TagRequest> requests = handler.getAll();
-        int size = requests.size();
-
-        if (requests.contains(request))
-            fail();
-
-        handler.set(request);
-        requests = handler.getAll();
-
-        Assert.assertEquals(size + 1, requests.size());
-
-        handler.set(request);
-        requests = handler.getAll();
-
-        Assert.assertEquals(size + 1, requests.size());
-
-        handler.remove(request);
-        requests = handler.getAll();
-
-        if (requests.contains(request))
-            fail();
+        TagRequestStorage.handler().remove(request);
     }
 }
