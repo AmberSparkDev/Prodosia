@@ -299,6 +299,6 @@ public class SubCommand implements ICommandFunc
     @Override
     public String info()
     {
-        return "Please visit https://github.com/bboellaard/Prodosia/wiki/Subscription-Command for information";
+        return "Please visit https://github.com/RoseLaLuna/Prodosia/wiki/Subscription-Command for information";
     }
 }

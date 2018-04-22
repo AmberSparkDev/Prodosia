@@ -171,7 +171,7 @@ public class TagRequest extends BaseTagRequest implements ICommentRequest
     @Override
     public Comment getParent() throws BaringoApiException, IOException, URISyntaxException
     {
-        if (this.parentComment == null && this.parentId < 0)
+        if (this.parentComment == null && this.parentId <= 0)
             return null;
 
         if (this.parentComment == null)

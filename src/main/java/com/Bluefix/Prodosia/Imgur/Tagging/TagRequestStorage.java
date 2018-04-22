@@ -161,7 +161,7 @@ public class TagRequestStorage extends LocalStorageHandler<TagRequest>
 
         PreparedStatement prep = SqlDatabase.getStatement(query);
         prep.setString(1, t.getImgurId());
-        prep.setLong(2, t.getParent().getId());
+        prep.setLong(2, t.getParentId());
         prep.setString(3, t.getDbTaglists());
         prep.setInt(4, t.getRating().getValue());
         prep.setString(5, t.getFilter());

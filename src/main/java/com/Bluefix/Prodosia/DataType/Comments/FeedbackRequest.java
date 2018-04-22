@@ -69,7 +69,6 @@ public abstract class FeedbackRequest extends Thread implements ICommentRequest
         this.commentId = commentId;
     }
 
-
     /**
      * Run the `runAfter` command, catching any exceptions it might throw.
      */

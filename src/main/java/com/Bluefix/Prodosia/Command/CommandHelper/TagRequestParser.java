@@ -121,6 +121,9 @@ public class TagRequestParser
                 if (t.hasRatings())
                     taglists.remove(t);
             }
+
+            // change the rating to include "all"
+            rating = Rating.ALL;
         }
 
         // if no taglists were remaining, indicate this to the user.

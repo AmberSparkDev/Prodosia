@@ -75,6 +75,12 @@ public class TagCommand implements ICommandFunc
      */
     private static void parseTagRequest(CommandInformation ci, String[] arguments) throws Exception
     {
+        if (arguments == null || arguments.length == 0)
+        {
+            msgNoArguments(ci);
+            return;
+        }
+
         int pointer = 0;
 
         // if the imgur post id was not supplied in the command-information, we expect it to
@@ -91,21 +97,30 @@ public class TagCommand implements ICommandFunc
             imgurId = ci.getImgurId();
         }
 
+        // if there was no known imgur-id, the tag request cannot complete.
+        if (imgurId == null || imgurId.isEmpty())
+        {
+            msgNoImgurId(ci);
+            return;
+        }
+
 
         // filter out all arguments that don't pertain to the tag request.
         LinkedList<String> tagRequestArguments = new LinkedList<>();
         String parentComment = null;
 
-        for (String a : arguments)
+        for (int i = pointer; i < arguments.length; i++)
         {
-            if (a.startsWith("\"") && a.endsWith("\""))
+            String arg = arguments[i];
+
+            if (arg.startsWith("\"") && arg.endsWith("\""))
             {
                 // this is a quote and as such it will be the parent comment.
-                parentComment = a.substring(1, a.length()-1);
+                parentComment = arg.substring(1, arg.length()-1);
             }
             else
             {
-                tagRequestArguments.addLast(a);
+                tagRequestArguments.addLast(arg);
             }
         }
 
@@ -266,6 +281,16 @@ public class TagCommand implements ICommandFunc
 
     //region Messages
 
+    private static void msgNoArguments(CommandInformation ci) throws Exception
+    {
+        ci.reply("Error! No tag data provided.");
+    }
+
+    private static void msgNoImgurId(CommandInformation ci) throws Exception
+    {
+        ci.reply("Error! No Imgur post id was provided.");
+    }
+
     private static void msgNoTaglists(CommandInformation ci) throws Exception
     {
         ci.reply("Error! No taglists were found.");
@@ -288,6 +313,6 @@ public class TagCommand implements ICommandFunc
     @Override
     public String info()
     {
-        return "Please visit https://github.com/bboellaard/Prodosia/wiki/Tag-Command for information";
+        return "Please visit https://github.com/RoseLaLuna/Prodosia/wiki/Tag-Command for information";
     }
 }

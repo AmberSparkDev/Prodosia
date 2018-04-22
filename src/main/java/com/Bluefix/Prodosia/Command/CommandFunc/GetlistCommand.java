@@ -165,6 +165,7 @@ public class GetlistCommand implements ICommandFunc
     @Override
     public String info()
     {
-        return null;
+
+        return "Please visit https://github.com/RoseLaLuna/Prodosia/wiki/Getlist-Command for information";
     }
 }

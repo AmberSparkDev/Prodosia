@@ -201,6 +201,6 @@ public class UnsubCommand implements ICommandFunc
     @Override
     public String info()
     {
-        return "Please visit https://github.com/bboellaard/Prodosia/wiki/Unsubscription-Command for information";
+        return "Please visit https://github.com/RoseLaLuna/Prodosia/wiki/Unsubscription-Command for information";
     }
 }

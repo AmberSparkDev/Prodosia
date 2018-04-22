@@ -23,6 +23,10 @@
 package com.Bluefix.Prodosia.Command.CommandFunc;
 
 import com.Bluefix.Prodosia.Command.CommandRecognition;
+import com.Bluefix.Prodosia.DataType.Comments.FeedbackRequest;
+import com.Bluefix.Prodosia.DataType.Comments.TagRequest.TagRequest;
+import com.Bluefix.Prodosia.Imgur.Tagging.CommentExecution;
+import com.Bluefix.Prodosia.Imgur.Tagging.TagRequestStorage;
 import com.Bluefix.Prodosia.Prefix.CommandPrefixStorage;
 import com.Bluefix.Prodosia.DataHandler.TaglistHandler;
 import com.Bluefix.Prodosia.DataHandler.TrackerHandler;
@@ -38,146 +42,190 @@ import com.Bluefix.Prodosia.DataType.User.UserSubscription;
 import com.Bluefix.Prodosia.Imgur.ImgurApi.ImgurManager;
 import com.github.kskelm.baringo.model.Comment;
 import com.github.kskelm.baringo.util.BaringoApiException;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.*;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.LinkedList;
+
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 public class TagCommandTest
 {
-    private String prefix;
-    private CommandPrefix cPrefix;
+    // the imgur-id of the post that is user for tag-request testing.
+    private static final String TestImgurId = "ZqWMmil";
+
+    private ICommandFunc tagCommand;
 
     private Taglist tlTest0;
     private Taglist tlTest1;
 
-    private UserSubscription us0;
-    private UserSubscription us1;
-    private UserSubscription us2;
-    private UserSubscription us3;
-    private UserSubscription us4;
+    @Mock
+    CommandInformation commandInformation;
 
-    private String uName0;
-    private String uName1;
-    private String uName2;
+    @Mock
+    Tracker tracker;
 
-    private User u0;
-    private User u1;
-    private User u2;
-
-    private static final long imgurId = 33641050;
-    private Tracker myTracker;
-    private static final long parentId = 1301573497;
+    @Rule
+    public MockitoRule mockitoRule = MockitoJUnit.rule();
 
 
     @Before
     public void setUp() throws Exception
     {
-        prefix = "!testPrefix ";
-
-        cPrefix = new CommandPrefix(
-                CommandPrefix.Type.TEST,
-                CommandPrefix.parsePatternForItems(prefix));
-
-        CommandPrefixStorage.handler().set(cPrefix);
-
+        tagCommand = new TagCommand();
 
         tlTest0 = new Taglist("test0", "test0 taglist", false);
         tlTest1 = new Taglist("test1", "test1 taglist", true);
 
         TaglistHandler.handler().set(tlTest0);
         TaglistHandler.handler().set(tlTest1);
-
-        HashSet<UserSubscription> sub0 = new HashSet<>();
-        HashSet<UserSubscription> sub1 = new HashSet<>();
-        HashSet<UserSubscription> sub2 = new HashSet<>();
-
-        HashSet<Rating> ratings = new HashSet<>();
-        ratings.add(Rating.SAFE);
-
-        UserSubscription us0 = new UserSubscription(tlTest0, null, null);
-        UserSubscription us1 = new UserSubscription(tlTest0, null, "cows");
-        UserSubscription us2 = new UserSubscription(tlTest0, ratings, null);
-        UserSubscription us3 = new UserSubscription(tlTest1, ratings, null);
-        UserSubscription us4 = new UserSubscription(tlTest1, null, null);
-        UserSubscription us5 = new UserSubscription(tlTest1, ratings, "cows");
-
-        sub0.add(us0);
-        sub0.add(us3);
-        sub1.add(us1);
-        sub1.add(us4);
-        sub2.add(us2);
-        sub2.add(us5);
-
-        uName0 = "mashedstew";
-        uName1 = "BloomingRose";
-        uName2 = "MisterThree";
-
-        long u0Id = 33641050;
-        long u1Id = 58590281;
-        long u2Id = 13920225;
-
-        u0 = new User(uName0, u0Id, sub0);
-        u1 = new User(uName1, u1Id, sub1);
-        u2 = new User(uName2, u2Id, sub2);
-
-        UserHandler.handler().set(u0);
-        UserHandler.handler().set(u1);
-        UserHandler.handler().set(u2);
-
-
-        myTracker = TrackerHandler.getTrackerByImgurId(imgurId);
-
-
-
-
-
-
     }
 
     @After
     public void tearDown() throws Exception
     {
-        CommandPrefixStorage.handler().remove(cPrefix);
-
         TaglistHandler.handler().remove(tlTest0);
         TaglistHandler.handler().remove(tlTest1);
 
-        UserHandler.handler().remove(u0);
-        UserHandler.handler().remove(u1);
-        UserHandler.handler().remove(u2);
+        ArrayList<TagRequest> req = new ArrayList<>(TagRequestStorage.handler().getAll());
+
+        // make sure to remove all items from the storage that pertain to this test.
+        for (TagRequest tr : req)
+        {
+            if (tr.getImgurId().equals(TestImgurId))
+                TagRequestStorage.handler().remove(tr);
+        }
+
+
     }
 
 
-    /**
-     * Test 0
-     *
-     * Expected to tag mashedstew and misterthree
-     */
+    //region Bad Weather tests
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testNoTracker() throws Exception
+    {
+        tagCommand.execute(commandInformation, new String[0]);
+    }
+
     @Test
-    public void testTagWithRatingList() throws Exception
+    public void testNoParentOrImgurId() throws Exception
     {
-        String command = prefix + "tag test1 s";
+        when(commandInformation.getTracker()).thenReturn(tracker);
 
-        executeCommand(command, parentId);
+        tagCommand.execute(commandInformation, new String[0]);
+
+        verify(commandInformation).reply("Error! No tag data provided.");
+    }
+
+    @Test
+    public void testNoImgurId() throws Exception
+    {
+        when(commandInformation.getTracker()).thenReturn(tracker);
+
+        tagCommand.execute(commandInformation, new String[]{""});
+
+        verify(commandInformation).reply("Error! No Imgur post id was provided.");
     }
 
 
-
-    private void executeCommand(String command, long parentId) throws BaringoApiException, IOException, URISyntaxException
+    @Test
+    public void testNoTaglists() throws Exception
     {
-        Comment comment = ImgurManager.client().commentService().getComment(parentId);
+        when(commandInformation.getTracker()).thenReturn(tracker);
 
-        //TODO: for a proper test I should mock CommandInformation and check if the reply method is properly called.
+        tagCommand.execute(commandInformation, new String[]{TestImgurId});
 
-        CommandInformation ci =
-                new ImgurCommandInformation(myTracker, comment);
-
-        CommandRecognition.executeEntry(CommandPrefix.Type.TEST, ci, command);
+        verify(commandInformation).reply("Error! No taglists were found.");
     }
+
+    @Test
+    public void testNoRatings() throws Exception
+    {
+        when(commandInformation.getTracker()).thenReturn(tracker);
+        when(tracker.hasPermission(tlTest1)).thenReturn(true);
+
+        tagCommand.execute(commandInformation, new String[]{TestImgurId, "test1"});
+
+        verify(commandInformation).reply("Error! All provided taglists require a rating. Please provide one (s / q / e).");
+    }
+
+    @Test
+    public void testTaglistNotAllowed() throws Exception
+    {
+        when(commandInformation.getTracker()).thenReturn(tracker);
+
+        tagCommand.execute(commandInformation, new String[]{TestImgurId, "test1"});
+
+        verify(commandInformation).reply("Error! Tracker does not have permission for the indicated taglists");
+    }
+
+    //endregion
+
+    //region Good Weather tests
+
+    @Test
+    public void testSuccessWithoutParentComment() throws Exception
+    {
+        when(commandInformation.getTracker()).thenReturn(tracker);
+        when(commandInformation.getImgurId()).thenReturn(TestImgurId);
+        when(tracker.hasPermission(tlTest0)).thenReturn(true);
+
+        tagCommand.execute(commandInformation, new String[]{"test0"});
+
+        ArrayList<TagRequest> tagRequests = TagRequestStorage.handler().getAll();
+
+        boolean contained = false;
+
+        for (TagRequest tr : tagRequests)
+        {
+            if (tr.getImgurId().equals(TestImgurId))
+            {
+                contained = tr.getParent() == null &&
+                        tr.getRating() == Rating.ALL;
+            }
+        }
+
+        Assert.assertTrue(contained);
+    }
+
+    @Test
+    public void testSuccessWithParentComment() throws Exception
+    {
+        String parentComment = "parent comment";
+
+        when(commandInformation.getTracker()).thenReturn(tracker);
+        when(commandInformation.getImgurId()).thenReturn(TestImgurId);
+        when(tracker.hasPermission(tlTest0)).thenReturn(true);
+
+        tagCommand.execute(commandInformation, new String[]{"test0", "\"" + parentComment + "\""});
+
+        LinkedList<FeedbackRequest> feedbackRequests = CommentExecution.handler().getFeedbackRequests();
+
+        boolean contained = false;
+
+        for (FeedbackRequest fbr : feedbackRequests)
+        {
+            if (fbr.getImgurId().equals(TestImgurId))
+            {
+                for (String s : fbr.getComments())
+                {
+                    contained = contained || parentComment.equals(s);
+                }
+            }
+        }
+
+        Assert.assertTrue(contained);
+    }
+
+    //endregion
 
 
 

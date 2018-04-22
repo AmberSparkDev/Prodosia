@@ -56,28 +56,18 @@ import static org.mockito.Mockito.when;
 
 public class SubCommandTest
 {
+    /**
+     * The name used for testing.
+     *
+     * The account will not change its name, so it can be presumed to always
+     * be available.
+     */
+    private static final String TestImgurName = "mashedstew";
+
     private ICommandFunc subCommand;
 
     private Taglist tlTest0;
     private Taglist tlTest1;
-
-    private UserSubscription us0;
-    private UserSubscription us1;
-    private UserSubscription us2;
-    private UserSubscription us3;
-    private UserSubscription us4;
-
-    private String uName0;
-    private String uName1;
-    private String uName2;
-
-    private User u0;
-    private User u1;
-    private User u2;
-
-    private long u0Id;
-    private long u1Id;
-    private long u2Id;
 
 
     @Mock
@@ -95,60 +85,24 @@ public class SubCommandTest
     {
         subCommand = new SubCommand();
 
-
         tlTest0 = new Taglist("test0", "test0 taglist", false);
         tlTest1 = new Taglist("test1", "test1 taglist", true);
 
         TaglistHandler.handler().set(tlTest0);
         TaglistHandler.handler().set(tlTest1);
-
-        HashSet<UserSubscription> sub0 = new HashSet<>();
-        HashSet<UserSubscription> sub1 = new HashSet<>();
-        HashSet<UserSubscription> sub2 = new HashSet<>();
-
-        HashSet<Rating> ratings = new HashSet<>();
-        ratings.add(Rating.SAFE);
-
-        UserSubscription us0 = new UserSubscription(tlTest0, null, null);
-        UserSubscription us1 = new UserSubscription(tlTest0, null, "cows");
-        UserSubscription us2 = new UserSubscription(tlTest0, ratings, null);
-        UserSubscription us3 = new UserSubscription(tlTest1, ratings, null);
-        UserSubscription us4 = new UserSubscription(tlTest1, null, null);
-        UserSubscription us5 = new UserSubscription(tlTest1, ratings, "cows");
-
-        sub0.add(us0);
-        sub0.add(us3);
-        sub1.add(us1);
-        sub1.add(us4);
-        sub2.add(us2);
-        sub2.add(us5);
-
-        uName0 = "mashedstew";
-        uName1 = "BloomingRose";
-        uName2 = "MisterThree";
-
-        u0Id = 33641050;
-        u1Id = 58590281;
-        u2Id = 13920225;
-
-        u0 = new User(uName0, u0Id, sub0);
-        u1 = new User(uName1, u1Id, sub1);
-        u2 = new User(uName2, u2Id, sub2);
-
-        UserHandler.handler().remove(u0);
-        UserHandler.handler().remove(u1);
-        UserHandler.handler().remove(u2);
     }
 
     @After
     public void tearDown() throws Exception
     {
-        UserHandler.handler().remove(u0);
-        UserHandler.handler().remove(u1);
-        UserHandler.handler().remove(u2);
-
         TaglistHandler.handler().remove(tlTest0);
         TaglistHandler.handler().remove(tlTest1);
+
+
+        User u = UserHandler.getUserByImgurName(TestImgurName);
+
+        if (u != null)
+            UserHandler.handler().remove(u);
     }
 
 
@@ -174,7 +128,7 @@ public class SubCommandTest
     public void testNoSubscriptionData() throws Exception
     {
         when(commandInformation.getTracker()).thenReturn(tracker);
-        String[] arguments = new String[]{"mashedstew"};
+        String[] arguments = new String[]{TestImgurName};
 
         subCommand.execute(commandInformation, arguments);
 
@@ -196,7 +150,7 @@ public class SubCommandTest
     public void testNoPermissions() throws Exception
     {
         when(commandInformation.getTracker()).thenReturn(tracker);
-        String[] arguments = new String[]{"mashedstew", "test0"};
+        String[] arguments = new String[]{TestImgurName, "test0"};
 
         subCommand.execute(commandInformation, arguments);
 
@@ -210,7 +164,9 @@ public class SubCommandTest
     {
         when(commandInformation.getTracker()).thenReturn(tracker);
         when(tracker.hasPermission(tlTest1)).thenReturn(true);
-        String[] arguments = new String[]{"mashedstew", "test1"};
+
+
+        String[] arguments = new String[]{TestImgurName, "test1"};
 
         subCommand.execute(commandInformation, arguments);
 
@@ -222,7 +178,7 @@ public class SubCommandTest
     public void testNoTaglists() throws Exception
     {
         when(commandInformation.getTracker()).thenReturn(tracker);
-        String[] arguments = new String[]{"mashedstew", "NotATaglist"};
+        String[] arguments = new String[]{TestImgurName, "NotATaglist"};
 
         subCommand.execute(commandInformation, arguments);
 
@@ -252,7 +208,7 @@ public class SubCommandTest
     @Test
     public void testFwNoRatingSupplied() throws Exception
     {
-        User user = UserHandler.getUserByImgurName("mashedstew");
+        User user = UserHandler.getUserByImgurName(TestImgurName);
 
         Assert.assertTrue(
                 user == null ||
@@ -262,15 +218,15 @@ public class SubCommandTest
         when(commandInformation.getTracker()).thenReturn(tracker);
         when(tracker.hasPermission(tlTest0)).thenReturn(true);
         when(tracker.hasPermission(tlTest1)).thenReturn(true);
-        String[] arguments = new String[]{"mashedstew", "test1", "test0"};
+        String[] arguments = new String[]{TestImgurName, "test1", "test0"};
 
         subCommand.execute(commandInformation, arguments);
 
         verify(commandInformation).reply(
-                "Successfully subscribed user \"mashedstew\" to taglists (test0).");
+                "Successfully subscribed user \"" + TestImgurName + "\" to taglists (test0).");
 
         if (user == null)
-            user = UserHandler.getUserByImgurName("mashedstew");
+            user = UserHandler.getUserByImgurName(TestImgurName);
 
         Assert.assertNotNull(user.getSubscription(tlTest0.getId()));
         Assert.assertNull(user.getSubscription(tlTest1.getId()));
@@ -285,7 +241,7 @@ public class SubCommandTest
     @Test
     public void testNoRatingTaglist() throws Exception
     {
-        User user = UserHandler.getUserByImgurName("mashedstew");
+        User user = UserHandler.getUserByImgurName(TestImgurName);
 
         Assert.assertTrue(
                 user == null ||
@@ -294,15 +250,15 @@ public class SubCommandTest
 
         when(commandInformation.getTracker()).thenReturn(tracker);
         when(tracker.hasPermission(tlTest0)).thenReturn(true);
-        String[] arguments = new String[]{"mashedstew", "test0"};
+        String[] arguments = new String[]{TestImgurName, "test0"};
 
         subCommand.execute(commandInformation, arguments);
 
         verify(commandInformation).reply(
-                "Successfully subscribed user \"mashedstew\" to taglists (test0).");
+                "Successfully subscribed user \"" + TestImgurName + "\" to taglists (test0).");
 
         if (user == null)
-            user = UserHandler.getUserByImgurName("mashedstew");
+            user = UserHandler.getUserByImgurName(TestImgurName);
 
         Assert.assertTrue(user.getSubscription(tlTest0.getId()) != null);
     }
@@ -311,7 +267,7 @@ public class SubCommandTest
     @Test
     public void testRatingTaglist() throws Exception
     {
-        User user = UserHandler.getUserByImgurName("mashedstew");
+        User user = UserHandler.getUserByImgurName(TestImgurName);
 
         Assert.assertTrue(
                 user == null ||
@@ -320,15 +276,15 @@ public class SubCommandTest
 
         when(commandInformation.getTracker()).thenReturn(tracker);
         when(tracker.hasPermission(tlTest1)).thenReturn(true);
-        String[] arguments = new String[]{"mashedstew", "test1", "s", "q", "e"};
+        String[] arguments = new String[]{TestImgurName, "test1", "s", "q", "e"};
 
         subCommand.execute(commandInformation, arguments);
 
         verify(commandInformation).reply(
-                "Successfully subscribed user \"mashedstew\" to taglists (test1).");
+                "Successfully subscribed user \"" + TestImgurName + "\" to taglists (test1).");
 
         if (user == null)
-            user = UserHandler.getUserByImgurName("mashedstew");
+            user = UserHandler.getUserByImgurName(TestImgurName);
 
         UserSubscription us = user.getSubscription(tlTest1.getId());
 
@@ -342,7 +298,7 @@ public class SubCommandTest
     @Test
     public void testFilter() throws Exception
     {
-        User user = UserHandler.getUserByImgurName("mashedstew");
+        User user = UserHandler.getUserByImgurName(TestImgurName);
 
         Assert.assertTrue(
                 user == null ||
@@ -351,15 +307,15 @@ public class SubCommandTest
 
         when(commandInformation.getTracker()).thenReturn(tracker);
         when(tracker.hasPermission(tlTest0)).thenReturn(true);
-        String[] arguments = new String[]{"mashedstew", "test0", "filter"};
+        String[] arguments = new String[]{TestImgurName, "test0", "filter"};
 
         subCommand.execute(commandInformation, arguments);
 
         verify(commandInformation).reply(
-                "Successfully subscribed user \"mashedstew\" to taglists (test0).");
+                "Successfully subscribed user \"" + TestImgurName + "\" to taglists (test0).");
 
         if (user == null)
-            user = UserHandler.getUserByImgurName("mashedstew");
+            user = UserHandler.getUserByImgurName(TestImgurName);
 
         UserSubscription us = user.getSubscription(tlTest0.getId());
         Assert.assertNotNull(us);

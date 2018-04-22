@@ -24,6 +24,13 @@ package com.Bluefix.Prodosia.Application;
 
 
 import com.Bluefix.Prodosia.GUI.Navigation.VistaNavigator;
+import com.Bluefix.Prodosia.Imgur.ImgurApi.ImgurManager;
+import com.Bluefix.Prodosia.Module.ModuleManager;
+import com.github.kskelm.baringo.BaringoClient;
+import com.github.kskelm.baringo.util.BaringoApiException;
+
+import java.io.IOException;
+import java.net.URISyntaxException;
 
 
 public class Main
@@ -32,6 +39,19 @@ public class Main
     {
 
         System.out.println("com.Bluefix.Prodosia.Application started");
+
+        // initialize the Imgur dependencies if applicable.
+        try
+        {
+            BaringoClient client = ImgurManager.client();
+
+            if (client != null)
+                ModuleManager.startImgurDependencies();
+
+        } catch (Exception e)
+        {
+            // ignore
+        }
 
         // launch the VistaNavigator
         VistaNavigator.initialize();

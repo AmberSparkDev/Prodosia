@@ -110,7 +110,7 @@ public class Taglist
     //region Equals
 
     /**
-     * Equals only needs to be unique for the abbreviation.
+     * Equals only needs to be unique for the id
      * @param o
      * @return
      */
@@ -120,7 +120,14 @@ public class Taglist
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Taglist taglist = (Taglist) o;
-        return Objects.equals(this.id, taglist.id);
+        try
+        {
+            return Objects.equals(this.getId(), taglist.getId());
+        } catch (Exception e)
+        {
+            e.printStackTrace();
+            return false;
+        }
     }
 
     @Override

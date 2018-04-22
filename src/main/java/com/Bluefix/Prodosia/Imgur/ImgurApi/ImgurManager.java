@@ -95,7 +95,7 @@ public class ImgurManager
             }
 
             // start the imgur dependencies
-            ModuleManager.startImgurDependencies();
+            //ModuleManager.startImgurDependencies();
         }
 
         return client;

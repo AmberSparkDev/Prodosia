@@ -168,6 +168,6 @@ public class GetuserCommand implements ICommandFunc
     @Override
     public String info()
     {
-        return "Please visit https://github.com/LunaBloomingRose/Prodosia/wiki/Getuser-Command for information";
+        return "Please visit https://github.com/RoseLaLuna/Prodosia/wiki/Getuser-Command for information";
     }
 }

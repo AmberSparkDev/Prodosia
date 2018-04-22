@@ -107,6 +107,11 @@ public class CommentExecution extends Thread
      */
     private LinkedList<FeedbackRequest> feedbackRequests;
 
+    public LinkedList<FeedbackRequest> getFeedbackRequests()
+    {
+        return feedbackRequests;
+    }
+
     /**
      * Execute a FeedbackRequest comment. After the comment has been posted, it will call the callback
      * method.
