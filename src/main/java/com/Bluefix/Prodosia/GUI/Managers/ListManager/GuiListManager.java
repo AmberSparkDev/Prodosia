@@ -94,6 +94,7 @@ public abstract class GuiListManager<T extends Labeled> implements AutoCloseable
     {
         dereference();
 
+        this.guiEntries.getChildren().clear();
         this.guiEntries = null;
     }
 

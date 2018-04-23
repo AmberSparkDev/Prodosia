@@ -65,7 +65,11 @@ public abstract class LocalStorageHandler <T>
 
     //region use local storage
 
-    private boolean useLocalStorage;
+    /**
+     * This boolean indicates whether the Handler class will use a local storage
+     * for quick retrieval of items.
+     */
+    protected boolean useLocalStorage;
 
     /**
      * Indicate whether the Handler class should use local storage for data speedup.

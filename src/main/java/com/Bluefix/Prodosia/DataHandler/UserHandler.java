@@ -64,7 +64,7 @@ public class UserHandler extends LocalStorageHandler<User>
 
     private UserHandler()
     {
-        super(true);
+        super(false);
     }
 
     //endregion
@@ -228,6 +228,47 @@ public class UserHandler extends LocalStorageHandler<User>
         return parsedUsers.get(0);
     }
 
+
+    /**
+     * Retrieve a user from the database based on its Imgur name.
+     * @param imgurName
+     * @return
+     */
+    private synchronized static User dbGetUser(String imgurName) throws SQLException
+    {
+        // select the specified user with its respective usersubscription data.
+        String query =
+                "SELECT U.id, " +
+                        "U.name, " +
+                        "U.imgurId, " +
+                        "US.taglistId, " +
+                        "US.ratings, " +
+                        "US.filters " +
+                        "FROM User as U " +
+                        "INNER JOIN UserSubscription as US ON U.id = US.userId " +
+                        "WHERE U.name = ?;";
+
+        PreparedStatement prep = SqlDatabase.getStatement(query);
+        prep.setString(1, imgurName);
+        ArrayList<ResultSet> result = SqlDatabase.query(prep);
+
+        if (result.size() != 1)
+            throw new SQLException("SqlDatabase exception: Expected result size did not match (was " + result.size() + ")");
+
+        ResultSet rs = result.get(0);
+
+        // parse the users and return
+        ArrayList<User> parsedUsers = parseUsers(rs);
+
+        if (parsedUsers.isEmpty())
+            return null;
+
+        return parsedUsers.get(0);
+    }
+
+
+
+
     private synchronized static ArrayList<User> dbGetUsers() throws SQLException
     {
         // select all users with their respective usersubscription data.
@@ -387,6 +428,11 @@ public class UserHandler extends LocalStorageHandler<User>
      */
     public static User getUserByImgurId(long imgurId) throws SQLException
     {
+        if (!handler().useLocalStorage)
+        {
+            return dbGetUser(imgurId);
+        }
+
         ArrayList<User> users = handler().getAll();
 
         for (User u : users)
@@ -406,6 +452,11 @@ public class UserHandler extends LocalStorageHandler<User>
      */
     public static User getUserByImgurName(String name) throws SQLException
     {
+        if (!handler().useLocalStorage)
+        {
+            return dbGetUser(name);
+        }
+
         ArrayList<User> users = handler().getAll();
 
         for (User u : users)
