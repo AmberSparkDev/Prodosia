@@ -236,9 +236,10 @@ public class EditUserWindow extends EditableWindowPane
     }
 
     @Override
-    protected void deleteItem() throws Exception
+    protected boolean deleteItem() throws Exception
     {
         UserHandler.handler().remove(curUser);
+        return true;
     }
 
     /**

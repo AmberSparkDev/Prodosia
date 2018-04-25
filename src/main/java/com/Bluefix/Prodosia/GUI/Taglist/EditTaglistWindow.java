@@ -23,6 +23,7 @@
 package com.Bluefix.Prodosia.GUI.Taglist;
 
 import com.Bluefix.Prodosia.DataHandler.TaglistHandler;
+import com.Bluefix.Prodosia.DataHandler.UserHandler;
 import com.Bluefix.Prodosia.DataType.Taglist.Taglist;
 import com.Bluefix.Prodosia.GUI.Helpers.DataFieldStorage;
 import com.Bluefix.Prodosia.GUI.Helpers.EditableWindowPane;
@@ -31,6 +32,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 
 import java.util.ArrayList;
+import java.util.Optional;
 
 public class EditTaglistWindow extends EditableWindowPane
 {
@@ -173,10 +175,36 @@ public class EditTaglistWindow extends EditableWindowPane
     }
 
     @Override
-    protected void deleteItem() throws Exception
+    protected boolean deleteItem() throws Exception
     {
-        TaglistHandler.handler().remove(curTaglist);
-        curTaglist = null;
+        // check how many users will be removed because of this deletion.
+        int amount = UserHandler.amountOfUserDependencies(curTaglist);
+
+        boolean shouldDelete = amount <= 0;
+
+        if (amount > 0)
+        {
+            // if there are no users that will be deleted by this, skip the confirmation phase.
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+            alert.setTitle("Delete " + curTaglist.getAbbreviation());
+            alert.setHeaderText("You are about to delete " + curTaglist.getAbbreviation() + "!");
+            alert.setContentText("This action will also remove " + amount + " users from the system " +
+                    "since they will no longer have any taglists they are subscribed to. Do you wish " +
+                    "to continue?");
+
+            Optional<ButtonType> result = alert.showAndWait();
+
+            shouldDelete = shouldDelete || result.get() == ButtonType.OK;
+        }
+
+
+        if (shouldDelete){
+            TaglistHandler.handler().clear(curTaglist);
+            curTaglist = null;
+            return true;
+        }
+
+        return false;
     }
 
     @Override

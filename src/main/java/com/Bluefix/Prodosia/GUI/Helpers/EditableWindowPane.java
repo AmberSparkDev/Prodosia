@@ -277,15 +277,21 @@ public abstract class EditableWindowPane
 
     protected void button_ConfirmDelete() throws Exception
     {
+        boolean deleted = false;
+
         try
         {
-            deleteItem();
+            deleted = deleteItem();
         } catch (Exception e)
         {
             ExceptionHelper.showWarning(e);
         }
-        ApplicationWindow aw = VistaNavigator.loadVista(VistaNavigator.AppStage.MAIN_MENU);
-        aw.update();
+
+        if (deleted)
+        {
+            ApplicationWindow aw = VistaNavigator.loadVista(VistaNavigator.AppStage.MAIN_MENU);
+            aw.update();
+        }
     }
 
     //endregion
@@ -336,8 +342,9 @@ public abstract class EditableWindowPane
 
     /**
      * Deletion has been confirmed. Requests the subclass to complete the item from storage.
+     * @return true iff the item was deleted, false if the action was cancelled.
      */
-    protected abstract void deleteItem() throws Exception;
+    protected abstract boolean deleteItem() throws Exception;
 
     /**
      * Store the current data.

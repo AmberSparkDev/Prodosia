@@ -146,6 +146,23 @@ public class UserHandlerTest extends DataHandlerTest<User>
         Assert.assertFalse(allUsers.contains(user));
     }
 
+    @Test
+    public void testUserRemovalAmountOnTaglistClear() throws SQLException, LoginException, IOException, BaringoApiException, URISyntaxException
+    {
+        HashSet<User> allUsers = new HashSet<>(UserHandler.handler().getAll());
+        Assert.assertFalse(allUsers.contains(user));
+
+        UserHandler.handler().set(user);
+
+        allUsers = new HashSet<>(UserHandler.handler().getAll());
+        Assert.assertTrue(allUsers.contains(user));
+
+        // check how many users will be removed.
+        int amount = UserHandler.amountOfUserDependencies(taglist);
+
+        Assert.assertEquals(1, amount);
+    }
+
     //endregion
 
 

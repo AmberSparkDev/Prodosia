@@ -254,9 +254,10 @@ public class EditTrackerWindow extends EditableWindowPane
     }
 
     @Override
-    protected void deleteItem() throws Exception
+    protected boolean deleteItem() throws Exception
     {
         TrackerHandler.handler().remove(curTracker);
+        return true;
     }
 
     @Override

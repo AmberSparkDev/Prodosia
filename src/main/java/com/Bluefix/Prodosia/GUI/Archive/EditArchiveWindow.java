@@ -237,10 +237,11 @@ public class EditArchiveWindow extends EditableWindowPane
      * Deletion has been confirmed.
      */
     @Override
-    protected void deleteItem() throws Exception
+    protected boolean deleteItem() throws Exception
     {
         ArchiveHandler.handler().remove(selectedArchive);
         selectedArchive = null;
+        return true;
     }
 
     /**
