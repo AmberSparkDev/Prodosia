@@ -173,6 +173,19 @@ public abstract class LocalStorageHandler <T>
     }
 
 
+    /**
+     * Force the handler to refresh from its database contents.
+     */
+    public void refresh() throws SQLException
+    {
+        // if no local storage is used, this is not necessary.
+        if (!useLocalStorage)
+            return;
+
+        data = getAllItems();
+    }
+
+
     //endregion
 
 

@@ -221,4 +221,16 @@ public class Tracker
     }
 
     //endregion
+
+
+    /**
+     * Removes the reference to the specified taglist if it was contained in the tracker.
+     * @param t
+     * @return true iff the taglist was removed, false if the taglist was not part of this tracker.
+     */
+    public boolean removeTaglistDependency(Taglist t)
+    {
+        return this.permissions.removeTaglistDependency(t);
+    }
+
 }

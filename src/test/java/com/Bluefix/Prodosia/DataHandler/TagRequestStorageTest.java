@@ -88,7 +88,7 @@ public class TagRequestStorageTest extends DataHandlerTest<TagRequest>
     @After
     public void tearDown() throws Exception
     {
-        TaglistHandler.handler().remove(taglist);
+        TaglistHandler.handler().clear(taglist);
         TagRequestStorage.handler().remove(request);
     }
 }

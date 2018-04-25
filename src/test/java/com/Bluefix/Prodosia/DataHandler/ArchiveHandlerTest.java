@@ -87,7 +87,7 @@ public class ArchiveHandlerTest extends DataHandlerTest<Archive>
     public void tearDown() throws Exception
     {
         ArchiveHandler.handler().remove(archive);
-        TaglistHandler.handler().remove(taglist);
+        TaglistHandler.handler().clear(taglist);
     }
 
 

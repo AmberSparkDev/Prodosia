@@ -95,7 +95,7 @@ public class UserHandlerTest extends DataHandlerTest<User>
     @After
     public void tearDown() throws Exception
     {
-        TaglistHandler.handler().remove(taglist);
+        TaglistHandler.handler().clear(taglist);
         UserHandler.handler().remove(user);
     }
 

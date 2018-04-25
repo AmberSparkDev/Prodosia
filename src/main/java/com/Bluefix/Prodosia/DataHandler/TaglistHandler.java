@@ -23,12 +23,18 @@
 package com.Bluefix.Prodosia.DataHandler;
 
 import com.Bluefix.Prodosia.DataType.Taglist.Taglist;
+import com.Bluefix.Prodosia.DataType.Tracker.Tracker;
 import com.Bluefix.Prodosia.SQLite.SqlDatabase;
+import com.github.kskelm.baringo.util.BaringoApiException;
 
+import javax.security.auth.login.LoginException;
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashSet;
 
 /**
  * Handler for taglist management.
@@ -53,6 +59,28 @@ public class TaglistHandler extends LocalStorageHandler<Taglist>
     }
 
     //endregion
+
+    /**
+     * Clear an item from the collection.
+     * This method will also remove *any* references to this taglist in UserSubscriptions,
+     * TrackerPermissions and Archives.
+     *
+     * @param taglist The item to be cleared.
+     */
+    public void clear(Taglist taglist) throws SQLException, BaringoApiException, IOException, URISyntaxException, LoginException
+    {
+        if (taglist == null)
+            return;
+
+        // if the taglist has no id, it hasn't been stored and can't be permanently removed.
+        if (taglist.getId() < 0)
+            throw new IllegalArgumentException("This method can only be applied to a taglist that was stored beforehand.");
+
+        dbClearTaglist(taglist);
+
+        // finally, remove the taglist in the conventional way.
+        super.remove(taglist);
+    }
 
 
     //region Local Storage Handler implementation
@@ -147,6 +175,110 @@ public class TaglistHandler extends LocalStorageHandler<Taglist>
 
         SqlDatabase.execute(prep);
     }
+
+    //region Database dependency clearing
+
+    /**
+     * This method removes any references or dependencies on this taglist, but
+     * does not remove the actual taglist itself.
+     * @param t
+     * @throws SQLException
+     */
+    private synchronized static void dbClearTaglist(Taglist t) throws SQLException, LoginException, IOException, BaringoApiException, URISyntaxException
+    {
+        dbClearUserDependencies(t);
+        dbClearTrackerPermissions(t);
+        dbClearArchiveDependencies(t);
+
+        // ensure that the handlers are refreshed.
+        UserHandler.handler().refresh();
+        //TrackerHandler.handler().refresh();
+        ArchiveHandler.handler().refresh();
+    }
+
+    /**
+     * Clear all user-subscriptions that rely on this taglist and clear
+     * any users that no longer have any active subscriptions.
+     * @param t
+     */
+    private synchronized static void dbClearUserDependencies(Taglist t) throws SQLException
+    {
+        // delete all usersubscriptions that pertain to this taglist.
+        String query0 =
+                "DELETE FROM UserSubscription " +
+                "WHERE taglistId = ?;";
+
+        PreparedStatement prep0 = SqlDatabase.getStatement(query0);
+        prep0.setLong(1, t.getId());
+        SqlDatabase.execute(prep0);
+
+        // Check to see if any users exist that do not have any user-subscriptions.
+        String query1 =
+                "SELECT id FROM User WHERE id NOT IN " +
+                        "(SELECT userId FROM UserSubscription);";
+
+        PreparedStatement prep1 = SqlDatabase.getStatement(query1);
+        ArrayList<ResultSet> result = SqlDatabase.query(prep1);
+
+        if (result.size() != 1)
+            throw new SQLException("SqlDatabase exception: Expected result size did not match (was " + result.size() + ")");
+
+        ResultSet rs = result.get(0);
+
+        HashSet<Long> userIds = new HashSet<>();
+
+        while (rs.next())
+            userIds.add(rs.getLong(1));
+
+        // delete all the users that have no remaining user-subscriptions.
+        for (Long l : userIds)
+        {
+            String delQuery =
+                    "DELETE FROM User " +
+                    "WHERE id = ?;";
+
+            PreparedStatement delPrep = SqlDatabase.getStatement(delQuery);
+            delPrep.setLong(1, l);
+
+            SqlDatabase.execute(delPrep);
+        }
+    }
+
+    /**
+     * Clear all permissions that rely on the specified taglist.
+     * @param t
+     */
+    private synchronized static void dbClearTrackerPermissions(Taglist t) throws SQLException, URISyntaxException, IOException, LoginException, BaringoApiException
+    {
+        // retrieve all trackers
+        ArrayList<Tracker> trackers = new ArrayList<>(TrackerHandler.handler().getAll());
+
+        for (Tracker tracker : trackers)
+        {
+            // if the taglist had to be removed from the specified tracker, update it in the system.
+            if (tracker.removeTaglistDependency(t))
+                TrackerHandler.handler().set(tracker);
+        }
+    }
+
+    /**
+     * Clear all actives pertaining to the specified taglist.
+     * @param t
+     */
+    private synchronized static void dbClearArchiveDependencies(Taglist t) throws SQLException
+    {
+        String query =
+                "DELETE FROM Archive " +
+                "WHERE taglistId = ?;";
+
+        PreparedStatement prep = SqlDatabase.getStatement(query);
+        prep.setLong(1, t.getId());
+        SqlDatabase.execute(prep);
+    }
+
+
+    //endregion
+
 
     private synchronized static ArrayList<Taglist> dbGetTaglists() throws SQLException
     {
@@ -245,6 +377,53 @@ public class TaglistHandler extends LocalStorageHandler<Taglist>
         return dbGetTaglist(abbreviation);
     }
 
+
+    //endregion
+
+    //region Taglist dependencies
+
+    /**
+     * This retrieves the amount of users that will not persist
+     * should this taglist be deleted. This means that these users
+     * only have the specified taglist as UserSubscription.
+     *
+     * This method does not actually remove any items.
+     * @param t
+     * @return
+     */
+    public static int amountOfUserDependencies(Taglist t) throws SQLException
+    {
+        if (t == null)
+            return 0;
+
+        // if the taglist has no id, it hasn't been stored and can't be permanently removed.
+        if (t.getId() < 0)
+            return 0;
+
+        String query =
+                "SELECT COUNT(*) " +
+                "FROM UserSubscription " +
+                "WHERE taglistId = ? AND " +
+                "userId NOT IN (" +
+                        "SELECT userId " +
+                        "FROM UserSubscription " +
+                        "WHERE taglistId != ?);";
+
+        PreparedStatement prep = SqlDatabase.getStatement(query);
+        prep.setLong(1, t.getId());
+        prep.setLong(2, t.getId());
+        ArrayList<ResultSet> result = SqlDatabase.query(prep);
+
+        if (result.size() != 1)
+            throw new SQLException("SqlDatabase exception: Expected result size did not match (was " + result.size() + ")");
+
+        ResultSet rs = result.get(0);
+
+        if (!rs.next())
+            throw new SQLException("Sql Exception! Could not find the count.");
+
+        return rs.getInt(1);
+    }
 
     //endregion
 

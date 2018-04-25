@@ -93,8 +93,8 @@ public class UnsubCommandTest
     @After
     public void tearDown() throws Exception
     {
-        TaglistHandler.handler().remove(tlTest0);
-        TaglistHandler.handler().remove(tlTest1);
+        TaglistHandler.handler().clear(tlTest0);
+        TaglistHandler.handler().clear(tlTest1);
 
 
         User u = UserHandler.getUserByImgurName(TestImgurName);
