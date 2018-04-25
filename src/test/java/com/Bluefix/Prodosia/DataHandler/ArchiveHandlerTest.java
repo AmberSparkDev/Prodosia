@@ -26,6 +26,7 @@ import com.Bluefix.Prodosia.DataHandler.ArchiveHandler;
 import com.Bluefix.Prodosia.DataHandler.TaglistHandler;
 import com.Bluefix.Prodosia.DataType.Archive.Archive;
 import com.Bluefix.Prodosia.DataType.Taglist.Taglist;
+import com.github.kskelm.baringo.util.BaringoApiException;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -33,6 +34,10 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
+import javax.security.auth.login.LoginException;
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -103,6 +108,29 @@ public class ArchiveHandlerTest extends DataHandlerTest<Archive>
         Assert.assertEquals(1, archives.size());
     }
 
+
+
+    //region Taglist clear testing
+
+    @Test
+    public void testArchiveRemovalOnTaglistClear() throws SQLException, URISyntaxException, IOException, LoginException, BaringoApiException
+    {
+        ArrayList<Archive> archives = ArchiveHandler.getArchivesForTaglist(taglist);
+        Assert.assertTrue(archives.isEmpty());
+
+        ArchiveHandler.handler().set(archive);
+
+        archives = ArchiveHandler.getArchivesForTaglist(taglist);
+        Assert.assertEquals(1, archives.size());
+
+        // clear the taglist.
+        TaglistHandler.handler().clear(taglist);
+
+        archives = ArchiveHandler.getArchivesForTaglist(taglist);
+        Assert.assertTrue(archives.isEmpty());
+    }
+
+    //endregion
 
 
 }

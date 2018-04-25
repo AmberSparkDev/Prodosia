@@ -105,5 +105,37 @@ public class TaglistHandlerTest extends DataHandlerTest<Taglist>
 
 
 
+    //region Taglist clearing
+
+    @Test
+    public void testClearNullTaglist() throws URISyntaxException, SQLException, IOException, LoginException, BaringoApiException
+    {
+        TaglistHandler.handler().clear(null);
+    }
+
+
+    @Test
+    public void testClearTaglist() throws SQLException, URISyntaxException, IOException, LoginException, BaringoApiException
+    {
+        Taglist t = TaglistHandler.getTaglistByAbbreviation("test0");
+        Assert.assertNull(t);
+
+        TaglistHandler.handler().set(taglist);
+
+        t = TaglistHandler.getTaglistByAbbreviation("test0");
+        Assert.assertEquals(taglist, t);
+
+        TaglistHandler.handler().clear(t);
+
+        t = TaglistHandler.getTaglistByAbbreviation("test0");
+        Assert.assertNull(t);
+    }
+
+
+
+    //endregion
+
+
+
 
 }

@@ -126,5 +126,27 @@ public class UserHandlerTest extends DataHandlerTest<User>
         Assert.assertEquals(user, u);
     }
 
+    //region Taglist clear testing
+
+    @Test
+    public void testUserRemovalOnTaglistClear() throws SQLException, LoginException, IOException, BaringoApiException, URISyntaxException
+    {
+        HashSet<User> allUsers = new HashSet<>(UserHandler.handler().getAll());
+        Assert.assertFalse(allUsers.contains(user));
+
+        UserHandler.handler().set(user);
+
+        allUsers = new HashSet<>(UserHandler.handler().getAll());
+        Assert.assertTrue(allUsers.contains(user));
+
+        // now we clear the taglist that has the user in it. This should also remove the user.
+        TaglistHandler.handler().clear(taglist);
+
+        allUsers = new HashSet<>(UserHandler.handler().getAll());
+        Assert.assertFalse(allUsers.contains(user));
+    }
+
+    //endregion
+
 
 }

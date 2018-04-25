@@ -22,8 +22,10 @@
 
 package com.Bluefix.Prodosia.DataHandler;
 
+import com.Bluefix.Prodosia.DataType.Taglist.Taglist;
 import com.Bluefix.Prodosia.DataType.Tracker.Tracker;
 import com.Bluefix.Prodosia.DataType.Tracker.TrackerPermissions;
+import com.github.kskelm.baringo.util.BaringoApiException;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -31,9 +33,14 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
+import javax.security.auth.login.LoginException;
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
 
 import static org.junit.Assert.*;
 
@@ -118,4 +125,43 @@ public class TrackerHandlerTest extends DataHandlerTest<Tracker>
         Assert.assertEquals(TestImgurName, t.getImgurName());
         Assert.assertEquals(TestImgurId, t.getImgurId());
     }
+
+
+    //region Taglist clear testing
+
+    @Test
+    public void testPermissionRemovalOnTaglistClear() throws URISyntaxException, SQLException, IOException, LoginException, BaringoApiException
+    {
+        Taglist tl = new Taglist("test0", "test0 taglist", false);
+        TaglistHandler.handler().set(tl);
+
+        TrackerPermissions myPerm = new TrackerPermissions(TrackerPermissions.TrackerType.TRACKER,
+                tl);
+
+        tracker = new Tracker(
+                TestImgurName,
+                TestImgurId,
+                "",
+                "",
+                "",
+                myPerm);
+
+        Tracker dbTracker = TrackerHandler.getTrackerByImgurId(TestImgurId);
+        Assert.assertNull(dbTracker);
+
+        TrackerHandler.handler().set(tracker);
+
+        dbTracker = TrackerHandler.getTrackerByImgurId(TestImgurId);
+        Assert.assertNotNull(dbTracker);
+        Assert.assertTrue(dbTracker.getPermissions().getTaglists().contains(tl));
+
+        // clear the taglist.
+        TaglistHandler.handler().clear(tl);
+
+        dbTracker = TrackerHandler.getTrackerByImgurId(TestImgurId);
+        Assert.assertNotNull(dbTracker);
+        Assert.assertFalse(dbTracker.getPermissions().getTaglists().contains(tl));
+    }
+
+    //endregion
 }

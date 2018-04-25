@@ -380,51 +380,6 @@ public class TaglistHandler extends LocalStorageHandler<Taglist>
 
     //endregion
 
-    //region Taglist dependencies
 
-    /**
-     * This retrieves the amount of users that will not persist
-     * should this taglist be deleted. This means that these users
-     * only have the specified taglist as UserSubscription.
-     *
-     * This method does not actually remove any items.
-     * @param t
-     * @return
-     */
-    public static int amountOfUserDependencies(Taglist t) throws SQLException
-    {
-        if (t == null)
-            return 0;
-
-        // if the taglist has no id, it hasn't been stored and can't be permanently removed.
-        if (t.getId() < 0)
-            return 0;
-
-        String query =
-                "SELECT COUNT(*) " +
-                "FROM UserSubscription " +
-                "WHERE taglistId = ? AND " +
-                "userId NOT IN (" +
-                        "SELECT userId " +
-                        "FROM UserSubscription " +
-                        "WHERE taglistId != ?);";
-
-        PreparedStatement prep = SqlDatabase.getStatement(query);
-        prep.setLong(1, t.getId());
-        prep.setLong(2, t.getId());
-        ArrayList<ResultSet> result = SqlDatabase.query(prep);
-
-        if (result.size() != 1)
-            throw new SQLException("SqlDatabase exception: Expected result size did not match (was " + result.size() + ")");
-
-        ResultSet rs = result.get(0);
-
-        if (!rs.next())
-            throw new SQLException("Sql Exception! Could not find the count.");
-
-        return rs.getInt(1);
-    }
-
-    //endregion
 
 }
