@@ -24,8 +24,13 @@ package com.Bluefix.Prodosia.DataHandler;
 
 import com.Bluefix.Prodosia.DataType.Archive.Archive;
 import com.Bluefix.Prodosia.DataType.Taglist.Taglist;
+import com.Bluefix.Prodosia.GUI.GuiUpdate;
 import com.Bluefix.Prodosia.SQLite.SqlDatabase;
+import com.github.kskelm.baringo.util.BaringoApiException;
 
+import javax.security.auth.login.LoginException;
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -55,6 +60,22 @@ public class ArchiveHandler extends LocalStorageHandler<Archive>
     }
 
     //endregion
+
+
+
+    @Override
+    public void set(Archive archive) throws SQLException, URISyntaxException, IOException, LoginException, BaringoApiException
+    {
+        super.set(archive);
+        GuiUpdate.updateArchives();
+    }
+
+    @Override
+    public void remove(Archive archive) throws SQLException, BaringoApiException, IOException, URISyntaxException
+    {
+        super.remove(archive);
+        GuiUpdate.updateArchives();
+    }
 
 
     /**

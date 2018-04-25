@@ -116,6 +116,7 @@ public abstract class LimitedGuiListManager<T extends Labeled> extends GuiListMa
 
         if (super.items == null || super.items.length == 0)
         {
+            this.selectedLabel.setText("0 selected");
             hideInfoLabel();
             return;
         }

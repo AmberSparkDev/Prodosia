@@ -24,6 +24,8 @@ package com.Bluefix.Prodosia.DataHandler;
 
 import com.Bluefix.Prodosia.DataType.Taglist.Taglist;
 import com.Bluefix.Prodosia.DataType.Tracker.Tracker;
+import com.Bluefix.Prodosia.DataType.User.User;
+import com.Bluefix.Prodosia.GUI.GuiUpdate;
 import com.Bluefix.Prodosia.SQLite.SqlDatabase;
 import com.github.kskelm.baringo.util.BaringoApiException;
 
@@ -84,6 +86,20 @@ public class TaglistHandler extends LocalStorageHandler<Taglist>
 
 
     //region Local Storage Handler implementation
+
+    @Override
+    public void set(Taglist t) throws SQLException, URISyntaxException, IOException, LoginException, BaringoApiException
+    {
+        super.set(t);
+        GuiUpdate.updateTaglists();
+    }
+
+    @Override
+    public void remove(Taglist t) throws SQLException, BaringoApiException, IOException, URISyntaxException
+    {
+        super.remove(t);
+        GuiUpdate.updateTaglists();
+    }
 
     /**
      * Add an item to the storage.

@@ -26,9 +26,14 @@ package com.Bluefix.Prodosia.DataHandler;
 import com.Bluefix.Prodosia.DataType.Taglist.Taglist;
 import com.Bluefix.Prodosia.DataType.Tracker.Tracker;
 import com.Bluefix.Prodosia.DataType.Tracker.TrackerPermissions;
+import com.Bluefix.Prodosia.GUI.GuiUpdate;
 import com.Bluefix.Prodosia.SQLite.SqlBuilder;
 import com.Bluefix.Prodosia.SQLite.SqlDatabase;
+import com.github.kskelm.baringo.util.BaringoApiException;
 
+import javax.security.auth.login.LoginException;
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -67,6 +72,20 @@ public class TrackerHandler extends LocalStorageHandler<Tracker>
 
 
     //region Local Storage Handler implementation
+
+    @Override
+    public void set(Tracker t) throws URISyntaxException, SQLException, IOException, LoginException, BaringoApiException
+    {
+        super.set(t);
+        GuiUpdate.updateTrackers();
+    }
+
+    @Override
+    public void remove(Tracker t) throws URISyntaxException, SQLException, IOException, BaringoApiException
+    {
+        super.remove(t);
+        GuiUpdate.updateTrackers();
+    }
 
     @Override
     Tracker setItem(Tracker t) throws SQLException

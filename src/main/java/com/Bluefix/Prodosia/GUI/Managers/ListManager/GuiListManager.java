@@ -204,7 +204,7 @@ public abstract class GuiListManager<T extends Labeled> implements AutoCloseable
      */
     public void update() throws Exception
     {
-        if (this.root == null || this.guiEntries == null)
+        if (this.root == null)
             return;
 
         fill();
