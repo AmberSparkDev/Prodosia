@@ -25,6 +25,7 @@ package com.Bluefix.Prodosia.GUI.Application;
 import com.Bluefix.Prodosia.DataType.Archive.Archive;
 import com.Bluefix.Prodosia.DataType.Taglist.Taglist;
 import com.Bluefix.Prodosia.DataHandler.ArchiveHandler;
+import com.Bluefix.Prodosia.Exception.ExceptionHelper;
 import com.Bluefix.Prodosia.GUI.Archive.EditArchiveWindow;
 import com.Bluefix.Prodosia.GUI.Managers.ButtonListManager.ButtonListManager;
 import com.Bluefix.Prodosia.GUI.Managers.ButtonListManager.TaglistListManager;
@@ -36,6 +37,7 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 
+import java.sql.SQLException;
 import java.util.*;
 
 public class ApplicationWindow_Archive
@@ -228,7 +230,14 @@ public class ApplicationWindow_Archive
             return event ->
             {
                 EditArchiveWindow controller = VistaNavigator.loadVista(VistaNavigator.AppStage.ARCHIVE_EDIT);
-                controller.init(archiveCollection[entry]);
+                try
+                {
+                    controller.init(archiveCollection[entry]);
+                } catch (SQLException e)
+                {
+                    e.printStackTrace();
+                    ExceptionHelper.showWarning(e);
+                }
             };
         }
     }

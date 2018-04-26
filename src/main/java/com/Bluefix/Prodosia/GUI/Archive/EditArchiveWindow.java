@@ -34,6 +34,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import net.dv8tion.jda.core.entities.TextChannel;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Objects;
@@ -106,7 +107,7 @@ public class EditArchiveWindow extends EditableWindowPane
      * Initialize the Edit Archive Window with the specified archive.
      * @param archive
      */
-    public void init(Archive archive)
+    public void init(Archive archive) throws SQLException
     {
         if (archive == null)
             throw new IllegalArgumentException("Cannot instantiate an Edit Archive Window without a valid archive.");

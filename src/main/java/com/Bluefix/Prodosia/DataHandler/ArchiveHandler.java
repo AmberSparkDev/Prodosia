@@ -256,7 +256,15 @@ public class ArchiveHandler extends LocalStorageHandler<Archive>
         ArrayList<Archive> archives = new ArrayList<>(handler().getAll());
 
         archives.removeIf(a ->
-                !a.getTaglist().equals(t));
+        {
+            try
+            {
+                return !a.getTaglist().equals(t);
+            } catch (SQLException e)
+            {
+                return true;
+            }
+        });
 
         return archives;
     }

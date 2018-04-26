@@ -80,8 +80,13 @@ public class Archive
     //region Getters
 
 
-    public Taglist getTaglist()
+    public Taglist getTaglist() throws SQLException
     {
+        if (this.taglist != null && this.taglist.getId() >= 0)
+        {
+            this.taglist = TaglistHandler.getTaglistById(this.taglist.getId());
+        }
+
         return taglist;
     }
 

@@ -127,6 +127,11 @@ public class CommandPrefix
      */
     public int matchIndex(String comment)
     {
+        // return -1 on invalid regex.
+        if (this.regex == null || this.regex.trim().isEmpty())
+            return -1;
+
+
         Pattern p = Pattern.compile(this.regex);
 
         Matcher matcher = p.matcher(comment);
@@ -186,6 +191,10 @@ public class CommandPrefix
 
         while (it.hasNext())
             list.add(it.next());
+
+        // if the list is empty, return empty string
+        if (list.isEmpty())
+            return "";
 
         return parsePatternForItems(list.toArray(new String[0]));
     }
