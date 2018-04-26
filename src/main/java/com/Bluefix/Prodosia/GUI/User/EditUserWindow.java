@@ -507,8 +507,6 @@ public class EditUserWindow extends EditableWindowPane
 
         UserSubscription us = parseUserSubscription();
 
-        System.out.println("#### us == null ? " + (us == null));
-
         uslm.updateUserSubscription(selectedTaglist, us);
 
         if (us != null)

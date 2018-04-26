@@ -6,6 +6,7 @@
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.TitledPane?>
+<?import javafx.scene.control.Tooltip?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.shape.Line?>
 
@@ -51,12 +52,27 @@
                   <CheckBox fx:id="chk_explicit" layoutX="180.0" layoutY="138.0" mnemonicParsing="false" text="explicit" translateY="30.0" />
                   <Label layoutX="357.0" layoutY="89.0" text="Filters:" translateY="30.0" />
                   <TextArea fx:id="ta_filters" layoutX="322.0" layoutY="116.0" prefHeight="66.0" prefWidth="273.0" translateY="30.0" />
-                  <Label layoutX="14.0" layoutY="14.0" styleClass="infomarker" text="?" />
-                  <Label layoutX="14.0" layoutY="49.0" styleClass="infomarker" text="?" />
-                  <Label fx:id="lbl_ratingsInfo" layoutX="14.0" layoutY="84.0" styleClass="infomarker" text="!" translateY="30.0" />
-                  <Label layoutX="322.0" layoutY="84.0" styleClass="infomarker" text="?" translateY="30.0" />
+                  <Label layoutX="14.0" layoutY="14.0" styleClass="infomarker" text="?">
+                     <tooltip>
+                        <Tooltip text="The name of the taglist." />
+                     </tooltip></Label>
+                  <Label layoutX="14.0" layoutY="49.0" styleClass="infomarker" text="?">
+                     <tooltip>
+                        <Tooltip text="The ID of the Discord channel." />
+                     </tooltip></Label>
+                  <Label fx:id="lbl_ratingsInfo" layoutX="14.0" layoutY="84.0" styleClass="infomarker" text="?" translateY="30.0">
+                     <tooltip>
+                        <Tooltip text="The ratings that should appear in this channel." />
+                     </tooltip></Label>
+                  <Label layoutX="322.0" layoutY="84.0" styleClass="infomarker" text="?" translateY="30.0">
+                     <tooltip>
+                        <Tooltip text="Any filters that should apply for this channel." />
+                     </tooltip></Label>
                   <Line endY="100.0" layoutX="311.0" layoutY="84.0" translateY="30.0" />
-                  <Label layoutX="14.0" layoutY="196.0" styleClass="infomarker" text="?" translateY="30.0" />
+                  <Label layoutX="14.0" layoutY="196.0" styleClass="infomarker" text="?" translateY="30.0">
+                     <tooltip>
+                        <Tooltip text="A short description of this archive." />
+                     </tooltip></Label>
                   <Label layoutX="48.0" layoutY="201.0" text="Description:" translateY="30.0" />
                   <TextField fx:id="tf_description" layoutX="180.0" layoutY="196.0" prefHeight="29.0" prefWidth="413.0" translateY="30.0" />
                   <Label layoutX="62.0" layoutY="89.0" text="Channel name:" />

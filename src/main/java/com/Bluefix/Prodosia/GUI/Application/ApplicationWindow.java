@@ -109,75 +109,6 @@ public class ApplicationWindow
 
     //endregion
 
-    //region Tag a Post
-
-    /*
-    @FXML private TextField tap_url;
-
-    @FXML private TextArea tap_parentComment;
-
-    @FXML private MenuButton tap_ratingButton;
-
-    @FXML private VBox tap_taglistSelector;
-
-    private void initializeTap()
-    {
-        tap_url.setText("tap_url");
-        tap_parentComment.setText("tap_parentComment");
-        tap_parentComment.setDisable(true);
-        selectRating(Rating.ALL);
-    }
-
-
-    @FXML private void tap_ratingA(ActionEvent actionEvent)
-    {
-        selectRating(Rating.ALL);
-    }
-
-    @FXML private void tap_ratingS(ActionEvent actionEvent)
-    {
-        selectRating(Rating.SAFE);
-    }
-
-    @FXML private void tap_ratingQ(ActionEvent actionEvent)
-    {
-        selectRating(Rating.QUESTIONABLE);
-    }
-
-    @FXML private void tap_ratingE(ActionEvent actionEvent)
-    {
-        selectRating(Rating.EXPLICIT);
-    }
-
-    private Rating tap_rating;
-
-    private void selectRating(Rating rating)
-    {
-        tap_rating = rating;
-
-        tap_ratingButton.setText(Data.ToString(rating));
-    }
-
-
-    @FXML
-    private void tap_execute(ActionEvent actionEvent)
-    {
-        String[] items = tap_taglist_cl.getSelectedItems();
-
-        System.out.println("Selected items:");
-
-        for (String i : items)
-        {
-            System.out.println(i);
-        }
-
-        System.out.println();
-    }
-
-    */
-
-    //endregion
-
 
     //region Trackers
 
@@ -218,15 +149,6 @@ public class ApplicationWindow
 
     //endregion
 
-    //region Constructor
-
-    public ApplicationWindow()
-    {
-
-    }
-
-    //endregion
-
     //region Initialization
 
     @FXML
@@ -239,16 +161,11 @@ public class ApplicationWindow
         initializeStatusWindow();
 
 
-
-        /* Tag a Post */
-        //initializeTap();
-
         // init list managers
         setupListManagers();
 
         // init Archive
         initializeArchive();
-
     }
 
 
@@ -267,8 +184,6 @@ public class ApplicationWindow
     private TaglistListManager tllm;
     private UserListManager ulm;
 
-    private GuiCheckboxListManager tap_taglist_cl;
-
 
     private void setupListManagers()
     {
@@ -281,6 +196,7 @@ public class ApplicationWindow
             ExceptionHelper.showWarning(e);
         }
 
+        // taglist list
         try
         {
             tllm = new TaglistListManager(taglists_overview);
@@ -289,6 +205,7 @@ public class ApplicationWindow
             ExceptionHelper.showWarning(e);
         }
 
+        // user list
         try
         {
             ulm = new UserListManager(users_overview);
@@ -296,17 +213,6 @@ public class ApplicationWindow
         {
             ExceptionHelper.showWarning(e);
         }
-
-        /*
-        try
-        {
-            // setup checkbox gui list managers.
-            tap_taglist_cl = new TaglistClManager(tap_taglistSelector);
-        } catch (Exception e)
-        {
-            ExceptionHelper.showWarning(e);
-        }
-        */
 
         // setup listeners for their respective filters.
 
@@ -329,7 +235,7 @@ public class ApplicationWindow
     /**
      * Update the components now that we changed data somewhere else.
      */
-    public void updateListManagers() throws Exception
+    private void updateListManagers() throws Exception
     {
         tlm.update();
         tllm.update();
@@ -414,25 +320,7 @@ public class ApplicationWindow
         });
     }
 
-
-
-
     //endregion
-
-    /**
-     * Temporary test method.
-     * @param actionEvent
-     */
-    public void test(ActionEvent actionEvent) throws Exception
-    {
-
-
-    }
-
-
-
-
-
 }
 
 

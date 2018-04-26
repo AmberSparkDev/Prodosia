@@ -6,6 +6,7 @@
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.TitledPane?>
+<?import javafx.scene.control.Tooltip?>
 <?import javafx.scene.layout.AnchorPane?>
 
 <!--
@@ -32,18 +33,27 @@
 
 <AnchorPane maxHeight="480.0" maxWidth="640.0" prefHeight="480.0" prefWidth="640.0" stylesheets="@../stylesheet.css" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.Bluefix.Prodosia.GUI.Taglist.EditTaglistWindow">
    <children>
-      <Button fx:id="button_back" layoutX="14.0" layoutY="42.0" mnemonicParsing="false"  prefHeight="40.0" prefWidth="120.0" text="Back" />
+      <Button fx:id="button_back" layoutX="14.0" layoutY="42.0" mnemonicParsing="false" prefHeight="40.0" prefWidth="120.0" text="Back" />
       <Button fx:id="button_edit" layoutX="151.0" layoutY="42.0" mnemonicParsing="false" prefHeight="40.0" prefWidth="120.0" text="Edit" />
-      <Button fx:id="button_delete" layoutX="506.0" layoutY="42.0" mnemonicParsing="false"  prefHeight="40.0" prefWidth="120.0" text="Delete" />
+      <Button fx:id="button_delete" layoutX="506.0" layoutY="42.0" mnemonicParsing="false" prefHeight="40.0" prefWidth="120.0" text="Delete" />
       <TitledPane animated="false" collapsible="false" layoutX="15.0" layoutY="95.0" prefHeight="231.0" prefWidth="610.0" text="Taglist">
          <content>
             <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="608.0">
                <children>
                   <TextField fx:id="tf_abbreviation" layoutX="183.0" layoutY="14.0" prefHeight="29.0" prefWidth="413.0" text="abbreviation" />
                   <CheckBox fx:id="chk_ratings" layoutX="51.0" layoutY="62.0" mnemonicParsing="false" text="Has Ratings" />
-                  <Label layoutX="14.0" layoutY="14.0" styleClass="infomarker" text="?" />
-                  <Label layoutX="14.0" layoutY="58.0" styleClass="infomarker" text="?" />
-                  <Label layoutX="14.0" layoutY="102.0" styleClass="infomarker" text="?" />
+                  <Label layoutX="14.0" layoutY="14.0" styleClass="infomarker" text="?">
+                     <tooltip>
+                        <Tooltip text="The (short) abbreviation for the taglist." />
+                     </tooltip></Label>
+                  <Label layoutX="14.0" layoutY="58.0" styleClass="infomarker" text="?">
+                     <tooltip>
+                        <Tooltip text="Does the taglist use ratings? (s/q/e)" />
+                     </tooltip></Label>
+                  <Label layoutX="14.0" layoutY="102.0" styleClass="infomarker" text="?">
+                     <tooltip>
+                        <Tooltip text="A simple description on the goal for the taglist." />
+                     </tooltip></Label>
                   <Label layoutX="51.0" layoutY="19.0" text="Abbreviation:" />
                   <Label layoutX="51.0" layoutY="107.0" text="Description:" />
                   <TextArea fx:id="ta_description" layoutX="183.0" layoutY="102.0" prefHeight="86.0" prefWidth="413.0" text="line 1&#10;line 2&#10;line 3&#10;line 4" />
@@ -52,7 +62,7 @@
       </TitledPane>
       <Label layoutX="15.0" layoutY="14.0" text="Taglist &gt; " />
       <Label fx:id="lbl_navigation" layoutX="86.0" layoutY="14.0" text="Add/Edit/Delete Taglist" />
-      <Button fx:id="button_confirmDelete" layoutX="371.0" layoutY="42.0" mnemonicParsing="false"  prefHeight="40.0" prefWidth="120.0" text="Yes" />
+      <Button fx:id="button_confirmDelete" layoutX="371.0" layoutY="42.0" mnemonicParsing="false" prefHeight="40.0" prefWidth="120.0" text="Yes" />
       <Label fx:id="lbl_deleteConfirmation" layoutX="470.0" layoutY="14.0" text="Delete?" />
    </children>
 </AnchorPane>

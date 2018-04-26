@@ -5,6 +5,7 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.TitledPane?>
+<?import javafx.scene.control.Tooltip?>
 <?import javafx.scene.layout.AnchorPane?>
 
 <!--
@@ -44,10 +45,22 @@
                   <Label layoutX="51.0" layoutY="60.0" text="Client secret:" />
                   <Label layoutX="53.0" layoutY="148.0" text="Callback:" />
                   <CheckBox fx:id="chk_callback" layoutX="51.0" layoutY="103.0" mnemonicParsing="false" onAction="#callbackCheckbox" text="Has callback?" />
-                  <Label layoutX="16.0" layoutY="11.0" styleClass="infomarker" text="?" />
-                  <Label layoutX="16.0" layoutY="55.0" styleClass="infomarker" text="?" />
-                  <Label layoutX="16.0" layoutY="99.0" styleClass="infomarker" text="?" />
-                  <Label layoutX="16.0" layoutY="143.0" styleClass="infomarker" text="?" />
+                  <Label layoutX="16.0" layoutY="11.0" styleClass="infomarker" text="?">
+                     <tooltip>
+                        <Tooltip text="The Imgur Client-ID." />
+                     </tooltip></Label>
+                  <Label layoutX="16.0" layoutY="55.0" styleClass="infomarker" text="?">
+                     <tooltip>
+                        <Tooltip text="The Imgur Client Secret. " />
+                     </tooltip></Label>
+                  <Label layoutX="16.0" layoutY="99.0" styleClass="infomarker" text="?">
+                     <tooltip>
+                        <Tooltip text="Use this if a custom callback was selected during setup." />
+                     </tooltip></Label>
+                  <Label layoutX="16.0" layoutY="143.0" styleClass="infomarker" text="?">
+                     <tooltip>
+                        <Tooltip text="The callback for the Imgur key credentials." />
+                     </tooltip></Label>
                </children></AnchorPane>
         </content>
       </TitledPane>
@@ -58,13 +71,22 @@
                <children>
                   <TextField fx:id="tf_discordToken" layoutX="161.0" layoutY="15.0" prefHeight="29.0" prefWidth="435.0" />
                   <Label layoutX="49.0" layoutY="21.0" text="Token:" />
-                  <Label layoutX="14.0" layoutY="16.0" styleClass="infomarker" text="?" />
+                  <Label layoutX="14.0" layoutY="16.0" styleClass="infomarker" text="?">
+                     <tooltip>
+                        <Tooltip text="The Discord token for a bot account." />
+                     </tooltip></Label>
                </children>
             </AnchorPane>
         </content>
       </TitledPane>
       <Button layoutX="506.0" layoutY="42.0" mnemonicParsing="false" onAction="#reset" prefHeight="40.0" prefWidth="120.0" text="Reset" />
-      <Label layoutX="144.0" layoutY="48.0" styleClass="infomarker" text="?" />
-      <Label layoutX="467.0" layoutY="48.0" styleClass="infomarker" text="?" />
+      <Label layoutX="144.0" layoutY="48.0" styleClass="infomarker" text="?">
+         <tooltip>
+            <Tooltip text="Accept the keys and return to the application." />
+         </tooltip></Label>
+      <Label layoutX="467.0" layoutY="48.0" styleClass="infomarker" text="?">
+         <tooltip>
+            <Tooltip text="Reset the keys to how they were before." />
+         </tooltip></Label>
    </children>
 </AnchorPane>

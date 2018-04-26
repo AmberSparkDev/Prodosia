@@ -35,8 +35,8 @@
 <AnchorPane minWidth="520.0" prefHeight="480.0" prefWidth="640.0" stylesheets="@../stylesheet.css" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.Bluefix.Prodosia.GUI.Tracker.EditTrackerWindow">
     <children>
         <Button fx:id="button_back" layoutX="14.0" layoutY="42.0" mnemonicParsing="false" prefHeight="40.0" prefWidth="120.0" text="Back" />
-        <Button fx:id="button_edit" layoutX="151.0" layoutY="42.0" mnemonicParsing="false"  prefHeight="40.0" prefWidth="120.0" text="Edit" />
-        <Button fx:id="button_delete" layoutX="506.0" layoutY="42.0" mnemonicParsing="false"  prefHeight="40.0" prefWidth="120.0" text="Delete" />
+        <Button fx:id="button_edit" layoutX="151.0" layoutY="42.0" mnemonicParsing="false" prefHeight="40.0" prefWidth="120.0" text="Edit" />
+        <Button fx:id="button_delete" layoutX="506.0" layoutY="42.0" mnemonicParsing="false" prefHeight="40.0" prefWidth="120.0" text="Delete" />
         <TitledPane animated="false" collapsible="false" layoutX="15.0" layoutY="95.0" prefHeight="108.0" prefWidth="610.0" text="Imgur">
             <content>
                 <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="608.0">
@@ -48,7 +48,7 @@
                         <Button fx:id="button_checkImgurName" layoutX="497.0" layoutY="41.0" mnemonicParsing="false" onAction="#updateImgurData" prefHeight="29.0" prefWidth="100.0" text="Check" />
                         <Label layoutX="461.0" layoutY="41.0" styleClass="infomarker" text="?">
                             <tooltip>
-                                <Tooltip text="Empty Tooltip" />
+                                <Tooltip text="Retrieve the Imgur ID based on the name. " />
                             </tooltip>
                         </Label>
                     </children></AnchorPane>
@@ -66,7 +66,7 @@
                         <Label layoutX="481.0" layoutY="14.0" text="#" />
                         <Label layoutX="461.0" layoutY="41.0" styleClass="infomarker" text="?">
                             <tooltip>
-                                <Tooltip text="Empty Tooltip" />
+                                <Tooltip text="Retrieve the Discord name based on the ID." />
                             </tooltip>
                         </Label>
                   <Button fx:id="button_checkDiscordTag" layoutX="497.0" layoutY="41.0" mnemonicParsing="false" onAction="#updateDiscordData" prefHeight="29.0" prefWidth="100.0" text="Check" />
@@ -75,21 +75,27 @@
         </TitledPane>
         <Label layoutX="15.0" layoutY="14.0" text="Tracker &gt; " />
         <Label fx:id="lbl_navigation" layoutX="93.0" layoutY="14.0" text="Add/Edit/Delete Tracker" />
-        <Button fx:id="button_confirmDelete" layoutX="371.0" layoutY="42.0" mnemonicParsing="false"  prefHeight="40.0" prefWidth="120.0" text="Yes" />
+        <Button fx:id="button_confirmDelete" layoutX="371.0" layoutY="42.0" mnemonicParsing="false" prefHeight="40.0" prefWidth="120.0" text="Yes" />
         <Label fx:id="lbl_deleteConfirmation" layoutX="470.0" layoutY="14.0" text="Delete?" />
         <TitledPane collapsible="false" layoutX="15.0" layoutY="311.0" maxHeight="155.0" maxWidth="610.0" minHeight="155.0" minWidth="610.0" prefHeight="155.0" prefWidth="610.0" text="Permissions" AnchorPane.bottomAnchor="14.0" AnchorPane.leftAnchor="15.0" AnchorPane.rightAnchor="15.0" AnchorPane.topAnchor="311.0">
             <content>
                 <AnchorPane maxHeight="125.0" maxWidth="608.0" minHeight="125.0" minWidth="608.0" prefHeight="125.0" prefWidth="608.0">
                     <children>
                         <CheckBox fx:id="perm_chkAdmin" layoutX="51.0" layoutY="86.0" mnemonicParsing="false" text="Admin" />
-                        <Label layoutX="14.0" layoutY="82.0" styleClass="infomarker" text="?" />
+                        <Label layoutX="14.0" layoutY="82.0" styleClass="infomarker" text="?">
+                     <tooltip>
+                        <Tooltip text="Admin means Tracker has default permissions for all taglists." />
+                     </tooltip></Label>
                         <ScrollPane fx:id="perm_scrollpane" hbarPolicy="NEVER" layoutX="307.7" layoutY="12.7" vbarPolicy="ALWAYS" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="296.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                             <content>
                                 <VBox fx:id="perm_taglists" />
                             </content>
                         </ScrollPane>
                   <TextField fx:id="perm_filter" layoutX="78.0" layoutY="12.0" prefHeight="29.0" prefWidth="230.0" />
-                  <Label layoutX="42.0" layoutY="12.0" styleClass="infomarker" text="?" />
+                  <Label layoutX="42.0" layoutY="12.0" styleClass="infomarker" text="?">
+                     <tooltip>
+                        <Tooltip text="Filter out the taglists." />
+                     </tooltip></Label>
                     </children>
                 </AnchorPane>
             </content></TitledPane>
