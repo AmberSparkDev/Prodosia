@@ -93,6 +93,7 @@ public class UserSanitationHandler
 
         // close the resultset
         rs.close();
+        prep.close();
 
         return entries;
     }
@@ -126,6 +127,7 @@ public class UserSanitationHandler
             PreparedStatement prep = SqlDatabase.getStatement(query);
             prep.setLong(1, l);
             SqlDatabase.execute(prep);
+            prep.close();
         }
     }
 

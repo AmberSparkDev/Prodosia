@@ -54,6 +54,7 @@ public class SqlDatabaseHelper
 
         // close the ResultSet
         rs.close();
+        s.close();
 
         return value;
     }
@@ -78,6 +79,9 @@ public class SqlDatabaseHelper
 
             // build the query.
             SqlDatabase.execute(s0, s1);
+
+            s0.close();
+            s1.close();
         }
         catch (SQLException e)
         {
@@ -107,6 +111,7 @@ public class SqlDatabaseHelper
 
         // close the resultset
         set.close();
+        s0.close();
 
         return value;
     }

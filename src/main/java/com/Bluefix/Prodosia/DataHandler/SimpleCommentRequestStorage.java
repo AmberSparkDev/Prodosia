@@ -150,6 +150,8 @@ public class SimpleCommentRequestStorage extends LocalStorageHandler<SimpleComme
             t.setId(SqlDatabase.getAffectedRow(prep));
         }
 
+        assert(prep.isClosed());
+
         return oldRequest;
     }
 
@@ -166,6 +168,8 @@ public class SimpleCommentRequestStorage extends LocalStorageHandler<SimpleComme
         PreparedStatement prep = SqlDatabase.getStatement(query);
         prep.setLong(1, t.getId());
         SqlDatabase.execute(prep);
+
+        assert(prep.isClosed());
     }
 
     private synchronized static SimpleCommentRequest dbGetCommentRequest(long id) throws SQLException
@@ -186,6 +190,9 @@ public class SimpleCommentRequestStorage extends LocalStorageHandler<SimpleComme
 
         // parse the result and return.
         ArrayList<SimpleCommentRequest> parsedResult = parseCommentRequests(rs);
+
+        prep.close();
+        assert(prep.isClosed());
 
         if (parsedResult.isEmpty())
             return null;
@@ -208,7 +215,13 @@ public class SimpleCommentRequestStorage extends LocalStorageHandler<SimpleComme
 
         ResultSet rs = result.get(0);
 
-        return parseCommentRequests(rs);
+        // parse the result and return.
+        ArrayList<SimpleCommentRequest> parsedResult = parseCommentRequests(rs);
+
+        prep.close();
+        assert(prep.isClosed());
+
+        return parsedResult;
     }
 
     private static ArrayList<SimpleCommentRequest> parseCommentRequests(ResultSet rs) throws SQLException

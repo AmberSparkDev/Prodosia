@@ -148,6 +148,8 @@ public class ArchiveHandler extends LocalStorageHandler<Archive>
         prep.setString(5, archive.getFilters());
         SqlDatabase.execute(prep);
 
+        assert(prep.isClosed());
+
         // return the old archive.
         return oldArchive;
     }
@@ -170,6 +172,8 @@ public class ArchiveHandler extends LocalStorageHandler<Archive>
         prep.setString(2, archive.getChannelId());
 
         SqlDatabase.execute(prep);
+
+        assert(prep.isClosed());
     }
 
     private static synchronized ArrayList<Archive> dbGetArchives() throws SQLException
@@ -186,8 +190,13 @@ public class ArchiveHandler extends LocalStorageHandler<Archive>
 
         ResultSet rs = result.get(0);
 
+        ArrayList<Archive> archives = parseArchives(rs);
+
+        prep.close();
+        assert(prep.isClosed());
+
         // parse the archive and return.
-        return parseArchives(rs);
+        return archives;
     }
 
     /**
@@ -215,6 +224,9 @@ public class ArchiveHandler extends LocalStorageHandler<Archive>
 
         // parse the archive and return.
         ArrayList<Archive> parsedResult = parseArchives(rs);
+
+        prep.close();
+        assert(prep.isClosed());
 
         if (parsedResult.isEmpty())
             return null;

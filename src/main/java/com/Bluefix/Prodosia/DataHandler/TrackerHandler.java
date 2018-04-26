@@ -166,6 +166,8 @@ public class TrackerHandler extends LocalStorageHandler<Tracker>
             trackerIndex = oldTracker.getId();
         }
 
+        assert(prep0.isClosed());
+
 
         // update the tracker id accordingly.
         t.setId(trackerIndex);
@@ -182,6 +184,8 @@ public class TrackerHandler extends LocalStorageHandler<Tracker>
         prep2.setString(3, t.getPermissions().dbGetTaglists());
 
         SqlDatabase.execute(prep2);
+
+        assert(prep2.isClosed());
 
         return oldTracker;
     }
@@ -222,6 +226,8 @@ public class TrackerHandler extends LocalStorageHandler<Tracker>
         // close the result-set.
         rs.close();
 
+        assert(prep0.isClosed());
+
         // delete the entry from Tracker and Permission
         String query1 =
                 "DELETE FROM Tracker " +
@@ -239,6 +245,9 @@ public class TrackerHandler extends LocalStorageHandler<Tracker>
                 .execute(prep1)
                 .execute(prep2)
                 .commit();
+
+        assert(prep1.isClosed());
+        assert(prep2.isClosed());
     }
 
 
@@ -271,6 +280,9 @@ public class TrackerHandler extends LocalStorageHandler<Tracker>
         // parse the tracker and return
         ArrayList<Tracker> parsedTrackers = parseTrackers(rs);
 
+        prep.close();
+        assert(prep.isClosed());
+
         if (parsedTrackers.isEmpty())
             return null;
 
@@ -300,7 +312,13 @@ public class TrackerHandler extends LocalStorageHandler<Tracker>
 
         ResultSet rs = result.get(0);
 
-        return parseTrackers(rs);
+        // parse the tracker and return
+        ArrayList<Tracker> parsedTrackers = parseTrackers(rs);
+
+        prep.close();
+        assert(prep.isClosed());
+
+        return parsedTrackers;
     }
 
     private static ArrayList<Tracker> parseTrackers(ResultSet rs) throws SQLException

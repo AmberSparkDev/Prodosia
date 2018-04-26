@@ -116,6 +116,8 @@ public class CommentScannerStorage extends LocalStorageHandler<TrackerBookmark>
 
         SqlDatabase.execute(prep);
 
+        assert(prep.isClosed());
+
         return oldBookmark;
     }
 
@@ -132,6 +134,8 @@ public class CommentScannerStorage extends LocalStorageHandler<TrackerBookmark>
         prep.setLong(1, tb.getTracker().getImgurId());
 
         SqlDatabase.execute(prep);
+
+        assert(prep.isClosed());
     }
 
     private synchronized static TrackerBookmark dbGetBookmark(long imgurId) throws SQLException
@@ -153,6 +157,9 @@ public class CommentScannerStorage extends LocalStorageHandler<TrackerBookmark>
         // parse result and return
         ArrayList<TrackerBookmark> parsedResult = parseBookmarks(rs);
 
+        prep.close();
+        assert(prep.isClosed());
+
         if (parsedResult.isEmpty())
             return null;
 
@@ -173,7 +180,13 @@ public class CommentScannerStorage extends LocalStorageHandler<TrackerBookmark>
 
         ResultSet rs = result.get(0);
 
-        return parseBookmarks(rs);
+        // parse result and return
+        ArrayList<TrackerBookmark> parsedResult = parseBookmarks(rs);
+
+        prep.close();
+        assert(prep.isClosed());
+
+        return parsedResult;
     }
 
     private static ArrayList<TrackerBookmark> parseBookmarks(ResultSet rs) throws SQLException

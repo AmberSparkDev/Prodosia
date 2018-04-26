@@ -118,6 +118,8 @@ public class CommandPrefixStorage extends LocalStorageHandler<CommandPrefix>
 
         SqlDatabase.execute(prep);
 
+        assert(prep.isClosed());
+
         return oldPrefix;
     }
 
@@ -135,6 +137,8 @@ public class CommandPrefixStorage extends LocalStorageHandler<CommandPrefix>
         prep.setInt(1, cp.getType().getValue());
 
         SqlDatabase.execute(prep);
+
+        assert(prep.isClosed());
     }
 
     private static synchronized CommandPrefix dbGetCPrefix(CommandPrefix.Type type) throws SQLException
@@ -156,6 +160,9 @@ public class CommandPrefixStorage extends LocalStorageHandler<CommandPrefix>
         // parse the query and return the result
         ArrayList<CommandPrefix> parseResult = parsePrefixes(rs);
 
+        prep.close();
+        assert(prep.isClosed());
+
         if (parseResult.isEmpty())
             return null;
 
@@ -176,7 +183,12 @@ public class CommandPrefixStorage extends LocalStorageHandler<CommandPrefix>
 
         ResultSet rs = result.get(0);
 
-        return parsePrefixes(rs);
+        ArrayList<CommandPrefix> parseResult = parsePrefixes(rs);
+
+        prep.close();
+        assert(prep.isClosed());
+
+        return parseResult;
     }
 
     private static ArrayList<CommandPrefix> parsePrefixes(ResultSet rs) throws SQLException

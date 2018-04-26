@@ -228,6 +228,8 @@ public class TaglistHandler extends LocalStorageHandler<Taglist>
         prep0.setLong(1, t.getId());
         SqlDatabase.execute(prep0);
 
+        assert(prep0.isClosed());
+
         // Check to see if any users exist that do not have any user-subscriptions.
         String query1 =
                 "SELECT id FROM User WHERE id NOT IN " +
@@ -249,6 +251,9 @@ public class TaglistHandler extends LocalStorageHandler<Taglist>
         // close the resultset
         rs.close();
 
+        prep1.close();
+        assert(prep1.isClosed());
+
         // delete all the users that have no remaining user-subscriptions.
         for (Long l : userIds)
         {
@@ -260,6 +265,8 @@ public class TaglistHandler extends LocalStorageHandler<Taglist>
             delPrep.setLong(1, l);
 
             SqlDatabase.execute(delPrep);
+
+            assert(delPrep.isClosed());
         }
     }
 
@@ -293,6 +300,8 @@ public class TaglistHandler extends LocalStorageHandler<Taglist>
         PreparedStatement prep = SqlDatabase.getStatement(query);
         prep.setLong(1, t.getId());
         SqlDatabase.execute(prep);
+
+        assert(prep.isClosed());
     }
 
 
@@ -313,7 +322,13 @@ public class TaglistHandler extends LocalStorageHandler<Taglist>
 
         ResultSet rs = result.get(0);
 
-        return parseTaglists(rs);
+        // parse the result and return
+        ArrayList<Taglist> parseResult = parseTaglists(rs);
+
+        prep.close();
+        assert(prep.isClosed());
+
+        return parseResult;
     }
 
     private synchronized static Taglist dbGetTaglist(String abbreviation) throws SQLException
@@ -334,6 +349,9 @@ public class TaglistHandler extends LocalStorageHandler<Taglist>
 
         // parse the result and return
         ArrayList<Taglist> parseResult = parseTaglists(rs);
+
+        prep.close();
+        assert(prep.isClosed());
 
         if (parseResult.isEmpty())
             return null;

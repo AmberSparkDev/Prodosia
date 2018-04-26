@@ -147,6 +147,8 @@ public class UserHandler extends LocalStorageHandler<User>
 
         long userIndex = SqlDatabase.getAffectedRow(prep0);
 
+        assert(prep0.isClosed());
+
         // now that we know the user-id, we can start inserting the user-subscriptions.
         for (UserSubscription us : u.getSubscriptions())
         {
@@ -162,6 +164,8 @@ public class UserHandler extends LocalStorageHandler<User>
             prep2.setString(4, us.getFilters());
 
             SqlDatabase.execute(prep2);
+
+            assert(prep2.isClosed());
         }
 
         return oldUser;
@@ -189,6 +193,9 @@ public class UserHandler extends LocalStorageHandler<User>
         sb.execute(prep1);
 
         sb.commit();
+
+        assert(prep0.isClosed());
+        assert(prep1.isClosed());
     }
 
 
@@ -222,6 +229,9 @@ public class UserHandler extends LocalStorageHandler<User>
 
         // parse the users and return
         ArrayList<User> parsedUsers = parseUsers(rs);
+
+        prep.close();
+        assert(prep.isClosed());
 
         if (parsedUsers.isEmpty())
             return null;
@@ -261,6 +271,9 @@ public class UserHandler extends LocalStorageHandler<User>
         // parse the users and return
         ArrayList<User> parsedUsers = parseUsers(rs);
 
+        prep.close();
+        assert(prep.isClosed());
+
         if (parsedUsers.isEmpty())
             return null;
 
@@ -291,7 +304,13 @@ public class UserHandler extends LocalStorageHandler<User>
 
         ResultSet rs = result.get(0);
 
-        return parseUsers(rs);
+        // parse the users and return
+        ArrayList<User> parsedUsers = parseUsers(rs);
+
+        prep.close();
+        assert(prep.isClosed());
+
+        return parsedUsers;
     }
 
     private static ArrayList<User> parseUsers(ResultSet rs) throws SQLException
@@ -421,6 +440,8 @@ public class UserHandler extends LocalStorageHandler<User>
         // close the resultset
         rs.close();
 
+        assert(prep.isClosed());
+
         return value;
     }
 
@@ -522,6 +543,8 @@ public class UserHandler extends LocalStorageHandler<User>
 
         // close the resultset
         rs.close();
+
+        assert(prep.isClosed());
 
         return value;
     }

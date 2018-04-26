@@ -170,6 +170,8 @@ public class TagRequestStorage extends LocalStorageHandler<TagRequest>
 
         SqlDatabase.execute(prep);
 
+        assert(prep.isClosed());
+
         return oldRequest;
     }
 
@@ -187,6 +189,8 @@ public class TagRequestStorage extends LocalStorageHandler<TagRequest>
         prep.setString(1, t.getImgurId());
         prep.setLong(2, t.getParentId());
         SqlDatabase.execute(prep);
+
+        assert(prep.isClosed());
     }
 
     private synchronized static TagRequest dbGetTagrequest(String imgurId, long parentId) throws SQLException
@@ -209,6 +213,9 @@ public class TagRequestStorage extends LocalStorageHandler<TagRequest>
         // parse the result and return
         ArrayList<TagRequest> parsedRequests = parseTagrequests(rs);
 
+        prep.close();
+        assert(prep.isClosed());
+
         if (parsedRequests.isEmpty())
             return null;
 
@@ -229,7 +236,13 @@ public class TagRequestStorage extends LocalStorageHandler<TagRequest>
 
         ResultSet rs = result.get(0);
 
-        return parseTagrequests(rs);
+        // parse the result and return
+        ArrayList<TagRequest> parsedRequests = parseTagrequests(rs);
+
+        prep.close();
+        assert(prep.isClosed());
+
+        return parsedRequests;
     }
 
     private static ArrayList<TagRequest> parseTagrequests(ResultSet rs) throws SQLException

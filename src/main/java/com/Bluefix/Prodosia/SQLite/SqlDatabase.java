@@ -232,15 +232,14 @@ public class SqlDatabase
         {
             try
             {
-
                 switch (query[i].type)
                 {
                     case EXECUTE:
                         out.add(i, (T) Boolean.valueOf(query[i].statement.execute()));
                         break;
                     case QUERY:
-                        out.add(i, (T) query[i].statement.executeQuery());
                         query[i].statement.closeOnCompletion();
+                        out.add(i, (T) query[i].statement.executeQuery());
                         break;
                     case UPDATE:
                         out.add(i, (T) Integer.valueOf(query[i].statement.executeUpdate()));
@@ -277,21 +276,21 @@ public class SqlDatabase
             }
         }
 
-        // commit the queries
-        Database().conn.commit();
-
         // close all the statements.
         for (int i = 0; i < query.length; i++)
         {
             try
             {
                 if (query[i].type != SqlBuilder.QueryType.QUERY)
-                query[i].statement.close();
+                    query[i].statement.close();
             } catch (SQLException ex)
             {
                 // ignore
             }
         }
+
+        // commit the queries
+        Database().conn.commit();
 
         // return the results.
         return out;

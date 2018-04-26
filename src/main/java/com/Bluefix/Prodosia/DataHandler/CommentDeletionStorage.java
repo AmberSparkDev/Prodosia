@@ -113,6 +113,8 @@ public class CommentDeletionStorage extends LocalStorageHandler<Long>
 
         SqlDatabase.execute(prep);
 
+        assert(prep.isClosed());
+
         return d;
     }
 
@@ -126,6 +128,8 @@ public class CommentDeletionStorage extends LocalStorageHandler<Long>
         prep.setLong(1, d);
 
         SqlDatabase.execute(prep);
+
+        assert(prep.isClosed());
     }
 
     private synchronized ArrayList<Long> dbGetDeletions() throws SQLException
@@ -149,6 +153,8 @@ public class CommentDeletionStorage extends LocalStorageHandler<Long>
 
         // close the resultset
         rs.close();
+        prep.close();
+        assert(prep.isClosed());
 
         return output;
     }

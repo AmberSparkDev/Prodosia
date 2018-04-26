@@ -83,6 +83,7 @@ public class Taglist
 
             // close the result-set.
             rs.close();
+            prep.close();
         }
 
         return id;
