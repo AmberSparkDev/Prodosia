@@ -28,12 +28,15 @@ import com.Bluefix.Prodosia.Module.ModuleManager;
 import com.Bluefix.Prodosia.Storage.KeyStorage;
 import com.github.kskelm.baringo.BaringoClient;
 import javafx.application.Application;
+import javafx.application.Platform;
+import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import javafx.stage.WindowEvent;
 
 import javax.security.auth.login.LoginException;
 import java.io.IOException;
@@ -99,6 +102,14 @@ public class GuiApplication extends Application
 
         primaryStage.setTitle("Prodosía - by ReGeX");
         primaryStage.setResizable(false);
+
+        // ensure that the entire application is shut down on closing this window.
+        primaryStage.setOnCloseRequest(t ->
+        {
+            Platform.exit();
+            System.exit(0);
+        });
+
         //primaryStage.initStyle(StageStyle.UTILITY);
         Scene scene = new Scene(root, 640, 480);
 
