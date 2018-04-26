@@ -23,6 +23,8 @@
 package com.Bluefix.Prodosia.GUI.Navigation;
 
 
+import javafx.stage.Stage;
+
 import java.io.IOException;
 
 /**
@@ -169,5 +171,17 @@ public class VistaNavigator
     {
         app = new GuiApplication();
         app.launch(GuiApplication.class);
+    }
+
+
+    /**
+     * Bring to foreground
+     */
+    public static void show()
+    {
+        if (VistaNavigator.vistaHolder == null)
+            return;
+
+        ((Stage)VistaNavigator.vistaHolder.vistaHolder.getScene().getWindow()).show();
     }
 }

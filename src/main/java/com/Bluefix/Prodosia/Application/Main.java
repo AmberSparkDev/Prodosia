@@ -23,11 +23,16 @@
 package com.Bluefix.Prodosia.Application;
 
 
+import com.Bluefix.Prodosia.GUI.Navigation.GuiApplication;
 import com.Bluefix.Prodosia.GUI.Navigation.VistaNavigator;
 import com.Bluefix.Prodosia.Imgur.ImgurApi.ImgurManager;
 import com.Bluefix.Prodosia.Module.ModuleManager;
 import com.github.kskelm.baringo.BaringoClient;
 import com.github.kskelm.baringo.util.BaringoApiException;
+import it.sauronsoftware.junique.AlreadyLockedException;
+import it.sauronsoftware.junique.JUnique;
+import it.sauronsoftware.junique.MessageHandler;
+import javafx.scene.control.Alert;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -35,8 +40,28 @@ import java.net.URISyntaxException;
 
 public class Main
 {
+    private static String duplicateMsg = "duplicate";
+    private static String uniqueIdentifier = "85386f61-c164-4671-9dfc-1e50ed2b9541";
+
     public static void main(String[] args)
     {
+        // ensure that there wasn't a former instance of the application already running.
+        try
+        {
+            JUnique.acquireLock(uniqueIdentifier, s ->
+            {
+                if (duplicateMsg.equals(s))
+                    VistaNavigator.show();
+
+                return null;
+            });
+        }
+        catch (AlreadyLockedException e)
+        {
+            JUnique.sendMessage(uniqueIdentifier, duplicateMsg);
+            System.exit(0);
+        }
+
 
         System.out.println("com.Bluefix.Prodosia.Application started");
 

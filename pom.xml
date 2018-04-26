@@ -116,6 +116,15 @@
         </dependency>
 
 
+        <!-- https://mvnrepository.com/artifact/it.sauronsoftware/junique -->
+        <dependency>
+            <groupId>it.sauronsoftware</groupId>
+            <artifactId>junique</artifactId>
+            <version>1.0.4</version>
+        </dependency>
+
+
+
 
 
 
