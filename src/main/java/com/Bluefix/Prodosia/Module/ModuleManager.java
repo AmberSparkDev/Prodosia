@@ -25,6 +25,7 @@ package com.Bluefix.Prodosia.Module;
 import com.Bluefix.Prodosia.Imgur.CommentDeletion.CommentDeletionExecution;
 import com.Bluefix.Prodosia.Imgur.CommentScanner.CommentScannerExecution;
 import com.Bluefix.Prodosia.Imgur.Tagging.CommentExecution;
+import com.Bluefix.Prodosia.Imgur.UserSanitation.UserSanitationModule;
 
 /**
  * Global module manager
@@ -36,6 +37,7 @@ public class ModuleManager
     private CommentDeletionExecution commentDeletionExecution;
     private CommentScannerExecution commentScannerExecution;
     private CommentExecution commentExecution;
+    private UserSanitationModule sanitationModule;
 
     private static ModuleManager me;
 
@@ -69,11 +71,13 @@ public class ModuleManager
         handler().commentScannerExecution = CommentScannerExecution.handler();
         handler().commentDeletionExecution = CommentDeletionExecution.handler();
         handler().commentExecution = CommentExecution.handler();
+        handler().sanitationModule = UserSanitationModule.handler();
 
         // start the modules
         handler().commentScannerExecution.start();
         handler().commentDeletionExecution.start();
         handler().commentExecution.start();
+        handler().sanitationModule.start();
     }
 
 }

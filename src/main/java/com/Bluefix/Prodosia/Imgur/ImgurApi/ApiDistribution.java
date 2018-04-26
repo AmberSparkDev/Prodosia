@@ -40,6 +40,13 @@ package com.Bluefix.Prodosia.Imgur.ImgurApi;
  *    If the name of a user was not known, it will request the account base.
  *  (0/1): tag command
  *    If a parent-comment is created, the actual Comment must be retrieved by its ID.
+ *
+ *
+ * Guaranteed cap usage:
+ * (per hour):
+ * 250 + 50 = 300 per hour (minimum)
+ * (per day):
+ * 300 * 24 = 7200 = 57.6%
  */
 public class ApiDistribution
 {
@@ -54,12 +61,21 @@ public class ApiDistribution
 
 
     /**
-     * Deletion module uses 50 requests on average per hour.
+     * Deletion module uses 100 requests on average per hour.
      * This is 24 * 100 = 2400 per day (19.2%)
      *
      * The comment-deletion module doesn't necessarily use this cap,
      * only if it consistently has comments to delete.
      */
     public static final int DeletionModule = 100;
+
+
+    /**
+     * Sanitation module uses 50 requests on average per hour.
+     * This is 24 * 50 = 1200 per day (9.6%)
+     *
+     * This cap will always be reached unless the system has no users.
+     */
+    public static final int SanitationModule = 50;
 
 }

@@ -246,7 +246,7 @@ public class SqlDatabase
                         out.add(i, (T) Integer.valueOf(query[i].statement.executeUpdate()));
                         break;
                     default:
-                        throw new IllegalArgumentException("The type type was not recognized.");
+                        throw new IllegalArgumentException("The query type was not recognized.");
                 }
 
 
@@ -261,7 +261,16 @@ public class SqlDatabase
 
                 // close all the statements.
                 for (int j = 0; j < query.length; j++)
-                    query[j].statement.close();
+                {
+                    try
+                    {
+                        query[j].statement.close();
+                    } catch (SQLException ex)
+                    {
+                        // ignore
+                    }
+                }
+
 
                 // return null to indicate failure
                 return null;
@@ -274,8 +283,14 @@ public class SqlDatabase
         // close all the statements.
         for (int i = 0; i < query.length; i++)
         {
-            if (query[i].type != SqlBuilder.QueryType.QUERY)
+            try
+            {
+                if (query[i].type != SqlBuilder.QueryType.QUERY)
                 query[i].statement.close();
+            } catch (SQLException ex)
+            {
+                // ignore
+            }
         }
 
         // return the results.

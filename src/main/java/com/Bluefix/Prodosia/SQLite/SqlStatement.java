@@ -104,7 +104,10 @@ public class SqlStatement
                         "id integer PRIMARY KEY, " +
                         "imgurId text, " +
                         "parentId integer, " +
-                        "lines text); "
+                        "lines text); ",
+                /* --- UserSanitation --- */
+                        "CREATE TABLE IF NOT EXISTS UserSanitation (" +
+                        "imgurId integer PRIMARY KEY); "
 
         };
     }
