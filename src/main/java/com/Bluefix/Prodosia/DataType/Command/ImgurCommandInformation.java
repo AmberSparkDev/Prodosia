@@ -35,6 +35,7 @@ public class ImgurCommandInformation extends CommandInformation
     public ImgurCommandInformation(Tracker tracker, Comment comment)
     {
         super();
+
         super.setTracker(tracker);
         super.setParentComment(comment);
     }

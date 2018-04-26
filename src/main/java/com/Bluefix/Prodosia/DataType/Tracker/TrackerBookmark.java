@@ -22,8 +22,10 @@
 
 package com.Bluefix.Prodosia.DataType.Tracker;
 
+import com.Bluefix.Prodosia.DataHandler.TrackerHandler;
 import com.github.kskelm.baringo.model.Comment;
 
+import java.sql.SQLException;
 import java.util.Date;
 import java.util.Objects;
 
@@ -43,14 +45,14 @@ public class TrackerBookmark
      */
     private Date lastCommentTime;
 
-    private Tracker tracker;
+    private long imgurId;
 
 
     public TrackerBookmark(long lastCommentId, Date lastCommentTime, Tracker tracker)
     {
         this.lastCommentId = lastCommentId;
         this.lastCommentTime = lastCommentTime;
-        this.tracker = tracker;
+        this.imgurId = tracker.getImgurId();
     }
 
     public long getLastCommentId()
@@ -63,9 +65,9 @@ public class TrackerBookmark
         return lastCommentTime;
     }
 
-    public Tracker getTracker()
+    public Tracker getTracker() throws SQLException
     {
-        return tracker;
+        return TrackerHandler.getTrackerByImgurId(this.imgurId);
     }
 
 
@@ -75,13 +77,13 @@ public class TrackerBookmark
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         TrackerBookmark that = (TrackerBookmark) o;
-        return Objects.equals(tracker, that.tracker);
+        return imgurId == that.imgurId;
     }
 
     @Override
     public int hashCode()
     {
 
-        return Objects.hash(tracker);
+        return Objects.hash(imgurId);
     }
 }

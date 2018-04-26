@@ -75,9 +75,14 @@ public class Taglist
             ResultSet rs = result.get(0);
 
             if (!rs.next())
+            {
+                rs.close();
                 throw new SQLException("This Taglist was not stored in the database. Make sure you have added it first.");
-
+            }
             this.id = rs.getLong(1);
+
+            // close the result-set.
+            rs.close();
         }
 
         return id;

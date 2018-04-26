@@ -26,6 +26,7 @@ import com.Bluefix.Prodosia.Command.CommandRecognition;
 import com.Bluefix.Prodosia.DataHandler.CommentScannerStorage;
 import com.Bluefix.Prodosia.DataHandler.TrackerHandler;
 import com.Bluefix.Prodosia.DataType.Command.CommandInformation;
+import com.Bluefix.Prodosia.Exception.BaringoExceptionHelper;
 import com.Bluefix.Prodosia.Prefix.CommandPrefix;
 import com.Bluefix.Prodosia.DataType.Command.ImgurCommandInformation;
 import com.Bluefix.Prodosia.DataType.Tracker.Tracker;
@@ -33,6 +34,7 @@ import com.Bluefix.Prodosia.DataType.Tracker.TrackerBookmark;
 import com.Bluefix.Prodosia.Imgur.ImgurApi.ApiDistribution;
 import com.Bluefix.Prodosia.Imgur.ImgurApi.ImgurManager;
 import com.Bluefix.Prodosia.Module.ImgurIntervalRunner;
+import com.github.kskelm.baringo.model.Account;
 import com.github.kskelm.baringo.model.Comment;
 import com.github.kskelm.baringo.util.BaringoApiException;
 
@@ -310,6 +312,10 @@ public class CommentScannerExecution extends ImgurIntervalRunner
             // retrieve the current page and parse its comments.
             Tracker t = q.getBookmark().getTracker();
 
+            // if the tracker was invalidated for some reason, skip this phase.
+            if (t == null)
+                continue;
+
             requestCounter++;
             List<Comment> trackerComments = null;
 
@@ -320,9 +326,37 @@ public class CommentScannerExecution extends ImgurIntervalRunner
                         Comment.Sort.Newest,
                         curPage);
             }
+            catch (BaringoApiException ex)
+            {
+                // if the request returns a 404, update the tracker data.
+                if (BaringoExceptionHelper.isNotFound(ex))
+                {
+                    try
+                    {
+                        Account acc = ImgurManager.client().accountService().getAccount(t.getImgurId());
+
+                        Tracker newTracker = new Tracker(
+                                t.getId(),
+                                acc.getUserName(),
+                                t.getImgurId(),
+                                t.getDiscordName(),
+                                t.getDiscordTag(),
+                                t.getDiscordId(),
+                                t.getPermissions());
+
+                        TrackerHandler.handler().update(t, newTracker);
+                        System.out.println("Updated Tracker \"" + t.getImgurName() + "\" -> \"" + newTracker.getImgurName() + "\"");
+                        t = newTracker;
+                    }
+                    catch (Exception e)
+                    {
+                        // ignore this.
+                    }
+                }
+            }
             catch (Exception ex)
             {
-                // a single failure should not impede functionality alltogether.
+                // a single failure should not impede functionality.
             }
 
             if (trackerComments == null || trackerComments.isEmpty())

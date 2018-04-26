@@ -45,12 +45,17 @@ public class SqlDatabaseHelper
         PreparedStatement s = SqlDatabase.getStatement(sql);
         ResultSet rs = SqlDatabase.query(s).get(0);
 
+        int value = -1;
+
         if (rs.next())
         {
-            return rs.getInt(1);
+            value = rs.getInt(1);
         }
 
-        return -1;
+        // close the ResultSet
+        rs.close();
+
+        return value;
     }
 
     public synchronized static void setVersion(int version, String createdBy) throws SQLException
@@ -98,7 +103,12 @@ public class SqlDatabaseHelper
 
         ResultSet set = SqlDatabase.query(s0).get(0);
 
-        return set.next();
+        boolean value = set.next();
+
+        // close the resultset
+        set.close();
+
+        return value;
     }
 
 
