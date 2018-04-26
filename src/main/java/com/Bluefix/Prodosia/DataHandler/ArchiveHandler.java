@@ -239,6 +239,9 @@ public class ArchiveHandler extends LocalStorageHandler<Archive>
             archives.add(new Archive(taglistId, description, channelId, ratings, filters));
         }
 
+        // close the resultset.
+        rs.close();
+
         return archives;
     }
 

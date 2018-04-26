@@ -219,6 +219,9 @@ public class TrackerHandler extends LocalStorageHandler<Tracker>
 
         long trackerId = rs.getLong(1);
 
+        // close the result-set.
+        rs.close();
+
         // delete the entry from Tracker and Permission
         String query1 =
                 "DELETE FROM Tracker " +
@@ -322,6 +325,9 @@ public class TrackerHandler extends LocalStorageHandler<Tracker>
 
             trackers.add(myT);
         }
+
+        // close the result-set
+        rs.close();
 
         return trackers;
     }

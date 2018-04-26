@@ -191,6 +191,9 @@ public class CommandPrefixStorage extends LocalStorageHandler<CommandPrefix>
             output.add(new CommandPrefix(type, regex));
         }
 
+        // close the resultset.
+        rs.close();
+
         return output;
     }
 

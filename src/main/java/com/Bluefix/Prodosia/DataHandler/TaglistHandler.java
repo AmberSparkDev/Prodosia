@@ -246,6 +246,9 @@ public class TaglistHandler extends LocalStorageHandler<Taglist>
         while (rs.next())
             userIds.add(rs.getLong(1));
 
+        // close the resultset
+        rs.close();
+
         // delete all the users that have no remaining user-subscriptions.
         for (Long l : userIds)
         {
@@ -352,6 +355,9 @@ public class TaglistHandler extends LocalStorageHandler<Taglist>
             taglists.add(new Taglist(id, abbr, desc, hasRatings));
         }
 
+        // close the resultset
+        rs.close();
+
         return taglists;
     }
 
@@ -367,7 +373,6 @@ public class TaglistHandler extends LocalStorageHandler<Taglist>
      */
     public static synchronized Taglist getTaglistById(long taglistId) throws SQLException
     {
-        // TODO: if this methods is used frequently, it might be worth making a HashMap<long, Taglist>
         ArrayList<Taglist> taglists = handler().getAll();
 
         for (Taglist tl : taglists)

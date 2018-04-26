@@ -191,6 +191,9 @@ public class CommentScannerStorage extends LocalStorageHandler<TrackerBookmark>
             output.add(new TrackerBookmark(commentId, new Date(commentTime), t));
         }
 
+        // close the resultset.
+        rs.close();
+
         return output;
     }
 

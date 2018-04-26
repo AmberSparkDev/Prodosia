@@ -147,6 +147,9 @@ public class CommentDeletionStorage extends LocalStorageHandler<Long>
             output.add(rs.getLong(1));
         }
 
+        // close the resultset
+        rs.close();
+
         return output;
     }
 

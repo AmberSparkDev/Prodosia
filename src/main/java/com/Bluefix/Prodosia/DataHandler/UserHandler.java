@@ -331,6 +331,9 @@ public class UserHandler extends LocalStorageHandler<User>
             arrSub.add(new UserSubscription(taglistId, ratings, filters));
         }
 
+        // close the resultset
+        rs.close();
+
 
         // parse the user list
         ArrayList<User> finalList = new ArrayList<>();
@@ -343,7 +346,7 @@ public class UserHandler extends LocalStorageHandler<User>
 
             if (ud == null || aus == null)
             {
-                // TODO: show a warning to the user. Non-critical, but not supposed to happen and might indicate
+                // Perhaps show a warning to the user. Non-critical, but not supposed to happen and might indicate
                 // database corruption.
                 continue;
             }
@@ -413,7 +416,12 @@ public class UserHandler extends LocalStorageHandler<User>
         if (!rs.next())
             return -1;
 
-        return rs.getLong(1);
+        long value = rs.getLong(1);
+
+        // close the resultset
+        rs.close();
+
+        return value;
     }
 
     //endregion
@@ -510,7 +518,12 @@ public class UserHandler extends LocalStorageHandler<User>
         if (!rs.next())
             throw new SQLException("Sql Exception! Could not find the count.");
 
-        return rs.getInt(1);
+        int value = rs.getInt(1);
+
+        // close the resultset
+        rs.close();
+
+        return value;
     }
 
     //endregion

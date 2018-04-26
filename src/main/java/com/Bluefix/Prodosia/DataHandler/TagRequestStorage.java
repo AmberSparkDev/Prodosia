@@ -248,6 +248,9 @@ public class TagRequestStorage extends LocalStorageHandler<TagRequest>
             output.add(new TagRequest(imgurId, parentComment, taglists, rating, filters, cleanComments));
         }
 
+        // close the resultset
+        rs.close();
+
         return output;
     }
 

@@ -84,7 +84,10 @@ public class Archive
     {
         if (this.taglist != null && this.taglist.getId() >= 0)
         {
-            this.taglist = TaglistHandler.getTaglistById(this.taglist.getId());
+            Taglist tmpTl = TaglistHandler.getTaglistById(this.taglist.getId());
+
+            if (tmpTl != null)
+                this.taglist = tmpTl;
         }
 
         return taglist;

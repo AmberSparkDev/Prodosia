@@ -225,6 +225,9 @@ public class SimpleCommentRequestStorage extends LocalStorageHandler<SimpleComme
             output.add(SimpleCommentRequest.parse(id, imgurId, parentId, comments));
         }
 
+        // close the resultset
+        rs.close();
+
         return output;
     }
 

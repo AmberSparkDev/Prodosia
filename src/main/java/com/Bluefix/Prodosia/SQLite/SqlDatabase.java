@@ -227,11 +227,12 @@ public class SqlDatabase
         // init an arraylist with the proper size.
         ArrayList<T> out = new ArrayList<T>(query.length);
 
-        try
+        // attempt to execute the queries in order.
+        for (int i = 0; i < query.length; i++)
         {
-            // attempt to execute the queries in order.
-            for (int i = 0; i < query.length; i++)
+            try
             {
+
                 switch (query[i].type)
                 {
                     case EXECUTE:
@@ -239,6 +240,7 @@ public class SqlDatabase
                         break;
                     case QUERY:
                         out.add(i, (T) query[i].statement.executeQuery());
+                        query[i].statement.closeOnCompletion();
                         break;
                     case UPDATE:
                         out.add(i, (T) Integer.valueOf(query[i].statement.executeUpdate()));
@@ -246,25 +248,37 @@ public class SqlDatabase
                     default:
                         throw new IllegalArgumentException("The type type was not recognized.");
                 }
+
+
+
+            } catch (SQLException e)
+            {
+                // print stacktrace.
+                e.printStackTrace();
+
+                // rollback the changes.
+                Database().conn.rollback();
+
+                // close all the statements.
+                for (int j = 0; j < query.length; j++)
+                    query[j].statement.close();
+
+                // return null to indicate failure
+                return null;
             }
-
-            // commit the queries and return the values.
-            Database().conn.commit();
-
         }
-        catch (SQLException e)
+
+        // commit the queries
+        Database().conn.commit();
+
+        // close all the statements.
+        for (int i = 0; i < query.length; i++)
         {
-            // print stacktrace.
-            e.printStackTrace();
-
-            // rollback the changes.
-            Database().conn.rollback();
-
-            // return null to indicate failure
-            return null;
+            if (query[i].type != SqlBuilder.QueryType.QUERY)
+                query[i].statement.close();
         }
 
-
+        // return the results.
         return out;
     }
 
@@ -312,7 +326,12 @@ public class SqlDatabase
         if (!rs.next())
             throw new SQLException("SqlDatabase exception: The database did not provide a row-id for the inserted tracker");
 
-        return rs.getLong(1);
+        long value = rs.getLong(1);
+
+        // close the result-set
+        rs.close();
+
+        return value;
     }
 
     //endregion
