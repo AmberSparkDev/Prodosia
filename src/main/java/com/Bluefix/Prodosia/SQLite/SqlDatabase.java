@@ -103,6 +103,8 @@ public class SqlDatabase
             prep.execute();
             prep.close();
 
+            myDatabase.conn.commit();
+
             assert(prep.isClosed());
         }
 
@@ -126,7 +128,7 @@ public class SqlDatabase
     {
         // Imgur
         // default prefix is: @Tagaroo
-        String pattern = CommandPrefix.parsePatternForItems("@Tagaroo");
+        String pattern = CommandPrefix.parsePatternForItems("@Tagaroo ");
         CommandPrefix imgCp = new CommandPrefix(CommandPrefix.Type.IMGUR, pattern);
         CommandPrefixStorage.handler().set(imgCp);
 
@@ -145,7 +147,7 @@ public class SqlDatabase
         try
         {
             // check if the 'Info' table exists.
-            if (!SqlDatabaseHelper.tableExists( "Info"))
+            if (!SqlDatabaseHelper.tableExists("Info"))
             {
                 createDatabase();
                 return;
@@ -348,6 +350,10 @@ public class SqlDatabase
 
         // close the result-set
         rs.close();
+        myPrep.close();
+
+        assert(myPrep.isClosed());
+
 
         return value;
     }

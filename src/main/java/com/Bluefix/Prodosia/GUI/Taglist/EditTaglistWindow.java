@@ -199,7 +199,10 @@ public class EditTaglistWindow extends EditableWindowPane
 
 
         if (shouldDelete){
+            // temporarily disable user updating
+            UserHandler.handler().enableGuiUpdate(false);
             TaglistHandler.handler().clear(curTaglist);
+            UserHandler.handler().enableGuiUpdate(true);
             curTaglist = null;
             return true;
         }

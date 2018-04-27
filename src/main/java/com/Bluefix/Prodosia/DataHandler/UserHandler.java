@@ -66,6 +66,23 @@ public class UserHandler extends LocalStorageHandler<User>
     private UserHandler()
     {
         super(false);
+        this.isGuiUpdate = true;
+    }
+
+    //endregion
+
+
+    //region Gui Update
+
+    private boolean isGuiUpdate;
+
+    /**
+     * Set whether the GUI should automatically update.
+     * @param enable
+     */
+    public void enableGuiUpdate(boolean enable)
+    {
+        this.isGuiUpdate = enable;
     }
 
     //endregion
@@ -77,14 +94,17 @@ public class UserHandler extends LocalStorageHandler<User>
     public void set(User user) throws SQLException, URISyntaxException, IOException, LoginException, BaringoApiException
     {
         super.set(user);
-        GuiUpdate.updateUsers();
+
+        if (isGuiUpdate)
+            GuiUpdate.updateUsers();
     }
 
     @Override
     public void remove(User user) throws SQLException, BaringoApiException, IOException, URISyntaxException
     {
         super.remove(user);
-        GuiUpdate.updateUsers();
+        if (isGuiUpdate)
+            GuiUpdate.updateUsers();
     }
 
     /**

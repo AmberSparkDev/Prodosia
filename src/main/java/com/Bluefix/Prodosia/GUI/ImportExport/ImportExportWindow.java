@@ -22,6 +22,7 @@
 
 package com.Bluefix.Prodosia.GUI.ImportExport;
 
+import com.Bluefix.Prodosia.DataHandler.UserHandler;
 import com.Bluefix.Prodosia.GUI.Navigation.VistaNavigator;
 import com.Bluefix.Prodosia.ImportExport.ImportExportHandler;
 import javafx.collections.FXCollections;
@@ -234,8 +235,11 @@ public class ImportExportWindow
             return;
         }
 
+        // temporarily disable user gui updating
+        UserHandler.handler().enableGuiUpdate(false);
         ImportExportHandler.ImportResult ir =
                 ImportExportHandler.importFromFile(this.importFile, this.importPolicy);
+        UserHandler.handler().enableGuiUpdate(true);
 
         switch (ir)
         {

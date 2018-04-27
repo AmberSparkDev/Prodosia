@@ -1,9 +1,9 @@
 # private files
 private data.txt
-database.db
-database.db-journal
+database*
 keys.txt
 cookie.txt
+
 
 # Java .class files
 *.class
