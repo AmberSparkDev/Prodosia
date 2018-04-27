@@ -99,7 +99,11 @@ public class SqlDatabase
 
         for (String q : tableQueries)
         {
-            myDatabase.conn.prepareStatement(q).execute();
+            PreparedStatement prep = myDatabase.conn.prepareStatement(q);
+            prep.execute();
+            prep.close();
+
+            assert(prep.isClosed());
         }
 
         SqlDatabaseHelper.setVersion(DatabaseVersion, CreatedBy);
