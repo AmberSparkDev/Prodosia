@@ -57,7 +57,7 @@ public class CommentExecution extends Thread
      * over the amount of comments per minute to minimize the amount of wasted
      * comments.
      */
-    private static final int SimultaneousTagRequest = 10;
+    private static final int SimultaneousTagRequest = TagRequest.PostDelay * 6;
 
     /**
      * The default delay in milliseconds how long it takes for the
@@ -155,7 +155,7 @@ public class CommentExecution extends Thread
      * @param item The item to be added.
      * @return The amount of comments that the new item will post.
      */
-    private int addItem(ICommentRequest item) throws Exception
+    private void addItem(ICommentRequest item) throws Exception
     {
         // if the item already existed, we will be replacing it.
         removeItem(item);
@@ -165,8 +165,6 @@ public class CommentExecution extends Thread
 
         // add the item to the list.
         actions.put(item, comments);
-
-        return comments.size();
     }
 
     /**
@@ -252,7 +250,7 @@ public class CommentExecution extends Thread
      * @throws IOException
      * @throws URISyntaxException
      */
-    private void feedbackRequests() throws BaringoApiException, IOException, URISyntaxException
+    private void feedbackRequests()
     {
         while (commentCounter > 0 && !feedbackRequests.isEmpty())
         {
@@ -300,6 +298,8 @@ public class CommentExecution extends Thread
 
     /**
      * Remove all entries from the queue that were empty (i.e. completely handled)
+     *
+     * Does not remove Tag Requests (who are handled separately).
      * @throws Exception
      */
     private void cleanupEmptyItems() throws Exception
@@ -309,7 +309,8 @@ public class CommentExecution extends Thread
 
         for (Map.Entry<ICommentRequest, LinkedList<String>> entry : actions.entrySet())
         {
-            if (entry.getValue() == null || entry.getValue().isEmpty())
+            if ((entry.getValue() == null || entry.getValue().isEmpty()) &&
+                    !(entry instanceof TagRequest))
                 deletionList.add(entry.getKey());
         }
 
@@ -360,8 +361,50 @@ public class CommentExecution extends Thread
      */
     private void updateTagRequests() throws Exception
     {
+        // remove all TagRequest entries that were completed.
+        List<ICommentRequest> removal = new LinkedList<>();
+
+        for (ICommentRequest tr : actions.keySet())
+        {
+            // skip the entry if it wasn't a tag request.
+            if (!(tr instanceof TagRequest))
+                continue;
+
+            if (((TagRequest)tr).isCompleted())
+            {
+                removal.add(tr);
+            }
+        }
+
+        for (ICommentRequest icr : removal)
+            actions.remove(icr);
+
+
+        // update all TagRequest entries that were empty
+        for (Map.Entry<ICommentRequest, LinkedList<String>> tr : actions.entrySet())
+        {
+            // skip the entry if it wasn't a tag request.
+            if (!(tr.getKey() instanceof TagRequest))
+                continue;
+
+            // if the entry still contained comments to be posted, skip it.
+            if (tr.getValue() != null && !tr.getValue().isEmpty())
+                continue;
+
+            // find the comments for the tag-request
+            LinkedList<String> comments = new LinkedList<>(tr.getKey().getComments());
+
+            // add the item to the list.
+            actions.put(tr.getKey(), comments);
+        }
+
+
+
         // retrieve all current tag requests. Create a local copy.
         ArrayList<TagRequest> queueItems = new ArrayList<>(TagRequestStorage.handler().getAll());
+
+        removal = new LinkedList<>();
+        LinkedList<TagRequest> additions = new LinkedList<>();
 
         // if an old tagRequest has changed, replace it.
         for (ICommentRequest tr : actions.keySet())
@@ -376,7 +419,7 @@ public class CommentExecution extends Thread
             // if the item wasn't in the queue anymore, complete it from the list
             if (index < 0)
             {
-                removeItem(tr);
+                removal.add(tr);
                 continue;
             }
 
@@ -386,8 +429,8 @@ public class CommentExecution extends Thread
             // changed (most likely merged).
             if (!tr.deepEquals(myTr))
             {
-                removeItem(tr);
-                addItem(myTr);
+                removal.add(tr);
+                additions.add(myTr);
             }
 
             // if the entry was equal, we are good.
@@ -397,7 +440,19 @@ public class CommentExecution extends Thread
             queueItems.remove(index);
         }
 
-        // if the queue is still the full length, skip this phase.
+        assert(removal.size() >= additions.size());
+
+        // remove the entries that should be removed.
+        for (ICommentRequest icr : removal)
+            actions.remove(icr);
+
+        // add all new entries
+        for (TagRequest tr : additions)
+            addItem(tr);
+
+
+
+        // Skip further additions if there is no room.
         if (actions.size() >= SimultaneousTagRequest)
             return;
 
@@ -406,8 +461,7 @@ public class CommentExecution extends Thread
         for (int i = 0; i < SimultaneousTagRequest - actions.size() && i < queueItems.size(); i++)
         {
             TagRequest newItem = queueItems.get(i);
-            int comments = addItem(newItem);
-
+            addItem(newItem);
         }
     }
 

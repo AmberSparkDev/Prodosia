@@ -20,40 +20,43 @@
  * SOFTWARE.
  */
 
-package com.Bluefix.Prodosia.Exception;
+package com.Bluefix.Prodosia.Imgur;
 
-import com.github.kskelm.baringo.util.BaringoApiException;
+import com.github.kskelm.baringo.model.Comment;
 
-/**
- * Helps identify exceptions from the Baringo dependency.
- *
- */
-public class BaringoExceptionHelper
+import java.util.LinkedList;
+import java.util.List;
+
+public class CommentHelper
 {
-
     /**
-     * Returns true iff the exception indicates a Bad Request call.
-     * @param ex The exception to check.
-     * @return True iff the exception indicates a Bad Request (400) error. False otherwise.
+     * Check if the list of comments contains a comment with the specified commentId.
+     * @param comments The collection of comments.
+     * @param commentId The id of the comment to be checked.
+     * @return True iff the comment was contained in the collection, false otherwise.
      */
-    public static boolean isBadRequest(BaringoApiException ex)
+    public static boolean containsComment(List<Comment> comments, long commentId)
     {
-        // pattern
-        String pattern = "https://api\\.imgur\\.com/3/.+: Bad Request";
+        List<Comment> curComments = comments;
 
-        return ex.getMessage().matches(pattern);
+        while (!curComments.isEmpty())
+        {
+            List<Comment> newComments = new LinkedList<>();
+
+            for (Comment c : curComments)
+            {
+                // if this comment corresponds with the comment-id we are looking for, return true.
+                if (c.getId() == commentId)
+                    return true;
+
+                // add all the children to the list of new comments.
+                newComments.addAll(c.getChildren());
+            }
+
+            curComments = newComments;
+        }
+
+        return false;
     }
 
-    /**
-     * Returns true iff the exception indicates Not Found.
-     * @param ex The exception to check.
-     * @return True iff the exception indicates Not Found (404). False otherwise.
-     */
-    public static boolean isNotFound(BaringoApiException ex)
-    {
-        // pattern
-        String pattern = "https://api\\.imgur\\.com/3/.+: Not Found";
-
-        return ex.getMessage().matches(pattern);
-    }
 }

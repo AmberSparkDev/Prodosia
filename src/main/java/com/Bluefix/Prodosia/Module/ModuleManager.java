@@ -67,6 +67,7 @@ public class ModuleManager
 
         handler().imgurDependenciesStarted = true;
 
+
         // init all the module values
         handler().commentScannerExecution = CommentScannerExecution.handler();
         handler().commentDeletionExecution = CommentDeletionExecution.handler();

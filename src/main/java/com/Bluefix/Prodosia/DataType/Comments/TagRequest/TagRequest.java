@@ -28,6 +28,7 @@ import com.Bluefix.Prodosia.DataType.Taglist.Rating;
 import com.Bluefix.Prodosia.DataType.Taglist.Taglist;
 import com.Bluefix.Prodosia.Exception.BaringoExceptionHelper;
 import com.Bluefix.Prodosia.DataHandler.CommentDeletionStorage;
+import com.Bluefix.Prodosia.Imgur.CommentHelper;
 import com.Bluefix.Prodosia.Imgur.ImgurApi.ImgurManager;
 import com.Bluefix.Prodosia.DataHandler.SimpleCommentRequestStorage;
 import com.Bluefix.Prodosia.Imgur.Tagging.TagRequestComments;
@@ -36,6 +37,7 @@ import com.Bluefix.Prodosia.Logger.Logger;
 import com.github.kskelm.baringo.model.Comment;
 import com.github.kskelm.baringo.util.BaringoApiException;
 
+import javax.security.auth.login.LoginException;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.sql.SQLException;
@@ -58,6 +60,11 @@ public class TagRequest extends BaseTagRequest implements ICommentRequest
      */
     private static final int MaximumRetries = 500;
 
+    /**
+     * The amount of retries that should be skipped before attempting to finish the post.
+     */
+    public static final int PostDelay = 20;
+
     private String imgurId;
     private Comment parentComment;
     private long parentId;
@@ -67,6 +74,11 @@ public class TagRequest extends BaseTagRequest implements ICommentRequest
      * Boolean to indicate whether the Tag Request was already started once.
      */
     private boolean isStarted;
+
+    /**
+     * Boolean to indicate whether the Tag Request was completed, successfully or not.
+     */
+    private boolean isCompleted;
 
 
     public TagRequest(String imgurId, Comment parentComment, HashSet<Taglist> taglists, Rating rating, String filters, boolean cleanComments)
@@ -138,6 +150,8 @@ public class TagRequest extends BaseTagRequest implements ICommentRequest
         this.postIsComplete = false;
         this.counter = 0;
         this.isStarted = false;
+        this.isCompleted = false;
+
     }
 
 
@@ -208,6 +222,8 @@ public class TagRequest extends BaseTagRequest implements ICommentRequest
 
     private List<Comment> lastKnownComments;
 
+    private int delay;
+
     /**
      * Retrieve all comments that should be executed by this tag request.
      *
@@ -222,6 +238,7 @@ public class TagRequest extends BaseTagRequest implements ICommentRequest
             if (!isStarted)
             {
                 isStarted = true;
+                delay = 0;
 
                 getParent();
                 Logger.logMessage("Starting tag on \"" + this.getImgurId() + "\"", Logger.Severity.INFORMATIONAL);
@@ -229,20 +246,63 @@ public class TagRequest extends BaseTagRequest implements ICommentRequest
         }
         catch (BaringoApiException ex)
         {
+            isStarted = false;
+
             if (BaringoExceptionHelper.isBadRequest(ex) ||
                     BaringoExceptionHelper.isNotFound(ex))
                 parentIsInvalid = true;
+
+            // don't initiate any comments for this post.
+            return new LinkedList<>();
         }
 
         try
         {
+            // If the post was just tagged, check whether it was completed before starting
+            // the delay countdown.
+            if (delay == PostDelay)
+            {
+                // retrieve the post comments
+                lastKnownComments = ImgurManager.client().galleryService().getItemComments(this.getImgurId(), Comment.Sort.Best);
+                LinkedList<String> trComments = TagRequestComments.parseCommentsForTagRequest(this, lastKnownComments);
+
+                // if there were no more comments to be posted, the tag request is done.
+                if (trComments == null || trComments.isEmpty())
+                {
+                    postIsComplete = true;
+                    delay--;
+                    return new LinkedList<>();
+                }
+
+                // if the comments weren't empty, we will start the countdown. Notify the user.
+                Logger.logMessage("Postponing tag on \"" + getImgurId() + "\" for " + PostDelay + " minute" +
+                        (PostDelay == 1 ? "" : "s"));
+            }
+
+
+            // if the delay hasn't passed, return an empty list.
+            if (delay-- > 0)
+                return new LinkedList<>();
+
+            // set the delay.
+            delay = PostDelay;
+
+            // retrieve the post comments
             lastKnownComments = ImgurManager.client().galleryService().getItemComments(this.getImgurId(), Comment.Sort.Best);
+
+            // ensure that the parent comment is in the last-known comments.
+            if (!CommentHelper.containsComment(lastKnownComments, getParentId()))
+            {
+                parentIsInvalid = true;
+                return new LinkedList<>();
+            }
 
             LinkedList<String> trComments = TagRequestComments.parseCommentsForTagRequest(this, lastKnownComments);
 
             // if there were no more comments to be posted, the tag request is done.
             if (trComments == null || trComments.isEmpty())
                 postIsComplete = true;
+
 
             return trComments;
         }
@@ -252,9 +312,12 @@ public class TagRequest extends BaseTagRequest implements ICommentRequest
                     BaringoExceptionHelper.isNotFound(ex))
                 postIsInvalid = true;
 
-            return new LinkedList<String>();
+            return new LinkedList<>();
         }
     }
+
+
+
 
     /**
      * Indicate whether the entry deep-equals the other request.
@@ -281,11 +344,23 @@ public class TagRequest extends BaseTagRequest implements ICommentRequest
     @Override
     public void complete() throws Exception
     {
+        // if we were already completed, return
+        if (isCompleted)
+            return;
+
         // if the parent has become invalid, delete this tag request.
         if (parentIsInvalid)
         {
             Logger.logMessage("Parent-comment for post \"" + getImgurId() + "\" was deleted.", Logger.Severity.INFORMATIONAL);
             TagRequestStorage.handler().remove(this);
+            isCompleted = true;
+
+            // retrieve the actual tag comments and delete them if applicable.
+            if (this.isCleanComments())
+            {
+                initiateCleanComments();
+            }
+
             return;
         }
 
@@ -294,6 +369,7 @@ public class TagRequest extends BaseTagRequest implements ICommentRequest
         {
             Logger.logMessage("Post \"" + getImgurId() + "\" was deleted.", Logger.Severity.INFORMATIONAL);
             TagRequestStorage.handler().remove(this);
+            isCompleted = true;
             return;
         }
 
@@ -302,6 +378,7 @@ public class TagRequest extends BaseTagRequest implements ICommentRequest
         {
             Logger.logMessage("Post \"" + getImgurId() + "\" successfully tagged.");
             TagRequestStorage.handler().remove(this);
+            isCompleted = true;
 
             // retrieve the amount of users that were posted.
             int amount = TagRequestComments.findNumberOfMyMentions(lastKnownComments);
@@ -309,16 +386,12 @@ public class TagRequest extends BaseTagRequest implements ICommentRequest
             // retrieve the actual tag comments and delete them if applicable.
             if (this.isCleanComments())
             {
-                List<Comment> tagComments = TagRequestComments.findMyTagComments(lastKnownComments);
-
-                for (Comment c : tagComments)
-                {
-                    CommentDeletionStorage.handler().set(c.getId());
-                }
+                initiateCleanComments();
             }
 
             // finally, post the reply
             postSuccessfullCompletion(amount);
+
 
             return;
         }
@@ -328,12 +401,52 @@ public class TagRequest extends BaseTagRequest implements ICommentRequest
         {
             Logger.logMessage("Post \"" + getImgurId() + "\" has timed out.", Logger.Severity.WARNING);
             TagRequestStorage.handler().remove(this);
+            isCompleted = true;
+
+            // retrieve the actual tag comments and delete them if applicable.
+            if (this.isCleanComments())
+            {
+                initiateCleanComments();
+            }
+
             return;
         }
 
         // if neither of the three is the case, the post should not be deleted yet.
     }
 
+
+    /**
+     * Attempt to initiate a cleanup of the tag comments.
+     */
+    private void initiateCleanComments()
+    {
+        // if the comment cleanup fails in any way, it should not affect application behavior.
+        try
+        {
+            List<Comment> tagComments = TagRequestComments.findMyTagComments(lastKnownComments);
+
+            for (Comment c : tagComments)
+            {
+                try
+                {
+                    CommentDeletionStorage.handler().set(c.getId());
+                } catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+            }
+        } catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
+
+
+    public boolean isCompleted()
+    {
+        return isCompleted;
+    }
 
     private void postSuccessfullCompletion(int amount) throws Exception
     {
@@ -364,28 +477,14 @@ public class TagRequest extends BaseTagRequest implements ICommentRequest
         if (o == null || getClass() != o.getClass()) return false;
         if (!super.equals(o)) return false;
         TagRequest that = (TagRequest) o;
-        try
-        {
-            return getParentId() == that.getParentId() &&
-                    Objects.equals(getImgurId(), that.getImgurId());
-        } catch (Exception e)
-        {
-            e.printStackTrace();
-            return false;
-        }
+        return Objects.equals(imgurId, that.imgurId);
     }
 
     @Override
     public int hashCode()
     {
-        try
-        {
-            return Objects.hash(super.hashCode(), getImgurId(), getParentId());
-        } catch (Exception e)
-        {
-            e.printStackTrace();
-            return Objects.hash(super.hashCode(), getParentId());
-        }
+
+        return Objects.hash(super.hashCode(), imgurId);
     }
 
 
