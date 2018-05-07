@@ -75,13 +75,13 @@ public class UserSanitationHandler
     {
         HashSet<Long> entries = new HashSet<>();
 
-        String query =
+        String query0 =
                 "SELECT imgurId FROM UserSanitation LIMIT ?;";
 
-        PreparedStatement prep = SqlDatabase.getStatement(query);
-        prep.setInt(1, amount);
+        PreparedStatement prep0 = SqlDatabase.getStatement(query0);
+        prep0.setInt(1, amount);
 
-        ArrayList<ResultSet> result = SqlDatabase.query(prep);
+        ArrayList<ResultSet> result = SqlDatabase.query(prep0);
 
         if (result.size() != 1)
             throw new SQLException("SqlDatabase exception: Expected result size did not match (was " + result.size() + ")");
@@ -93,7 +93,25 @@ public class UserSanitationHandler
 
         // close the resultset
         rs.close();
-        prep.close();
+        prep0.close();
+
+        assert(rs.isClosed());
+        assert(prep0.isClosed());
+
+        // remove the entries from the database.
+        for (Long l : entries)
+        {
+            String query1 =
+                    "DELETE FROM UserSanitation WHERE imgurId = ?;";
+
+            PreparedStatement prep1 = SqlDatabase.getStatement(query1);
+            prep1.setLong(1, l);
+
+            SqlDatabase.execute(prep1);
+
+            prep1.close();
+            assert(prep1.isClosed());
+        }
 
         return entries;
     }
