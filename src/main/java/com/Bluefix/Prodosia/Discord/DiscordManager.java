@@ -138,6 +138,16 @@ public class DiscordManager
     {
         String pattern = CommandPrefix.parsePatternForItems(user.getAsMention());
 
+        // ensure that the bot still responds to commands if the bot has a nickname.
+        if (pattern.startsWith("<@!"))
+        {
+            pattern = pattern.replace("<@!", "<@!?");
+        }
+        else if (pattern.startsWith("<@"))
+        {
+            pattern = pattern.replace("<@", "<@!?");
+        }
+
         return new CommandPrefix(CommandPrefix.Type.DISCORD, pattern);
     }
 
