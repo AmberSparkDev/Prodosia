@@ -27,8 +27,9 @@ import com.Bluefix.Prodosia.Logger.Logger;
 import com.Bluefix.Prodosia.Storage.CookieStorage;
 import com.github.kskelm.baringo.BaringoClient;
 import com.github.kskelm.baringo.util.BaringoAuthException;
-import com.microsoft.alm.oauth2.useragent.*;
-import javafx.stage.Stage;
+import com.microsoft.alm.oauth2.useragent.AuthorizationException;
+import com.microsoft.alm.oauth2.useragent.AuthorizationResponse;
+import com.microsoft.alm.oauth2.useragent.UserAgentImpl;
 
 import java.io.IOException;
 import java.net.URI;

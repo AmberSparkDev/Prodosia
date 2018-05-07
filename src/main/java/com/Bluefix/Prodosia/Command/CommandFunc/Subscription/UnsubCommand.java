@@ -28,10 +28,8 @@ import com.Bluefix.Prodosia.DataHandler.UserHandler;
 import com.Bluefix.Prodosia.DataType.Command.CommandInformation;
 import com.Bluefix.Prodosia.DataType.Taglist.Taglist;
 import com.Bluefix.Prodosia.DataType.Tracker.Tracker;
-import com.Bluefix.Prodosia.DataType.Tracker.TrackerPermissions;
 import com.Bluefix.Prodosia.DataType.User.User;
 
-import javax.activation.CommandInfo;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;

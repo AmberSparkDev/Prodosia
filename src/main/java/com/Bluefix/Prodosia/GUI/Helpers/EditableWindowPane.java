@@ -27,7 +27,6 @@ import com.Bluefix.Prodosia.GUI.Application.ApplicationWindow;
 import com.Bluefix.Prodosia.GUI.Navigation.VistaNavigator;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
-import javafx.scene.control.Label;
 
 /**
  * This is a helper class aimed at an editable window.

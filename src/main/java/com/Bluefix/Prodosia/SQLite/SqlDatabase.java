@@ -22,8 +22,8 @@
 
 package com.Bluefix.Prodosia.SQLite;
 
-import com.Bluefix.Prodosia.Prefix.CommandPrefix;
 import com.Bluefix.Prodosia.DataHandler.CommandPrefixStorage;
+import com.Bluefix.Prodosia.Prefix.CommandPrefix;
 
 import java.sql.*;
 import java.util.ArrayList;

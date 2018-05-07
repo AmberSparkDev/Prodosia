@@ -24,15 +24,12 @@ package com.Bluefix.Prodosia.Command.CommandFunc.Subscription;
 
 import com.Bluefix.Prodosia.Command.CommandFunc.ICommandFunc;
 import com.Bluefix.Prodosia.DataHandler.TaglistHandler;
-import com.Bluefix.Prodosia.DataHandler.UserHandler;
 import com.Bluefix.Prodosia.DataType.Command.CommandInformation;
 import com.Bluefix.Prodosia.DataType.Taglist.Rating;
 import com.Bluefix.Prodosia.DataType.Taglist.Taglist;
 import com.Bluefix.Prodosia.DataType.User.User;
 import com.Bluefix.Prodosia.DataType.User.UserSubscription;
-import com.github.kskelm.baringo.util.BaringoApiException;
 
-import javax.activation.CommandInfo;
 import java.util.HashSet;
 import java.util.LinkedList;
 

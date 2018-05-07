@@ -27,7 +27,6 @@ import com.Bluefix.Prodosia.DataHandler.UserHandler;
 import com.Bluefix.Prodosia.DataType.Taglist.Taglist;
 import com.Bluefix.Prodosia.GUI.Helpers.DataFieldStorage;
 import com.Bluefix.Prodosia.GUI.Helpers.EditableWindowPane;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 

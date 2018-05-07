@@ -33,9 +33,6 @@ import javax.security.auth.login.LoginException;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.sql.SQLException;
-import java.util.ArrayList;
-
-import static org.junit.Assert.*;
 
 public class TaglistHandlerTest extends DataHandlerTest<Taglist>
 {

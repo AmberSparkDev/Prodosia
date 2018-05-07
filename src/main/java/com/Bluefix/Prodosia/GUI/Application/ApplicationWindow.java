@@ -22,12 +22,8 @@
 
 package com.Bluefix.Prodosia.GUI.Application;
 
-import com.Bluefix.Prodosia.DataType.Data;
-import com.Bluefix.Prodosia.DataType.Taglist.Rating;
 import com.Bluefix.Prodosia.Exception.ExceptionHelper;
 import com.Bluefix.Prodosia.GUI.ApiKeys.ApiKeysWindow;
-import com.Bluefix.Prodosia.GUI.Managers.CheckboxListManager.GuiCheckboxListManager;
-import com.Bluefix.Prodosia.GUI.Managers.CheckboxListManager.TaglistClManager;
 import com.Bluefix.Prodosia.GUI.Managers.ButtonListManager.TaglistListManager;
 import com.Bluefix.Prodosia.GUI.Managers.ButtonListManager.TrackerListManager;
 import com.Bluefix.Prodosia.GUI.Managers.ButtonListManager.UserListManager;
@@ -40,7 +36,10 @@ import com.Bluefix.Prodosia.Logger.Logger;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 
 

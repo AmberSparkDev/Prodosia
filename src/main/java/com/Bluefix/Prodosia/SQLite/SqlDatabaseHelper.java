@@ -22,7 +22,9 @@
 
 package com.Bluefix.Prodosia.SQLite;
 
-import java.sql.*;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 /**
  * Class that helps with initiating the database.

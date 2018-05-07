@@ -23,19 +23,9 @@
 package com.Bluefix.Prodosia.Application;
 
 
-import com.Bluefix.Prodosia.GUI.Navigation.GuiApplication;
 import com.Bluefix.Prodosia.GUI.Navigation.VistaNavigator;
-import com.Bluefix.Prodosia.Imgur.ImgurApi.ImgurManager;
-import com.Bluefix.Prodosia.Module.ModuleManager;
-import com.github.kskelm.baringo.BaringoClient;
-import com.github.kskelm.baringo.util.BaringoApiException;
 import it.sauronsoftware.junique.AlreadyLockedException;
 import it.sauronsoftware.junique.JUnique;
-import it.sauronsoftware.junique.MessageHandler;
-import javafx.scene.control.Alert;
-
-import java.io.IOException;
-import java.net.URISyntaxException;
 
 
 public class Main

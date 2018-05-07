@@ -36,8 +36,6 @@ import org.junit.Test;
 import java.sql.SQLException;
 import java.util.HashSet;
 
-import static org.junit.Assert.*;
-
 public class UserSanitationHandlerTest
 {
     private static final String TestImgurName = "mashedstew";

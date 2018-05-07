@@ -25,9 +25,9 @@ package com.Bluefix.Prodosia.GUI.Managers.ListManager;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.control.Labeled;
-import javafx.scene.layout.*;
-import javafx.scene.paint.Color;
-import javafx.scene.text.TextAlignment;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.VBox;
 
 import java.util.regex.Pattern;
 

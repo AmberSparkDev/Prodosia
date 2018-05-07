@@ -29,7 +29,6 @@ import javafx.scene.control.Button;
 import javafx.scene.layout.Pane;
 
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * A GUI Manager that allows for a pane with buttons.

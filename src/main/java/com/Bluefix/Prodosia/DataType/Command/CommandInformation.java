@@ -29,7 +29,6 @@ import com.github.kskelm.baringo.util.BaringoApiException;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.util.LinkedList;
 
 /**
  * Information pertaining to Command Execution.

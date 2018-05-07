@@ -43,7 +43,6 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Objects;
 
 public class EditUserWindow extends EditableWindowPane
 {

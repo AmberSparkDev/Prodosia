@@ -24,7 +24,6 @@ package com.Bluefix.Prodosia.DataHandler;
 
 import com.Bluefix.Prodosia.DataType.Taglist.Taglist;
 import com.Bluefix.Prodosia.DataType.Tracker.Tracker;
-import com.Bluefix.Prodosia.DataType.User.User;
 import com.Bluefix.Prodosia.GUI.GuiUpdate;
 import com.Bluefix.Prodosia.SQLite.SqlDatabase;
 import com.github.kskelm.baringo.util.BaringoApiException;

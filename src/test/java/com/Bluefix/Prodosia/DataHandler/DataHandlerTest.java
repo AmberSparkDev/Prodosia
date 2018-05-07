@@ -23,7 +23,6 @@
 package com.Bluefix.Prodosia.DataHandler;
 
 
-import com.Bluefix.Prodosia.DataType.Tracker.Tracker;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;

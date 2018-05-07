@@ -24,12 +24,8 @@ package com.Bluefix.Prodosia.Storage;
 
 import com.Bluefix.Prodosia.DataType.ImgurKey;
 
-import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Scanner;
-import java.util.stream.Stream;
 
 /**
  * Manager for storing keys.

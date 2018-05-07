@@ -22,17 +22,17 @@
 
 package com.Bluefix.Prodosia.DataType.Comments.TagRequest;
 
+import com.Bluefix.Prodosia.DataHandler.CommentDeletionStorage;
+import com.Bluefix.Prodosia.DataHandler.SimpleCommentRequestStorage;
+import com.Bluefix.Prodosia.DataHandler.TagRequestStorage;
 import com.Bluefix.Prodosia.DataType.Comments.ICommentRequest;
 import com.Bluefix.Prodosia.DataType.Comments.SimpleCommentRequest;
 import com.Bluefix.Prodosia.DataType.Taglist.Rating;
 import com.Bluefix.Prodosia.DataType.Taglist.Taglist;
 import com.Bluefix.Prodosia.Exception.BaringoExceptionHelper;
-import com.Bluefix.Prodosia.DataHandler.CommentDeletionStorage;
 import com.Bluefix.Prodosia.Imgur.CommentHelper;
 import com.Bluefix.Prodosia.Imgur.ImgurApi.ImgurManager;
-import com.Bluefix.Prodosia.DataHandler.SimpleCommentRequestStorage;
 import com.Bluefix.Prodosia.Imgur.Tagging.TagRequestComments;
-import com.Bluefix.Prodosia.DataHandler.TagRequestStorage;
 import com.Bluefix.Prodosia.Logger.Logger;
 import com.github.kskelm.baringo.model.Comment;
 import com.github.kskelm.baringo.util.BaringoApiException;

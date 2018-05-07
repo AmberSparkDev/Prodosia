@@ -23,7 +23,6 @@
 package com.Bluefix.Prodosia.DataHandler;
 
 
-import com.Bluefix.Prodosia.DataType.Taglist.Taglist;
 import com.Bluefix.Prodosia.DataType.Tracker.Tracker;
 import com.Bluefix.Prodosia.DataType.Tracker.TrackerPermissions;
 import com.Bluefix.Prodosia.GUI.GuiUpdate;

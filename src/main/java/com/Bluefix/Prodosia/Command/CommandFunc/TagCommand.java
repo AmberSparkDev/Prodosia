@@ -23,6 +23,7 @@
 package com.Bluefix.Prodosia.Command.CommandFunc;
 
 import com.Bluefix.Prodosia.Command.CommandHelper.TagRequestParser;
+import com.Bluefix.Prodosia.DataHandler.TagRequestStorage;
 import com.Bluefix.Prodosia.DataType.Command.CommandInformation;
 import com.Bluefix.Prodosia.DataType.Comments.FeedbackRequest;
 import com.Bluefix.Prodosia.DataType.Comments.ICommentRequest;
@@ -30,7 +31,6 @@ import com.Bluefix.Prodosia.DataType.Comments.TagRequest.BaseTagRequest;
 import com.Bluefix.Prodosia.DataType.Comments.TagRequest.TagRequest;
 import com.Bluefix.Prodosia.Imgur.ImgurApi.ImgurManager;
 import com.Bluefix.Prodosia.Imgur.Tagging.CommentExecution;
-import com.Bluefix.Prodosia.DataHandler.TagRequestStorage;
 import com.github.kskelm.baringo.model.Comment;
 import com.github.kskelm.baringo.util.BaringoApiException;
 

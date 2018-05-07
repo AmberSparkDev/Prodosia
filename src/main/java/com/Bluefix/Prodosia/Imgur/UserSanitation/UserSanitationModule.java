@@ -28,15 +28,10 @@ import com.Bluefix.Prodosia.Imgur.ImgurApi.ApiDistribution;
 import com.Bluefix.Prodosia.Imgur.ImgurApi.ImgurManager;
 import com.Bluefix.Prodosia.Module.ImgurIntervalRunner;
 import com.github.kskelm.baringo.model.Account;
-import com.github.kskelm.baringo.util.BaringoApiException;
 
-import javax.security.auth.login.LoginException;
-import java.io.IOException;
-import java.net.URISyntaxException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 
 public class UserSanitationModule extends ImgurIntervalRunner
 {

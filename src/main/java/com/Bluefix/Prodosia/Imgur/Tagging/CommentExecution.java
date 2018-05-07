@@ -24,7 +24,9 @@ package com.Bluefix.Prodosia.Imgur.Tagging;
 
 import com.Bluefix.Prodosia.DataHandler.SimpleCommentRequestStorage;
 import com.Bluefix.Prodosia.DataHandler.TagRequestStorage;
-import com.Bluefix.Prodosia.DataType.Comments.*;
+import com.Bluefix.Prodosia.DataType.Comments.FeedbackRequest;
+import com.Bluefix.Prodosia.DataType.Comments.ICommentRequest;
+import com.Bluefix.Prodosia.DataType.Comments.SimpleCommentRequest;
 import com.Bluefix.Prodosia.DataType.Comments.TagRequest.TagRequest;
 import com.Bluefix.Prodosia.Imgur.ImgurApi.ImgurManager;
 import com.github.kskelm.baringo.model.Comment;

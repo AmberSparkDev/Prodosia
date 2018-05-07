@@ -28,10 +28,8 @@ import com.Bluefix.Prodosia.DataType.User.User;
 import com.Bluefix.Prodosia.DataType.User.UserSubscription;
 import com.Bluefix.Prodosia.GUI.Managers.ListManager.GuiListManager;
 import javafx.scene.control.Button;
-import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 
-import javax.swing.*;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;

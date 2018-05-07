@@ -26,7 +26,6 @@ package com.Bluefix.Prodosia.Imgur.ImgurApi;
 import com.Bluefix.Prodosia.Authorization.ImgurAuthorization;
 import com.Bluefix.Prodosia.DataType.ImgurKey;
 import com.Bluefix.Prodosia.Exception.ExceptionHelper;
-import com.Bluefix.Prodosia.GUI.Navigation.VistaNavigator;
 import com.Bluefix.Prodosia.Module.ModuleManager;
 import com.Bluefix.Prodosia.Storage.KeyStorage;
 import com.github.kskelm.baringo.BaringoClient;

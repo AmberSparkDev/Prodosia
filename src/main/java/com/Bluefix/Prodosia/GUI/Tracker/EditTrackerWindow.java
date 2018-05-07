@@ -26,7 +26,6 @@ import com.Bluefix.Prodosia.DataHandler.TaglistHandler;
 import com.Bluefix.Prodosia.DataHandler.TrackerHandler;
 import com.Bluefix.Prodosia.DataType.Taglist.Taglist;
 import com.Bluefix.Prodosia.DataType.Tracker.Tracker;
-import com.Bluefix.Prodosia.DataType.Tracker.TrackerBuilder;
 import com.Bluefix.Prodosia.DataType.Tracker.TrackerPermissions;
 import com.Bluefix.Prodosia.Discord.DiscordManager;
 import com.Bluefix.Prodosia.Exception.ExceptionHelper;

@@ -29,11 +29,8 @@ import com.github.kskelm.baringo.model.Account;
 import com.github.kskelm.baringo.util.BaringoApiException;
 import net.dv8tion.jda.core.entities.User;
 
-import javax.security.auth.login.LoginException;
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.util.Iterator;
-import java.util.List;
 
 /**
  * A tracker-builder to create tracker objects.

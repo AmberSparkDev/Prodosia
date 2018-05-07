@@ -22,22 +22,13 @@
 
 package com.Bluefix.Prodosia.DataHandler;
 
-import com.Bluefix.Prodosia.DataHandler.TagRequestStorage;
-import com.Bluefix.Prodosia.DataHandler.TaglistHandler;
 import com.Bluefix.Prodosia.DataType.Comments.TagRequest.TagRequest;
 import com.Bluefix.Prodosia.DataType.Taglist.Rating;
 import com.Bluefix.Prodosia.DataType.Taglist.Taglist;
-import com.Bluefix.Prodosia.Imgur.ImgurApi.ImgurManager;
-import com.github.kskelm.baringo.model.Comment;
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Test;
 
-import java.util.ArrayList;
 import java.util.HashSet;
-
-import static org.junit.Assert.*;
 
 public class TagRequestStorageTest extends DataHandlerTest<TagRequest>
 {

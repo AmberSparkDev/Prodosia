@@ -25,7 +25,6 @@ package com.Bluefix.Prodosia.DataType.Command;
 import com.Bluefix.Prodosia.DataType.Tracker.Tracker;
 import com.Bluefix.Prodosia.Discord.StatDiscord;
 import net.dv8tion.jda.core.entities.Message;
-import net.dv8tion.jda.core.requests.restaction.MessageAction;
 
 import java.io.File;
 import java.util.LinkedList;

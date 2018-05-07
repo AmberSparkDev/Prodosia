@@ -24,12 +24,10 @@ package com.Bluefix.Prodosia.Command.CommandHelper;
 
 import com.Bluefix.Prodosia.DataHandler.TaglistHandler;
 import com.Bluefix.Prodosia.DataType.Comments.TagRequest.BaseTagRequest;
-import com.Bluefix.Prodosia.DataType.Comments.TagRequest.TagRequest;
 import com.Bluefix.Prodosia.DataType.Taglist.Rating;
 import com.Bluefix.Prodosia.DataType.Taglist.Taglist;
 import com.Bluefix.Prodosia.DataType.Tracker.Tracker;
 import com.Bluefix.Prodosia.DataType.User.Filter;
-import com.github.kskelm.baringo.model.Comment;
 
 import java.util.ArrayList;
 import java.util.HashSet;

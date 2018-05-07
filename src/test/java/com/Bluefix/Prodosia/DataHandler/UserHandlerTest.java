@@ -36,10 +36,7 @@ import javax.security.auth.login.LoginException;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.HashSet;
-
-import static org.junit.Assert.*;
 
 public class UserHandlerTest extends DataHandlerTest<User>
 {

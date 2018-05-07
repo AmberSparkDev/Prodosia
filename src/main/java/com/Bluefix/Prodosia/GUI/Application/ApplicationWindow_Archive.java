@@ -22,9 +22,9 @@
 
 package com.Bluefix.Prodosia.GUI.Application;
 
+import com.Bluefix.Prodosia.DataHandler.ArchiveHandler;
 import com.Bluefix.Prodosia.DataType.Archive.Archive;
 import com.Bluefix.Prodosia.DataType.Taglist.Taglist;
-import com.Bluefix.Prodosia.DataHandler.ArchiveHandler;
 import com.Bluefix.Prodosia.Exception.ExceptionHelper;
 import com.Bluefix.Prodosia.GUI.Archive.EditArchiveWindow;
 import com.Bluefix.Prodosia.GUI.Managers.ButtonListManager.ButtonListManager;
@@ -38,7 +38,9 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 
 import java.sql.SQLException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.Objects;
 
 public class ApplicationWindow_Archive
 {

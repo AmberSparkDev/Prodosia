@@ -23,7 +23,6 @@
 package com.Bluefix.Prodosia.DataType.Tracker;
 
 import com.Bluefix.Prodosia.DataHandler.TrackerHandler;
-import com.github.kskelm.baringo.model.Comment;
 
 import java.sql.SQLException;
 import java.util.Date;

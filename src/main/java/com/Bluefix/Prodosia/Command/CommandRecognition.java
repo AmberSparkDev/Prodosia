@@ -24,8 +24,8 @@ package com.Bluefix.Prodosia.Command;
 
 import com.Bluefix.Prodosia.DataHandler.CommandPrefixStorage;
 import com.Bluefix.Prodosia.DataType.Command.CommandInformation;
-import com.Bluefix.Prodosia.Prefix.CommandPrefix;
 import com.Bluefix.Prodosia.Logger.Logger;
+import com.Bluefix.Prodosia.Prefix.CommandPrefix;
 
 /**
  * Executes strings if they adhere to the prefix syntax.

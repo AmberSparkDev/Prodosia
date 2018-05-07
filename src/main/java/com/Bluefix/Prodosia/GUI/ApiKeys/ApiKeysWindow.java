@@ -22,7 +22,6 @@
 
 package com.Bluefix.Prodosia.GUI.ApiKeys;
 
-import com.Bluefix.Prodosia.DataHandler.TrackerHandler;
 import com.Bluefix.Prodosia.DataType.ImgurKey;
 import com.Bluefix.Prodosia.Discord.DiscordManager;
 import com.Bluefix.Prodosia.Exception.ExceptionHelper;

@@ -22,8 +22,6 @@
 
 package com.Bluefix.Prodosia.DataHandler;
 
-import com.Bluefix.Prodosia.DataHandler.CommentScannerStorage;
-import com.Bluefix.Prodosia.DataHandler.TrackerHandler;
 import com.Bluefix.Prodosia.DataType.Tracker.Tracker;
 import com.Bluefix.Prodosia.DataType.Tracker.TrackerBookmark;
 import com.Bluefix.Prodosia.DataType.Tracker.TrackerPermissions;
@@ -37,10 +35,7 @@ import javax.security.auth.login.LoginException;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.Date;
-
-import static org.junit.Assert.*;
 
 public class CommentScannerStorageTest extends DataHandlerTest<TrackerBookmark>
 {

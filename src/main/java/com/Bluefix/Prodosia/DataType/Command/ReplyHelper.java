@@ -22,7 +22,6 @@
 
 package com.Bluefix.Prodosia.DataType.Command;
 
-import java.util.Collection;
 import java.util.LinkedList;
 
 public class ReplyHelper

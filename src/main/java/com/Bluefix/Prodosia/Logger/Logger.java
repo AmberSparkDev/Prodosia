@@ -25,7 +25,6 @@ package com.Bluefix.Prodosia.Logger;
 import javafx.application.Platform;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextInputControl;
-import org.slf4j.LoggerFactory;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;

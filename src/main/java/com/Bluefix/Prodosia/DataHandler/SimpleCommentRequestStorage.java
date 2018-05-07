@@ -26,10 +26,7 @@ import com.Bluefix.Prodosia.DataType.Comments.SimpleCommentRequest;
 import com.Bluefix.Prodosia.Imgur.Tagging.CommentExecution;
 import com.Bluefix.Prodosia.SQLite.SqlBuilder;
 import com.Bluefix.Prodosia.SQLite.SqlDatabase;
-import com.github.kskelm.baringo.util.BaringoApiException;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;

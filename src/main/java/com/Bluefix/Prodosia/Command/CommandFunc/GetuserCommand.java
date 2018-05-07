@@ -25,7 +25,6 @@ package com.Bluefix.Prodosia.Command.CommandFunc;
 import com.Bluefix.Prodosia.DataHandler.UserHandler;
 import com.Bluefix.Prodosia.DataType.Command.CommandInformation;
 import com.Bluefix.Prodosia.DataType.Taglist.Rating;
-import com.Bluefix.Prodosia.DataType.Taglist.Taglist;
 import com.Bluefix.Prodosia.DataType.User.User;
 import com.Bluefix.Prodosia.DataType.User.UserSubscription;
 

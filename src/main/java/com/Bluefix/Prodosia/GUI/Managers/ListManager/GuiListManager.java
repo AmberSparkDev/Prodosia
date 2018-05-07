@@ -22,8 +22,6 @@
 
 package com.Bluefix.Prodosia.GUI.Managers.ListManager;
 
-import com.Bluefix.Prodosia.Exception.ExceptionHelper;
-import javafx.scene.Node;
 import javafx.scene.control.Labeled;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;

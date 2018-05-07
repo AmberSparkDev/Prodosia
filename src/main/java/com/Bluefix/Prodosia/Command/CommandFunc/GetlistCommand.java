@@ -27,7 +27,6 @@ import com.Bluefix.Prodosia.DataType.Command.CommandInformation;
 import com.Bluefix.Prodosia.DataType.Command.FileTransferable;
 import com.Bluefix.Prodosia.DataType.User.User;
 import com.Bluefix.Prodosia.Imgur.Tagging.TagRequestComments;
-import com.sun.xml.internal.ws.api.streaming.XMLStreamReaderFactory;
 
 import java.io.BufferedWriter;
 import java.io.File;

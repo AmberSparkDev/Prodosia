@@ -22,7 +22,6 @@
 
 package com.Bluefix.Prodosia.GUI.Navigation;
 
-import javafx.scene.Node;
 import javafx.scene.Parent;
 
 public class GuiNode<T>

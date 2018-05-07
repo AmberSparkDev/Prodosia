@@ -29,18 +29,13 @@ import com.Bluefix.Prodosia.Storage.KeyStorage;
 import com.github.kskelm.baringo.BaringoClient;
 import javafx.application.Application;
 import javafx.application.Platform;
-import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-import javafx.stage.StageStyle;
-import javafx.stage.WindowEvent;
 
 import javax.security.auth.login.LoginException;
 import java.io.IOException;
-import java.io.PrintStream;
 
 public class GuiApplication extends Application
 {

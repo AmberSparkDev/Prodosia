@@ -22,15 +22,15 @@
 
 package com.Bluefix.Prodosia.Command.CommandFunc;
 
-import com.Bluefix.Prodosia.DataType.Comments.FeedbackRequest;
-import com.Bluefix.Prodosia.DataType.Comments.TagRequest.TagRequest;
-import com.Bluefix.Prodosia.Imgur.Tagging.CommentExecution;
 import com.Bluefix.Prodosia.DataHandler.TagRequestStorage;
 import com.Bluefix.Prodosia.DataHandler.TaglistHandler;
 import com.Bluefix.Prodosia.DataType.Command.CommandInformation;
+import com.Bluefix.Prodosia.DataType.Comments.FeedbackRequest;
+import com.Bluefix.Prodosia.DataType.Comments.TagRequest.TagRequest;
 import com.Bluefix.Prodosia.DataType.Taglist.Rating;
 import com.Bluefix.Prodosia.DataType.Taglist.Taglist;
 import com.Bluefix.Prodosia.DataType.Tracker.Tracker;
+import com.Bluefix.Prodosia.Imgur.Tagging.CommentExecution;
 import org.junit.*;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;

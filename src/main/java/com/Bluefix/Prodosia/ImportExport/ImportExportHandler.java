@@ -22,6 +22,7 @@
 
 package com.Bluefix.Prodosia.ImportExport;
 
+import com.Bluefix.Prodosia.DataHandler.ArchiveHandler;
 import com.Bluefix.Prodosia.DataHandler.TaglistHandler;
 import com.Bluefix.Prodosia.DataHandler.TrackerHandler;
 import com.Bluefix.Prodosia.DataHandler.UserHandler;
@@ -31,7 +32,6 @@ import com.Bluefix.Prodosia.DataType.Tracker.Tracker;
 import com.Bluefix.Prodosia.DataType.Tracker.TrackerPermissions;
 import com.Bluefix.Prodosia.DataType.User.User;
 import com.Bluefix.Prodosia.DataType.User.UserSubscription;
-import com.Bluefix.Prodosia.DataHandler.ArchiveHandler;
 import com.Bluefix.Prodosia.GUI.GuiUpdate;
 import com.google.gson.Gson;
 
