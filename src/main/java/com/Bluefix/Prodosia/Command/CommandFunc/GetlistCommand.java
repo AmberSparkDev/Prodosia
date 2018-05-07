@@ -27,6 +27,7 @@ import com.Bluefix.Prodosia.DataType.Command.CommandInformation;
 import com.Bluefix.Prodosia.DataType.Command.FileTransferable;
 import com.Bluefix.Prodosia.DataType.User.User;
 import com.Bluefix.Prodosia.Imgur.Tagging.TagRequestComments;
+import com.sun.xml.internal.ws.api.streaming.XMLStreamReaderFactory;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -37,6 +38,8 @@ import java.util.LinkedList;
 
 public class GetlistCommand implements ICommandFunc
 {
+    private static final String DefaultSyntaxPattern = "%n\r\n";
+
     @Override
     public void execute(CommandInformation ci, String[] arguments) throws Exception
     {
@@ -54,7 +57,7 @@ public class GetlistCommand implements ICommandFunc
 
         // filter out all arguments that don't pertain to the tag request.
         LinkedList<String> tagRequestArguments = new LinkedList<>();
-        String syntaxPattern = "%n\n";
+        String syntaxPattern = DefaultSyntaxPattern;
 
         for (String a : arguments)
         {
@@ -107,7 +110,7 @@ public class GetlistCommand implements ICommandFunc
                 item = item.replace("%n", u.getImgurName());
                 item = item.replace("%i", "" + u.getImgurId());
                 item = item.replace("%c", "" + counter++);
-                item = item.replace("\\n", "\n");
+                item = item.replace("\\n", "\r\n");
                 item = item.replace("\\t", "\t");
 
                 bw.write(item);

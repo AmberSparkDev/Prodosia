@@ -29,6 +29,7 @@ import com.github.kskelm.baringo.util.BaringoApiException;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.sql.SQLException;
 import java.util.LinkedList;
 import java.util.Objects;
 
@@ -207,9 +208,24 @@ public class SimpleCommentRequest implements ICommentRequest
      * Remove the item from the storage.
      */
     @Override
-    public void complete() throws Exception
+    public void complete()
     {
-        SimpleCommentRequestStorage.handler().remove(this);
+        try
+        {
+            SimpleCommentRequestStorage.handler().remove(this);
+        } catch (SQLException e)
+        {
+            e.printStackTrace();
+        } catch (BaringoApiException e)
+        {
+            e.printStackTrace();
+        } catch (IOException e)
+        {
+            e.printStackTrace();
+        } catch (URISyntaxException e)
+        {
+            e.printStackTrace();
+        }
     }
 
     @Override

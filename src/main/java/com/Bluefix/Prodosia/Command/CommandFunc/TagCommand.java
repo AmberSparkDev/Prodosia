@@ -245,7 +245,7 @@ public class TagCommand implements ICommandFunc
          * Remove the item from the storage.
          */
         @Override
-        public void complete() throws Exception
+        public void complete()
         {
             // not necessary, since there is no storage for this feedback request.
         }

@@ -230,7 +230,7 @@ public class TagRequest extends BaseTagRequest implements ICommentRequest
      * @return
      */
     @Override
-    public LinkedList<String> getComments() throws Exception
+    public LinkedList<String> getComments()
     {
         try
         {
@@ -251,6 +251,13 @@ public class TagRequest extends BaseTagRequest implements ICommentRequest
             if (BaringoExceptionHelper.isBadRequest(ex) ||
                     BaringoExceptionHelper.isNotFound(ex))
                 parentIsInvalid = true;
+
+            // don't initiate any comments for this post.
+            return new LinkedList<>();
+        } catch (Exception e)
+        {
+            isStarted = false;
+            e.printStackTrace();
 
             // don't initiate any comments for this post.
             return new LinkedList<>();
@@ -314,6 +321,14 @@ public class TagRequest extends BaseTagRequest implements ICommentRequest
 
             return new LinkedList<>();
         }
+        catch (Exception ex)
+        {
+            // generic exception could be anything. We simply return an empty list, hoping that
+            // the issues resolves itself. Worst case scenario, the time-out in "complete" will catch it.
+            ex.printStackTrace();
+
+            return new LinkedList<>();
+        }
     }
 
 
@@ -342,65 +357,100 @@ public class TagRequest extends BaseTagRequest implements ICommentRequest
      * Remove the item from the storage.
      */
     @Override
-    public void complete() throws Exception
+    public void complete()
     {
         // if we were already completed, return
         if (isCompleted)
             return;
 
-        // if the parent has become invalid, delete this tag request.
-        if (parentIsInvalid)
+        try
         {
-            Logger.logMessage("Parent-comment for post \"" + getImgurId() + "\" was deleted.", Logger.Severity.INFORMATIONAL);
-            TagRequestStorage.handler().remove(this);
-            isCompleted = true;
-
-            // retrieve the actual tag comments and delete them if applicable.
-            if (this.isCleanComments())
+            // if the parent has become invalid, delete this tag request.
+            if (parentIsInvalid)
             {
-                initiateCleanComments();
+                Logger.logMessage("Parent-comment for post \"" + getImgurId() + "\" was deleted.", Logger.Severity.INFORMATIONAL);
+                TagRequestStorage.handler().remove(this);
+                isCompleted = true;
+
+                // retrieve the actual tag comments and delete them if applicable.
+                if (this.isCleanComments())
+                {
+                    initiateCleanComments();
+                }
+
+                return;
             }
 
-            return;
-        }
-
-        // if the post has become invalid or complete, delete this tag request.
-        if (postIsInvalid)
-        {
-            Logger.logMessage("Post \"" + getImgurId() + "\" was deleted.", Logger.Severity.INFORMATIONAL);
-            TagRequestStorage.handler().remove(this);
-            isCompleted = true;
-            return;
-        }
-
-        // if the post was complete, delete this tag request.
-        if (postIsComplete)
-        {
-            Logger.logMessage("Post \"" + getImgurId() + "\" successfully tagged.");
-            TagRequestStorage.handler().remove(this);
-            isCompleted = true;
-
-            // retrieve the amount of users that were posted.
-            int amount = TagRequestComments.findNumberOfMyMentions(lastKnownComments);
-
-            // retrieve the actual tag comments and delete them if applicable.
-            if (this.isCleanComments())
+            // if the post has become invalid or complete, delete this tag request.
+            if (postIsInvalid)
             {
-                initiateCleanComments();
+                Logger.logMessage("Post \"" + getImgurId() + "\" was deleted.", Logger.Severity.INFORMATIONAL);
+                TagRequestStorage.handler().remove(this);
+                isCompleted = true;
+                return;
             }
 
-            // finally, post the reply
-            postSuccessfullCompletion(amount);
+            // if the post was complete, delete this tag request.
+            if (postIsComplete)
+            {
+                Logger.logMessage("Post \"" + getImgurId() + "\" successfully tagged.");
+                TagRequestStorage.handler().remove(this);
+                isCompleted = true;
+
+                // retrieve the amount of users that were posted.
+                int amount = TagRequestComments.findNumberOfMyMentions(lastKnownComments);
+
+                // retrieve the actual tag comments and delete them if applicable.
+                if (this.isCleanComments())
+                {
+                    initiateCleanComments();
+                }
+
+                // finally, post the reply
+                postSuccessfullCompletion(amount);
 
 
-            return;
+                return;
+            }
+        } catch (IOException e)
+        {
+            e.printStackTrace();
+        } catch (URISyntaxException e)
+        {
+            e.printStackTrace();
+        } catch (SQLException e)
+        {
+            e.printStackTrace();
+        } catch (LoginException e)
+        {
+            e.printStackTrace();
+        } catch (BaringoApiException e)
+        {
+            e.printStackTrace();
         }
+
 
         // if we are over the maximum amount of retries, delete this tag request.
         if (counter++ > MaximumRetries)
         {
-            Logger.logMessage("Post \"" + getImgurId() + "\" has timed out.", Logger.Severity.WARNING);
-            TagRequestStorage.handler().remove(this);
+            try
+            {
+                Logger.logMessage("Post \"" + getImgurId() + "\" has timed out.", Logger.Severity.WARNING);
+                TagRequestStorage.handler().remove(this);
+            } catch (IOException e)
+            {
+                e.printStackTrace();
+            } catch (BaringoApiException e)
+            {
+                e.printStackTrace();
+            } catch (SQLException e)
+            {
+                e.printStackTrace();
+            } catch (URISyntaxException e)
+            {
+                e.printStackTrace();
+            }
+
             isCompleted = true;
 
             // retrieve the actual tag comments and delete them if applicable.
@@ -448,7 +498,7 @@ public class TagRequest extends BaseTagRequest implements ICommentRequest
         return isCompleted;
     }
 
-    private void postSuccessfullCompletion(int amount) throws Exception
+    private void postSuccessfullCompletion(int amount) throws BaringoApiException, IOException, URISyntaxException, LoginException, SQLException
     {
         String message = "Successfully tagged " + amount + " users.";
 

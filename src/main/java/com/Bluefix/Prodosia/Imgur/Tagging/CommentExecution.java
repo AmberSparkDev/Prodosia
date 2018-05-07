@@ -32,6 +32,7 @@ import com.github.kskelm.baringo.util.BaringoApiException;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.sql.SQLException;
 import java.util.*;
 
 /**
@@ -155,7 +156,7 @@ public class CommentExecution extends Thread
      * @param item The item to be added.
      * @return The amount of comments that the new item will post.
      */
-    private void addItem(ICommentRequest item) throws Exception
+    private void addItem(ICommentRequest item)
     {
         // if the item already existed, we will be replacing it.
         removeItem(item);
@@ -224,11 +225,10 @@ public class CommentExecution extends Thread
                 // dismissed.
                 updateQueue();
 
-            } catch (Exception e)
+            } catch (SQLException e)
             {
                 e.printStackTrace();
-            }
-            finally
+            } finally
             {
                 try
                 {
@@ -284,7 +284,7 @@ public class CommentExecution extends Thread
      * Update all the queues that hold Comment Requests. 
      * @throws Exception
      */
-    private void updateQueue() throws Exception
+    private void updateQueue() throws SQLException
     {
         // clean any items that were completely posted.
         cleanupEmptyItems();
@@ -302,7 +302,7 @@ public class CommentExecution extends Thread
      * Does not remove Tag Requests (who are handled separately).
      * @throws Exception
      */
-    private void cleanupEmptyItems() throws Exception
+    private void cleanupEmptyItems()
     {
         // complete all items from the queue that were empty.
         ArrayList<ICommentRequest> deletionList = new ArrayList<>();
@@ -331,7 +331,7 @@ public class CommentExecution extends Thread
      * Retrieves items from the `SimpleCommentRequestStorage` and adds them to our queue.
      * @throws Exception
      */
-    private void updateSimpleCommentRequests() throws Exception
+    private void updateSimpleCommentRequests() throws SQLException
     {
         // we ignore the size of the queue since simple tag requests always take priority.
         ArrayList<SimpleCommentRequest> scr = new ArrayList<>(SimpleCommentRequestStorage.handler().getAll());
@@ -359,28 +359,11 @@ public class CommentExecution extends Thread
      * If a tag request was updated, refresh its comment list.
      * @throws Exception
      */
-    private void updateTagRequests() throws Exception
+    private void updateTagRequests() throws SQLException
     {
-        // remove all TagRequest entries that were completed.
+        // update all TagRequest entries that were empty and remove those that were completed.
         List<ICommentRequest> removal = new LinkedList<>();
 
-        for (ICommentRequest tr : actions.keySet())
-        {
-            // skip the entry if it wasn't a tag request.
-            if (!(tr instanceof TagRequest))
-                continue;
-
-            if (((TagRequest)tr).isCompleted())
-            {
-                removal.add(tr);
-            }
-        }
-
-        for (ICommentRequest icr : removal)
-            actions.remove(icr);
-
-
-        // update all TagRequest entries that were empty
         for (Map.Entry<ICommentRequest, LinkedList<String>> tr : actions.entrySet())
         {
             // skip the entry if it wasn't a tag request.
@@ -391,12 +374,26 @@ public class CommentExecution extends Thread
             if (tr.getValue() != null && !tr.getValue().isEmpty())
                 continue;
 
+            // first, ensure we call completion.
+            tr.getKey().complete();
+
+            // if this entry was complete, add it to the queue for removal.
+            if (((TagRequest)tr.getKey()).isCompleted())
+            {
+                removal.add(tr.getKey());
+                continue;
+            }
+
             // find the comments for the tag-request
             LinkedList<String> comments = new LinkedList<>(tr.getKey().getComments());
 
             // add the item to the list.
             actions.put(tr.getKey(), comments);
         }
+
+        // remove all entries that should be deleted.
+        for (ICommentRequest icr : removal)
+            actions.remove(icr);
 
 
 
@@ -476,7 +473,7 @@ public class CommentExecution extends Thread
      * in the queue were empty. The method uses a breadth-first approach to attempt to
      * spread out the comments between the queue items.
      */
-    private void postComments() throws BaringoApiException, IOException, URISyntaxException
+    private void postComments()
     {
         Set<Map.Entry<ICommentRequest, LinkedList<String>>> entries = actions.entrySet();
 

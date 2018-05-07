@@ -51,7 +51,7 @@ public interface ICommentRequest
      * Retrieve all comments that should be executed by this tag request.
      * @return
      */
-    LinkedList<String> getComments() throws Exception;
+    LinkedList<String> getComments();
 
 
     /**
@@ -65,7 +65,7 @@ public interface ICommentRequest
     /**
      * Indicate that the comment request has been completed.
      */
-    void complete() throws Exception;
+    void complete();
 
 
 
