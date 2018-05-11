@@ -60,7 +60,7 @@ public class SqlDatabase
             {
                 myDatabase = new SqlDatabase();
                 myDatabase.connect();
-                myDatabase.conn.setAutoCommit(false);
+                //myDatabase.conn.setAutoCommit(false);
                 myDatabase.updateDatabase();
 
             } catch (SQLException e)
@@ -103,7 +103,7 @@ public class SqlDatabase
             prep.execute();
             prep.close();
 
-            myDatabase.conn.commit();
+            //myDatabase.conn.commit();
 
             assert(prep.isClosed());
         }
@@ -296,7 +296,7 @@ public class SqlDatabase
         }
 
         // commit the queries
-        Database().conn.commit();
+        //Database().conn.commit();
 
         // return the results.
         return out;

@@ -88,6 +88,18 @@ public class ImgurManager
         return client;
     }
 
+    /**
+     * Explicitly set the client.
+     * @param client
+     */
+    public static void setClient(BaringoClient client)
+    {
+        ImgurManager.client = client;
+    }
+
+
+
+
     private static BaringoClient createClient(ImgurKey key) throws IOException, BaringoApiException, URISyntaxException
     {
         // get the api key credentials.

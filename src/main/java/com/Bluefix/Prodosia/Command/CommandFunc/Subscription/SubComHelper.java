@@ -127,8 +127,6 @@ public class SubComHelper
      */
     public static List<Comment> getCommentsFromSameTier(List<Comment> comments, Comment commandComment)
     {
-        LinkedList<Comment> result = new LinkedList<>();
-
         // special case if the command comment had no parent.
         if (commandComment.getParentId() <= 0)
             return comments;

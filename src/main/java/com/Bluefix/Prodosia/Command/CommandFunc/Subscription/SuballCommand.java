@@ -61,7 +61,10 @@ public class SuballCommand implements ICommandFunc
 
         // if there was no parent comment, one of the requirements has failed.
         if (ci.getParentComment() == null)
-            throw new IllegalArgumentException("There was no parent comment supplied!");
+        {
+            msgNotInRoot(ci);
+            return;
+        }
 
         // if there is more than 1 argument, the call is invalid.
         if (arguments.length > 1)
@@ -129,8 +132,8 @@ public class SuballCommand implements ICommandFunc
 
 
 
-        // get all comments that correspond to our parent comment.
-        List<Comment> subComments = SubComHelper.getCommentsFromSameTier(comments, ci.getParentComment());
+        // get all comments that fall underneath our parent comment.
+        List<Comment> subComments = ci.getParentComment().getChildren();
 
         if (subComments != null)
         {
@@ -263,6 +266,13 @@ public class SuballCommand implements ICommandFunc
     private static void msgNotImgurComment(CommandInformation ci) throws Exception
     {
         String msg = "This command can only be used through Imgur comments.";
+
+        ci.reply(msg);
+    }
+
+    private static void msgNotInRoot(CommandInformation ci) throws Exception
+    {
+        String msg = "This command cannot be executed in the root of a post.";
 
         ci.reply(msg);
     }
