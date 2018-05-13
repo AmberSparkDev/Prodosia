@@ -27,9 +27,11 @@ import com.Bluefix.Prodosia.DataHandler.TaglistHandler;
 import com.Bluefix.Prodosia.DataHandler.UserHandler;
 import com.Bluefix.Prodosia.DataType.Command.CommandInformation;
 import com.Bluefix.Prodosia.DataType.Command.ImgurCommandInformation;
+import com.Bluefix.Prodosia.DataType.Taglist.Rating;
 import com.Bluefix.Prodosia.DataType.Taglist.Taglist;
 import com.Bluefix.Prodosia.DataType.Tracker.Tracker;
 import com.Bluefix.Prodosia.DataType.User.User;
+import com.Bluefix.Prodosia.DataType.User.UserSubscription;
 import com.Bluefix.Prodosia.Imgur.ImgurApi.ImgurManager;
 import com.github.kskelm.baringo.BaringoClient;
 import com.github.kskelm.baringo.GalleryService;
@@ -41,13 +43,16 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
+import java.sql.SQLException;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-public class SuballCommandTest
+public class UnsuballCommandTest
 {
     /**
      * The name used for testing.
@@ -57,11 +62,13 @@ public class SuballCommandTest
      */
     private static final String TestImgurName = "mashedstew";
 
+    private static final int TestImgurId = 33641050;
+
     private static final String TestImgurPost = "ZqWMmil";
 
     private static final String TestTaglist = "test0";
 
-    private ICommandFunc suballCommand;
+    private ICommandFunc unsuballCommand;
 
     private Taglist tlTest0;
     //private Taglist tlTest1;
@@ -97,11 +104,10 @@ public class SuballCommandTest
     @Rule
     public MockitoRule mockitoRule = MockitoJUnit.rule();
 
-
     @Before
     public void setUp() throws Exception
     {
-        suballCommand = new SuballCommand();
+        unsuballCommand = new UnsuballCommand();
 
         ImgurManager.setClient(client);
         when(client.galleryService()).thenReturn(gallery);
@@ -120,13 +126,13 @@ public class SuballCommandTest
         when(tagComment.getId()).thenReturn(new Long(1));
 
         when(subComment.getId()).thenReturn(new Long(1));
-        when(subComment.getAuthorId()).thenReturn(1);
+
+        when(subComment.getAuthorId()).thenReturn(TestImgurId);
 
 
         tlTest0 = new Taglist("test0", "test0 taglist", false);
 
         TaglistHandler.handler().set(tlTest0);
-
     }
 
     @After
@@ -141,12 +147,21 @@ public class SuballCommandTest
             UserHandler.handler().remove(u);
     }
 
-    // region Bad Weather tests
-
     @Test(expected = IllegalArgumentException.class)
     public void testNoTracker() throws Exception
     {
-        suballCommand.execute(ici, new String[0]);
+        unsuballCommand.execute(ici, new String[0]);
+    }
+
+
+    @Test
+    public void testNoImgurCommand() throws Exception
+    {
+        when(commandInformation.getTracker()).thenReturn(tracker);
+
+        unsuballCommand.execute(commandInformation, new String[0]);
+
+        verify(commandInformation).reply("This command can only be used through Imgur comments.");
     }
 
     @Test
@@ -154,19 +169,9 @@ public class SuballCommandTest
     {
         when(ici.getTracker()).thenReturn(tracker);
 
-        suballCommand.execute(ici, new String[2]);
+        unsuballCommand.execute(ici, new String[0]);
 
         verify(ici).reply("This command cannot be executed in the root of a post.");
-    }
-
-    @Test
-    public void testNoImgurCommand() throws Exception
-    {
-        when(commandInformation.getTracker()).thenReturn(tracker);
-
-        suballCommand.execute(commandInformation, new String[0]);
-
-        verify(commandInformation).reply("This command can only be used through Imgur comments.");
     }
 
     @Test
@@ -175,37 +180,35 @@ public class SuballCommandTest
         when(ici.getTracker()).thenReturn(tracker);
         when(ici.getParentComment()).thenReturn(parentComment);
 
-        suballCommand.execute(ici, new String[2]);
+        unsuballCommand.execute(ici, new String[2]);
 
         verify(ici).reply("There were too many arguments! Did you forget to put the syntax between \"\" quotation marks?");
     }
 
     @Test
-    public void testArgumentNotBetweenQuotes() throws Exception
+    public void testNoQuotationMarks() throws Exception
     {
         when(ici.getTracker()).thenReturn(tracker);
         when(ici.getParentComment()).thenReturn(parentComment);
 
-        suballCommand.execute(ici, new String[] { "NOTQUOTE"});
+        unsuballCommand.execute(ici, new String[]{"NOQUOTE"});
 
         verify(ici).reply("There were no \"\" quotation marks around the argument. Please check your syntax.");
     }
 
-
     @Test
-    public void testNoSpecifiedPost() throws Exception
+    public void testNoImgurPost() throws Exception
     {
         when(ici.getTracker()).thenReturn(tracker);
         when(ici.getParentComment()).thenReturn(parentComment);
 
-        suballCommand.execute(ici, new String[0]);
+        unsuballCommand.execute(ici, new String[0]);
 
         verify(ici).reply("Something went wrong and I can't find the imgur-id of the post :<");
     }
 
-
     @Test
-    public void testErrorRequestingComments() throws Exception
+    public void testErrorRetrievingComments() throws Exception
     {
         when(ici.getTracker()).thenReturn(tracker);
         when(ici.getParentComment()).thenReturn(parentComment);
@@ -213,25 +216,24 @@ public class SuballCommandTest
 
         when(gallery.getItemComments(TestImgurPost, Comment.Sort.Best)).thenThrow(new BaringoApiException(""));
 
-        suballCommand.execute(ici, new String[0]);
+        unsuballCommand.execute(ici, new String[0]);
 
         verify(ici).reply("Something went wrong and I can't find the post comments :<");
     }
 
-
     @Test
-    public void testNoTaggedContent() throws Exception
+    public void testNoPreviouslyTaggedContent() throws Exception
     {
         when(ici.getTracker()).thenReturn(tracker);
         when(ici.getParentComment()).thenReturn(parentComment);
         when(ici.getImgurId()).thenReturn(TestImgurPost);
+
         when(gallery.getItemComments(TestImgurPost, Comment.Sort.Best)).thenReturn(new LinkedList<>());
 
-        suballCommand.execute(ici, new String[0]);
+        unsuballCommand.execute(ici, new String[0]);
 
         verify(ici).reply("There were no taglists detected that were previously tagged by 'mashedstew'");
     }
-
 
     @Test
     public void testNoPermittedTaglists() throws Exception
@@ -244,14 +246,14 @@ public class SuballCommandTest
         coll.add(tagComment);
         when(gallery.getItemComments(TestImgurPost, Comment.Sort.Best)).thenReturn(coll);
 
-        suballCommand.execute(ici, new String[0]);
+        unsuballCommand.execute(ici, new String[0]);
 
         verify(ici).reply("You don't have permissions for any of the indicated taglists.");
     }
 
 
     @Test
-    public void testNoSubscriptionsDetected() throws Exception
+    public void testNoUnsubscriptionCommentDetected() throws Exception
     {
         when(ici.getTracker()).thenReturn(tracker);
         when(ici.getParentComment()).thenReturn(parentComment);
@@ -263,19 +265,23 @@ public class SuballCommandTest
 
         when(tracker.hasPermission(tlTest0)).thenReturn(true);
 
-        suballCommand.execute(ici, new String[0]);
+        unsuballCommand.execute(ici, new String[0]);
 
-        verify(ici).reply("Could not find any comments that indicate a subscription request. Is your pattern correct?");
+        verify(ici).reply("Could not find any comments that indicate an unsubscription request. Is your pattern correct?");
     }
+
 
     //endregion
 
     //region Good weather
 
     @Test
-    public void testSubscribeSingleUser() throws Exception
+    public void testUnsubscribeSingleUser() throws Exception
     {
-        Assert.assertNull(UserHandler.getUserByImgurName(TestImgurName));
+        User user = simpleSubscription();
+        Assert.assertNull(UserHandler.getUserByImgurId(TestImgurId));
+        UserHandler.handler().set(user);
+        Assert.assertNotNull(UserHandler.getUserByImgurId(TestImgurId));
 
         when(ici.getTracker()).thenReturn(tracker);
         when(ici.getParentComment()).thenReturn(parentComment);
@@ -287,10 +293,11 @@ public class SuballCommandTest
 
         when(tracker.hasPermission(tlTest0)).thenReturn(true);
 
-        suballCommand.execute(ici, new String[0]);
+        unsuballCommand.execute(ici, new String[0]);
 
-        verify(ici).reply("Successfully subscribed 1 users to taglist (test0)");
-        Assert.assertNotNull(UserHandler.getUserByImgurName(TestImgurName));
+        verify(ici).reply("Successfully unsubscribed 1 users from taglist (test0)");
+
+        Assert.assertNull(UserHandler.getUserByImgurId(TestImgurId));
     }
 
     private List<Comment> getCollection()
@@ -310,18 +317,33 @@ public class SuballCommandTest
         return coll;
     }
 
+    private User simpleSubscription() throws SQLException
+    {
+        HashSet<Rating> nonRatingRatings = new HashSet<>();
+        nonRatingRatings.add(Rating.ALL);
+
+        UserSubscription us = new UserSubscription(tlTest0, nonRatingRatings, null);
+        HashSet<UserSubscription> hus = new HashSet<>();
+        hus.add(us);
+
+        return new User(TestImgurName, TestImgurId, hus);
+    }
+
+
     //endregion
+
+
+
+
+
+
+
+
+
+
+
+
 }
-
-
-
-
-
-
-
-
-
-
 
 
 

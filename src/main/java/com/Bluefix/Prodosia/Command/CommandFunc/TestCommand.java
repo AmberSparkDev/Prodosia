@@ -27,18 +27,9 @@ import com.Bluefix.Prodosia.DataType.Command.CommandInformation;
 public class TestCommand implements ICommandFunc
 {
     @Override
-    public void execute(CommandInformation ci, String[] arguments)
+    public void execute(CommandInformation ci, String[] arguments) throws Exception
     {
-        System.out.println("Test command test executed");
-
-        System.out.println("### Arguments:");
-        for (String s : arguments)
-            System.out.println(s);
-        System.out.println("###");
-
-
-
-
+        ci.reply("test");
     }
 
     @Override

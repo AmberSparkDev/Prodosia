@@ -30,6 +30,7 @@ import com.Bluefix.Prodosia.DataType.Taglist.Taglist;
 import com.Bluefix.Prodosia.DataType.User.User;
 import com.Bluefix.Prodosia.Imgur.ImgurApi.ImgurManager;
 import com.github.kskelm.baringo.model.Comment;
+import com.github.kskelm.baringo.util.BaringoApiException;
 
 import java.util.HashSet;
 import java.util.List;
@@ -60,7 +61,10 @@ public class UnsuballCommand implements ICommandFunc
 
         // if there was no parent comment, one of the requirements has failed.
         if (ci.getParentComment() == null)
-            throw new IllegalArgumentException("There was no parent comment supplied!");
+        {
+            msgNotInRoot(ci);
+            return;
+        }
 
         // if there is more than 1 argument, the call is invalid.
         if (arguments.length > 1)
@@ -100,7 +104,7 @@ public class UnsuballCommand implements ICommandFunc
         {
             comments = ImgurManager.client().galleryService().getItemComments(imgurId, Comment.Sort.Best);
         }
-        catch (Exception e)
+        catch (BaringoApiException e)
         {
             msgErrorWhileRequestingPostComments(ci);
             return;
@@ -127,7 +131,7 @@ public class UnsuballCommand implements ICommandFunc
 
 
         // get all comments that correspond to our parent comment.
-        List<Comment> subComments = SubComHelper.getCommentsFromSameTier(comments, ci.getParentComment());
+        List<Comment> subComments = ci.getParentComment().getChildren();
 
         if (subComments != null)
         {
@@ -244,6 +248,13 @@ public class UnsuballCommand implements ICommandFunc
     private static void msgNotImgurComment(CommandInformation ci) throws Exception
     {
         String msg = "This command can only be used through Imgur comments.";
+
+        ci.reply(msg);
+    }
+
+    private static void msgNotInRoot(CommandInformation ci) throws Exception
+    {
+        String msg = "This command cannot be executed in the root of a post.";
 
         ci.reply(msg);
     }
