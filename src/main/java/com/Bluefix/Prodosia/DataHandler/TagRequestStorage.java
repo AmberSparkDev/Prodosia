@@ -101,10 +101,10 @@ public class TagRequestStorage extends LocalStorageHandler<TagRequest>
         else
         {
             super.set(tagRequest);
-
-            // Let the archive manager handle the tagrequest as well.
-            ArchiveManager.handleTagRequest(tagRequest);
         }
+
+        // Let the archive manager handle the tagrequest as well.
+        ArchiveManager.handleTagRequest(tagRequest);
     }
 
     /**

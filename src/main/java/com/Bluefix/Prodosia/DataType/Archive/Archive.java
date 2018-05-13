@@ -192,6 +192,7 @@ public class Archive
         if (o == null || getClass() != o.getClass()) return false;
         Archive archive = (Archive) o;
         return Objects.equals(taglist, archive.taglist) &&
+                Objects.equals(description, archive.description) &&
                 Objects.equals(channelId, archive.channelId);
     }
 
@@ -199,6 +200,6 @@ public class Archive
     public int hashCode()
     {
 
-        return Objects.hash(taglist, channelId);
+        return Objects.hash(taglist, description, channelId);
     }
 }

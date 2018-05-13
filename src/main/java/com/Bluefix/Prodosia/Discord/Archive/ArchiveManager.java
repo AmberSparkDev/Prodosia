@@ -54,7 +54,10 @@ public class ArchiveManager
     private synchronized static ArchiveManager manager()
     {
         if (me == null)
+        {
+            assert(HistoryLimit > 0);
             me = new ArchiveManager();
+        }
 
         return me;
     }
@@ -93,27 +96,44 @@ public class ArchiveManager
         /**
          * Create a new channel-info object.
          */
-        private ChannelInfo(String channelId) throws IOException, LoginException
+        private ChannelInfo(String channelId)
         {
             // retrieve the message history from the comments.
-            this.textChannel = DiscordManager.manager().getTextChannelById(channelId);
-
-            MessageHistory mh = textChannel.getHistory();
-            this.comments = new LinkedList<>();
-
-            for (Message m : mh.getRetrievedHistory())
+            try
             {
-                comments.addLast(m.getContentRaw());
+                this.textChannel = DiscordManager.manager().getTextChannelById(channelId);
+
+                MessageHistory mh = textChannel.getHistory();
+                this.comments = new LinkedList<>();
+
+                for (Message m : mh.getRetrievedHistory())
+                {
+                    comments.addLast(m.getContentRaw());
+                }
+            }
+            catch (LoginException e)
+            {
+                e.printStackTrace();
+            } catch (IOException e)
+            {
+                e.printStackTrace();
             }
 
             // TODO: Check if the message-history is stored in the right order.
         }
 
 
-        private void postMessage(String message)
+        /**
+         * Post a message to the channel if the channel didn't contain the message.
+         * @param message
+         */
+        private synchronized void postMessage(String message)
         {
-            if (comments.contains(message))
+            if (comments != null && comments.contains(message))
                 return;
+
+            if (comments == null)
+                comments = new LinkedList<>();
 
             // append the message to the end of the comments.
             comments.addLast(message);
@@ -135,7 +155,7 @@ public class ArchiveManager
      * Posts a tag request item to the specified archive channels if applicable.
      * @param tagRequest
      */
-    public static void handleTagRequest(TagRequest tagRequest) throws SQLException, BaringoApiException, IOException, URISyntaxException, LoginException
+    public static void handleTagRequest(TagRequest tagRequest) throws SQLException
     {
         // update the channel-list according to the archives.
         manager().update();
@@ -143,9 +163,23 @@ public class ArchiveManager
         // find the channels that correspond with the tag request
         for (Map.Entry<Archive, ChannelInfo> e : manager().channels.entrySet())
         {
-            if (e.getKey().isPartOf(tagRequest))
+            try
             {
-                e.getValue().postMessage(tagRequest.getArchiveMessage());
+                // if this channel was part of the specified tag request, post it.
+                if (e.getKey().isPartOf(tagRequest))
+                {
+                    e.getValue().postMessage(tagRequest.getArchiveMessage());
+                }
+
+            } catch (IOException e1)
+            {
+                e1.printStackTrace();
+            } catch (BaringoApiException e1)
+            {
+                e1.printStackTrace();
+            } catch (URISyntaxException e1)
+            {
+                e1.printStackTrace();
             }
         }
     }
@@ -154,7 +188,7 @@ public class ArchiveManager
     /**
      * Update the channel-list based on the archives available.
      */
-    private void update() throws SQLException, IOException, LoginException
+    private void update() throws SQLException
     {
         ArrayList<Archive> archives = ArchiveHandler.handler().getAll();
 
