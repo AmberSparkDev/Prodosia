@@ -25,9 +25,17 @@ package com.Bluefix.Prodosia.DataHandler;
 import com.Bluefix.Prodosia.DataType.Comments.TagRequest.TagRequest;
 import com.Bluefix.Prodosia.DataType.Taglist.Rating;
 import com.Bluefix.Prodosia.DataType.Taglist.Taglist;
+import com.github.kskelm.baringo.util.BaringoApiException;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Test;
 
+import javax.security.auth.login.LoginException;
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashSet;
 
 public class TagRequestStorageTest extends DataHandlerTest<TagRequest>
@@ -82,4 +90,92 @@ public class TagRequestStorageTest extends DataHandlerTest<TagRequest>
         TaglistHandler.handler().clear(taglist);
         TagRequestStorage.handler().remove(request);
     }
+
+
+
+
+    //region Test merge
+
+    @Test
+    public void testMerge() throws LoginException, SQLException, IOException, BaringoApiException, URISyntaxException
+    {
+        // create a new TagRequest that will merge
+        Taglist tlTest1 = new Taglist("test1", "test1 taglist", false);
+        TaglistHandler.handler().set(tlTest1);
+
+        HashSet<Taglist> tlSet = new HashSet<>();
+        tlSet.add(tlTest1);
+
+        TagRequest newRequest = new TagRequest(TestImgurId, null, tlSet, Rating.EXPLICIT, "nofilters", true);
+
+        // setup the initial request.
+        Assert.assertEquals(-1, TagRequestStorage.handler().getAll().indexOf(request));
+        Assert.assertFalse(TagRequestStorage.handler().getAll().contains(request));
+
+        int size = TagRequestStorage.handler().getAll().size();
+
+        TagRequestStorage.handler().set(request);
+
+        Assert.assertTrue(TagRequestStorage.handler().getAll().contains(request));
+        Assert.assertTrue(TagRequestStorage.handler().getAll().indexOf(request) >= 0);
+
+        Assert.assertEquals(size+1, TagRequestStorage.handler().getAll().size());
+
+        // now add the new request that will merge.
+        TagRequestStorage.handler().set(newRequest);
+
+        Assert.assertTrue(TagRequestStorage.handler().getAll().contains(request));
+        Assert.assertEquals(size+1, TagRequestStorage.handler().getAll().size());
+
+        int index = TagRequestStorage.handler().getAll().indexOf(request);
+
+        TagRequest storedRequest = TagRequestStorage.handler().getAll().get(index);
+
+        Assert.assertTrue(storedRequest.getTaglists().contains(taglist));
+        Assert.assertTrue(storedRequest.getTaglists().contains(tlTest1));
+        Assert.assertTrue(storedRequest.getRating() == Rating.EXPLICIT);
+        Assert.assertEquals("nofilters", storedRequest.getFilter());
+    }
+
+    //endregion
+
+
+
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

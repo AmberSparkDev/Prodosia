@@ -525,7 +525,6 @@ public class TagRequest extends BaseTagRequest implements ICommentRequest
     {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        if (!super.equals(o)) return false;
         TagRequest that = (TagRequest) o;
         return Objects.equals(imgurId, that.imgurId);
     }
@@ -534,7 +533,7 @@ public class TagRequest extends BaseTagRequest implements ICommentRequest
     public int hashCode()
     {
 
-        return Objects.hash(super.hashCode(), imgurId);
+        return Objects.hash(imgurId);
     }
 
 
