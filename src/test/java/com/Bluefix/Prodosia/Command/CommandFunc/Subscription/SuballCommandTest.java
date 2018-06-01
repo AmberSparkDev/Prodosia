@@ -94,6 +94,16 @@ public class SuballCommandTest
     @Mock
     Account selfAccount;
 
+    @Mock
+    Comment rootComment;
+
+    /*
+     * - Tag Comment (somewhere)
+     * - Root comment
+     *   - parentComment
+     *   - subscription comment(s)
+     */
+
     @Rule
     public MockitoRule mockitoRule = MockitoJUnit.rule();
 
@@ -114,13 +124,18 @@ public class SuballCommandTest
         when(tracker.getImgurId()).thenReturn(new Long(0));
 
         when(tagComment.getComment()).thenReturn("@Prefix tag test0");
-        when(parentComment.getComment()).thenReturn("Parent Comment");
-
-        when(parentComment.getId()).thenReturn(new Long(2));
         when(tagComment.getId()).thenReturn(new Long(1));
+
+        when(parentComment.getComment()).thenReturn("Parent Comment");
+        when(parentComment.getId()).thenReturn(new Long(2));
+        when(parentComment.getParentId()).thenReturn(new Long(3));
 
         when(subComment.getId()).thenReturn(new Long(1));
         when(subComment.getAuthorId()).thenReturn(1);
+        when(subComment.getParentId()).thenReturn(new Long(3));
+
+        when(rootComment.getId()).thenReturn(new Long(3));
+        when(rootComment.getAuthorId()).thenReturn(1);
 
 
         tlTest0 = new Taglist("test0", "test0 taglist", false);
@@ -301,11 +316,14 @@ public class SuballCommandTest
         when(subComment.getAuthorName()).thenReturn(TestImgurName);
 
         childComments.add(subComment);
-        when(parentComment.getChildren()).thenReturn(childComments);
+        childComments.add(parentComment);
+
+        when(rootComment.getChildren()).thenReturn(childComments);
+        when(rootComment.getComment()).thenReturn("Reply to this comment to subscribe");
 
         LinkedList<Comment> coll = new LinkedList<>();
+        coll.add(rootComment);
         coll.add(tagComment);
-        coll.add(parentComment);
 
         return coll;
     }

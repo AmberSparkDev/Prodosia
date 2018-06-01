@@ -133,7 +133,7 @@ public class SuballCommand implements ICommandFunc
 
 
         // get all comments that fall underneath our parent comment.
-        List<Comment> subComments = ci.getParentComment().getChildren();
+        List<Comment> subComments = SubComHelper.getCommentsFromSameTier(comments, ci.getParentComment());
 
         if (subComments != null)
         {

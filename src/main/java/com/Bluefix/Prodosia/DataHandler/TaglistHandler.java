@@ -335,10 +335,10 @@ public class TaglistHandler extends LocalStorageHandler<Taglist>
         String query =
                 "SELECT id, abbreviation, description, hasRatings " +
                 "FROM Taglist " +
-                "WHERE abbreviation = ?;";
+                "WHERE UPPER(abbreviation) = ?;";
 
         PreparedStatement prep = SqlDatabase.getStatement(query);
-        prep.setString(1, abbreviation);
+        prep.setString(1, abbreviation.toUpperCase());
         ArrayList<ResultSet> result = SqlDatabase.query(prep);
 
         if (result.size() != 1)
