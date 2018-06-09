@@ -93,7 +93,7 @@ public class CommentScannerStorage extends LocalStorageHandler<TrackerBookmark>
 
     //region Database management
 
-    private synchronized static TrackerBookmark dbSetBookmark(TrackerBookmark tb) throws SQLException
+    private static TrackerBookmark dbSetBookmark(TrackerBookmark tb) throws SQLException
     {
         if (tb == null)
             return null;
@@ -121,7 +121,7 @@ public class CommentScannerStorage extends LocalStorageHandler<TrackerBookmark>
         return oldBookmark;
     }
 
-    private synchronized static void dbRemoveBookmark(TrackerBookmark tb) throws SQLException
+    private static void dbRemoveBookmark(TrackerBookmark tb) throws SQLException
     {
         if (tb == null)
             return;
@@ -138,7 +138,7 @@ public class CommentScannerStorage extends LocalStorageHandler<TrackerBookmark>
         assert(prep.isClosed());
     }
 
-    private synchronized static TrackerBookmark dbGetBookmark(long imgurId) throws SQLException
+    private static TrackerBookmark dbGetBookmark(long imgurId) throws SQLException
     {
         String query =
                 "SELECT imgurId, lastCommentId, lastCommentTime " +
@@ -166,7 +166,7 @@ public class CommentScannerStorage extends LocalStorageHandler<TrackerBookmark>
         return parsedResult.get(0);
     }
 
-    private synchronized static ArrayList<TrackerBookmark> dbGetBookmarks() throws SQLException
+    private static ArrayList<TrackerBookmark> dbGetBookmarks() throws SQLException
     {
         String query =
                 "SELECT imgurId, lastCommentId, lastCommentTime " +

@@ -137,7 +137,7 @@ public class TaglistHandler extends LocalStorageHandler<Taglist>
 
     //region Database management
 
-    private synchronized static Taglist dbSetTaglist(Taglist t) throws SQLException
+    private static Taglist dbSetTaglist(Taglist t) throws SQLException
     {
         if (t == null)
             return null;
@@ -174,7 +174,7 @@ public class TaglistHandler extends LocalStorageHandler<Taglist>
         return oldTaglist;
     }
 
-    private synchronized static void dbRemoveTaglist(Taglist t) throws SQLException
+    private static void dbRemoveTaglist(Taglist t) throws SQLException
     {
         // skip if the taglist was null
         if (t == null)
@@ -199,7 +199,7 @@ public class TaglistHandler extends LocalStorageHandler<Taglist>
      * @param t
      * @throws SQLException
      */
-    private synchronized static void dbClearTaglist(Taglist t) throws SQLException, LoginException, IOException, BaringoApiException, URISyntaxException
+    private static void dbClearTaglist(Taglist t) throws SQLException, LoginException, IOException, BaringoApiException, URISyntaxException
     {
         dbClearUserDependencies(t);
         dbClearTrackerPermissions(t);
@@ -216,7 +216,7 @@ public class TaglistHandler extends LocalStorageHandler<Taglist>
      * any users that no longer have any active subscriptions.
      * @param t
      */
-    private synchronized static void dbClearUserDependencies(Taglist t) throws SQLException
+    private static void dbClearUserDependencies(Taglist t) throws SQLException
     {
         // delete all usersubscriptions that pertain to this taglist.
         String query0 =
@@ -273,7 +273,7 @@ public class TaglistHandler extends LocalStorageHandler<Taglist>
      * Clear all permissions that rely on the specified taglist.
      * @param t
      */
-    private synchronized static void dbClearTrackerPermissions(Taglist t) throws SQLException, URISyntaxException, IOException, LoginException, BaringoApiException
+    private static void dbClearTrackerPermissions(Taglist t) throws SQLException, URISyntaxException, IOException, LoginException, BaringoApiException
     {
         // retrieve all trackers
         ArrayList<Tracker> trackers = new ArrayList<>(TrackerHandler.handler().getAll());
@@ -290,7 +290,7 @@ public class TaglistHandler extends LocalStorageHandler<Taglist>
      * Clear all actives pertaining to the specified taglist.
      * @param t
      */
-    private synchronized static void dbClearArchiveDependencies(Taglist t) throws SQLException
+    private static void dbClearArchiveDependencies(Taglist t) throws SQLException
     {
         String query =
                 "DELETE FROM Archive " +
@@ -307,7 +307,7 @@ public class TaglistHandler extends LocalStorageHandler<Taglist>
     //endregion
 
 
-    private synchronized static ArrayList<Taglist> dbGetTaglists() throws SQLException
+    private static ArrayList<Taglist> dbGetTaglists() throws SQLException
     {
         String query =
                 "SELECT id, abbreviation, description, hasRatings " +
@@ -330,7 +330,7 @@ public class TaglistHandler extends LocalStorageHandler<Taglist>
         return parseResult;
     }
 
-    private synchronized static Taglist dbGetTaglist(String abbreviation) throws SQLException
+    private static Taglist dbGetTaglist(String abbreviation) throws SQLException
     {
         String query =
                 "SELECT id, abbreviation, description, hasRatings " +
@@ -388,7 +388,7 @@ public class TaglistHandler extends LocalStorageHandler<Taglist>
      * @param taglistId
      * @return
      */
-    public static synchronized Taglist getTaglistById(long taglistId) throws SQLException
+    public static Taglist getTaglistById(long taglistId) throws SQLException
     {
         ArrayList<Taglist> taglists = handler().getAll();
 
@@ -407,7 +407,7 @@ public class TaglistHandler extends LocalStorageHandler<Taglist>
      * @return The taglist if it existed, or null otherwise.
      * @throws Exception
      */
-    public static synchronized Taglist getTaglistByAbbreviation(String abbreviation) throws SQLException
+    public static Taglist getTaglistByAbbreviation(String abbreviation) throws SQLException
     {
         if (abbreviation == null || abbreviation.isEmpty())
             return null;

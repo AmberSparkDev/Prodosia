@@ -109,7 +109,7 @@ public class TrackerHandler extends LocalStorageHandler<Tracker>
 
     //region Database management
 
-    private synchronized static Tracker dbSetTracker(Tracker t) throws SQLException
+    private static Tracker dbSetTracker(Tracker t) throws SQLException
     {
         if (t == null)
             return null;
@@ -189,7 +189,7 @@ public class TrackerHandler extends LocalStorageHandler<Tracker>
         return oldTracker;
     }
 
-    private synchronized static void dbRemoveTracker(Tracker t) throws SQLException
+    private static void dbRemoveTracker(Tracker t) throws SQLException
     {
         // if the item did not exist, skip
         if (t == null)
@@ -250,7 +250,7 @@ public class TrackerHandler extends LocalStorageHandler<Tracker>
     }
 
 
-    private synchronized static Tracker dbGetTracker(long imgurId, String discordId) throws SQLException
+    private static Tracker dbGetTracker(long imgurId, String discordId) throws SQLException
     {
         String query =
                 "SELECT " +
@@ -288,7 +288,7 @@ public class TrackerHandler extends LocalStorageHandler<Tracker>
         return parsedTrackers.get(0);
     }
 
-    private synchronized static ArrayList<Tracker> dbGetTrackers() throws SQLException
+    private static ArrayList<Tracker> dbGetTrackers() throws SQLException
     {
         String query =
                 "SELECT " +

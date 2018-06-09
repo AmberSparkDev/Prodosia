@@ -146,7 +146,7 @@ public class UserHandler extends LocalStorageHandler<User>
 
     //region Database management.
 
-    private synchronized static User dbSetUser(User u) throws SQLException
+    private static User dbSetUser(User u) throws SQLException
     {
         // if there was no user, return null
         if (u == null)
@@ -193,7 +193,7 @@ public class UserHandler extends LocalStorageHandler<User>
         return oldUser;
     }
 
-    private synchronized static void dbRemoveUser(User u) throws SQLException
+    private static void dbRemoveUser(User u) throws SQLException
     {
         if (u == null)
             return;
@@ -226,7 +226,7 @@ public class UserHandler extends LocalStorageHandler<User>
      * @param imgurId
      * @return
      */
-    private synchronized static User dbGetUser(long imgurId) throws SQLException
+    private static User dbGetUser(long imgurId) throws SQLException
     {
         // select the specified user with its respective usersubscription data.
         String query =
@@ -267,7 +267,7 @@ public class UserHandler extends LocalStorageHandler<User>
      * @param imgurName
      * @return
      */
-    private synchronized static User dbGetUser(String imgurName) throws SQLException
+    private static User dbGetUser(String imgurName) throws SQLException
     {
         // select the specified user with its respective usersubscription data.
         String query =
@@ -305,7 +305,7 @@ public class UserHandler extends LocalStorageHandler<User>
 
 
 
-    private synchronized static ArrayList<User> dbGetUsers() throws SQLException
+    private static ArrayList<User> dbGetUsers() throws SQLException
     {
         // select all users with their respective usersubscription data.
         String query =
@@ -434,7 +434,7 @@ public class UserHandler extends LocalStorageHandler<User>
      * @return The imgur id for the specified user, or -1 if it did not exist in the database.
      * @throws SQLException
      */
-    private synchronized static long getUserId(User u) throws SQLException
+    private static long getUserId(User u) throws SQLException
     {
         // only the imgur id needs to be unique.
         String query =

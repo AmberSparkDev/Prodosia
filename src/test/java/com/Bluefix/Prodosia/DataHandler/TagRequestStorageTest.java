@@ -135,6 +135,8 @@ public class TagRequestStorageTest extends DataHandlerTest<TagRequest>
         Assert.assertTrue(storedRequest.getTaglists().contains(tlTest1));
         Assert.assertTrue(storedRequest.getRating() == Rating.EXPLICIT);
         Assert.assertEquals("nofilters", storedRequest.getFilter());
+
+        TaglistHandler.handler().clear(tlTest1);
     }
 
     //endregion

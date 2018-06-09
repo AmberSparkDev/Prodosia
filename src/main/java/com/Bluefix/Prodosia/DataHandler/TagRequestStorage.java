@@ -144,7 +144,7 @@ public class TagRequestStorage extends LocalStorageHandler<TagRequest>
 
     //region Database Management
 
-    private synchronized static TagRequest dbSetTagrequest(TagRequest t) throws SQLException, BaringoApiException, IOException, URISyntaxException
+    private static TagRequest dbSetTagrequest(TagRequest t) throws SQLException, BaringoApiException, IOException, URISyntaxException
     {
         if (t == null)
             return null;
@@ -175,7 +175,7 @@ public class TagRequestStorage extends LocalStorageHandler<TagRequest>
         return oldRequest;
     }
 
-    private synchronized static void dbRemoveTagrequest(TagRequest t) throws SQLException, BaringoApiException, IOException, URISyntaxException
+    private static void dbRemoveTagrequest(TagRequest t) throws SQLException, BaringoApiException, IOException, URISyntaxException
     {
         // if the tag request is null, skip
         if (t == null)
@@ -193,7 +193,7 @@ public class TagRequestStorage extends LocalStorageHandler<TagRequest>
         assert(prep.isClosed());
     }
 
-    private synchronized static TagRequest dbGetTagrequest(String imgurId, long parentId) throws SQLException
+    private static TagRequest dbGetTagrequest(String imgurId, long parentId) throws SQLException
     {
         String query =
                 "SELECT imgurId, parentComment, taglists, rating, filters, cleanComments " +
@@ -222,7 +222,7 @@ public class TagRequestStorage extends LocalStorageHandler<TagRequest>
         return parsedRequests.get(0);
     }
 
-    private synchronized static ArrayList<TagRequest> dbGetTagrequests() throws SQLException
+    private static ArrayList<TagRequest> dbGetTagrequests() throws SQLException
     {
         String query =
                 "SELECT imgurId, parentComment, taglists, rating, filters, cleanComments " +

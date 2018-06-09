@@ -113,6 +113,7 @@ public class SqlDatabase
         // initialize the default CommandPrefixes
         try
         {
+
             createDefaultPrefix();
         } catch (Exception e)
         {
@@ -130,6 +131,7 @@ public class SqlDatabase
         // default prefix is: @Tagaroo
         String pattern = CommandPrefix.parsePatternForItems("@Tagaroo ");
         CommandPrefix imgCp = new CommandPrefix(CommandPrefix.Type.IMGUR, pattern);
+
         CommandPrefixStorage.handler().set(imgCp);
 
         // Discord

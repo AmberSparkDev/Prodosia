@@ -46,7 +46,7 @@ public class ArchiveHandler extends LocalStorageHandler<Archive>
 
     private static ArchiveHandler me;
 
-    public synchronized static ArchiveHandler handler()
+    public static ArchiveHandler handler()
     {
         if (me == null)
             me = new ArchiveHandler();
@@ -123,7 +123,7 @@ public class ArchiveHandler extends LocalStorageHandler<Archive>
      * @param archive
      * @return
      */
-    private static synchronized Archive dbSetArchive(Archive archive) throws SQLException
+    private static Archive dbSetArchive(Archive archive) throws SQLException
     {
         if (archive == null)
             return null;
@@ -156,7 +156,7 @@ public class ArchiveHandler extends LocalStorageHandler<Archive>
 
 
 
-    private static synchronized void dbRemoveArchive(Archive archive) throws SQLException
+    private static void dbRemoveArchive(Archive archive) throws SQLException
     {
         if (archive == null)
             return;
@@ -176,7 +176,7 @@ public class ArchiveHandler extends LocalStorageHandler<Archive>
         assert(prep.isClosed());
     }
 
-    private static synchronized ArrayList<Archive> dbGetArchives() throws SQLException
+    private static ArrayList<Archive> dbGetArchives() throws SQLException
     {
         String query =
                 "SELECT taglistId, description, channel, ratings, filters " +
@@ -205,7 +205,7 @@ public class ArchiveHandler extends LocalStorageHandler<Archive>
      * @param channelId
      * @return
      */
-    private static synchronized Archive dbGetArchive(long taglistId, String channelId) throws SQLException
+    private static Archive dbGetArchive(long taglistId, String channelId) throws SQLException
     {
         String query =
                 "SELECT taglistId, description, channel, ratings, filters " +

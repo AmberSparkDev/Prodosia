@@ -96,7 +96,7 @@ public class CommandPrefixStorage extends LocalStorageHandler<CommandPrefix>
 
     //region Database management
 
-    private static synchronized CommandPrefix dbSetCPrefix(CommandPrefix cp) throws SQLException
+    private static CommandPrefix dbSetCPrefix(CommandPrefix cp) throws SQLException
     {
         // skip if the command prefix is null
         if (cp == null)
@@ -123,7 +123,7 @@ public class CommandPrefixStorage extends LocalStorageHandler<CommandPrefix>
         return oldPrefix;
     }
 
-    private static synchronized void dbRemoveCPrefix(CommandPrefix cp) throws SQLException
+    private static void dbRemoveCPrefix(CommandPrefix cp) throws SQLException
     {
         // skip if the command prefix is null
         if (cp == null)
@@ -141,7 +141,7 @@ public class CommandPrefixStorage extends LocalStorageHandler<CommandPrefix>
         assert(prep.isClosed());
     }
 
-    private static synchronized CommandPrefix dbGetCPrefix(CommandPrefix.Type type) throws SQLException
+    private static CommandPrefix dbGetCPrefix(CommandPrefix.Type type) throws SQLException
     {
         String query =
                 "SELECT type, regex " +
@@ -169,7 +169,7 @@ public class CommandPrefixStorage extends LocalStorageHandler<CommandPrefix>
         return parseResult.get(0);
     }
 
-    private static synchronized ArrayList<CommandPrefix> dbGetCPrefixes() throws SQLException
+    private static ArrayList<CommandPrefix> dbGetCPrefixes() throws SQLException
     {
         String query =
                 "SELECT type, regex " +

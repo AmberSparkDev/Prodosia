@@ -95,7 +95,7 @@ public class CommentDeletionStorage extends LocalStorageHandler<Long>
 
     //region Database management
 
-    private synchronized static Long dbSetDeletion(Long d) throws SQLException
+    private static Long dbSetDeletion(Long d) throws SQLException
     {
         if (d < 0)
             return d;
@@ -118,7 +118,7 @@ public class CommentDeletionStorage extends LocalStorageHandler<Long>
         return d;
     }
 
-    private synchronized static void dbRemoveDeletion(Long d) throws SQLException
+    private static void dbRemoveDeletion(Long d) throws SQLException
     {
         String query =
                 "DELETE FROM CommentDeletion " +
@@ -132,7 +132,7 @@ public class CommentDeletionStorage extends LocalStorageHandler<Long>
         assert(prep.isClosed());
     }
 
-    private synchronized ArrayList<Long> dbGetDeletions() throws SQLException
+    private ArrayList<Long> dbGetDeletions() throws SQLException
     {
         String query =
                 "SELECT id FROM CommentDeletion;";

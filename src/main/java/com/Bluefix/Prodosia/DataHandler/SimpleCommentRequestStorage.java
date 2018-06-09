@@ -104,7 +104,7 @@ public class SimpleCommentRequestStorage extends LocalStorageHandler<SimpleComme
 
     //region Database Management
 
-    private synchronized static SimpleCommentRequest dbSetCommentRequest(SimpleCommentRequest t) throws SQLException
+    private static SimpleCommentRequest dbSetCommentRequest(SimpleCommentRequest t) throws SQLException
     {
         if (t == null)
             return null;
@@ -152,7 +152,7 @@ public class SimpleCommentRequestStorage extends LocalStorageHandler<SimpleComme
         return oldRequest;
     }
 
-    private synchronized static void dbRemoveCommentRequest(SimpleCommentRequest t) throws SQLException
+    private static void dbRemoveCommentRequest(SimpleCommentRequest t) throws SQLException
     {
         // if the request is null, skip
         if (t == null)
@@ -169,7 +169,7 @@ public class SimpleCommentRequestStorage extends LocalStorageHandler<SimpleComme
         assert(prep.isClosed());
     }
 
-    private synchronized static SimpleCommentRequest dbGetCommentRequest(long id) throws SQLException
+    private static SimpleCommentRequest dbGetCommentRequest(long id) throws SQLException
     {
         String query =
                 "SELECT id, imgurId, parentId, lines " +
@@ -198,7 +198,7 @@ public class SimpleCommentRequestStorage extends LocalStorageHandler<SimpleComme
     }
 
 
-    private synchronized static ArrayList<SimpleCommentRequest> dbGetCommentRequests() throws SQLException
+    private static ArrayList<SimpleCommentRequest> dbGetCommentRequests() throws SQLException
     {
         String query =
                 "SELECT id, imgurId, parentId, lines " +
