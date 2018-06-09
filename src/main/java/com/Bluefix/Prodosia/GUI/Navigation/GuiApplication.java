@@ -95,7 +95,7 @@ public class GuiApplication extends Application
                 )
         );
 
-        primaryStage.setTitle("Prodosía - by ReGeX");
+        primaryStage.setTitle("Prodosia - by RoseLaLuna");
         primaryStage.setResizable(false);
 
         // ensure that the entire application is shut down on closing this window.

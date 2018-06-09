@@ -26,6 +26,7 @@ import com.Bluefix.Prodosia.DataHandler.ArchiveHandler;
 import com.Bluefix.Prodosia.DataType.Archive.Archive;
 import com.Bluefix.Prodosia.DataType.Comments.TagRequest.TagRequest;
 import com.Bluefix.Prodosia.Discord.DiscordManager;
+import com.Bluefix.Prodosia.Logger.Logger;
 import com.github.kskelm.baringo.util.BaringoApiException;
 import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.MessageHistory;
@@ -103,6 +104,7 @@ public class ArchiveManager
             {
                 this.textChannel = DiscordManager.manager().getTextChannelById(channelId);
 
+
                 MessageHistory mh = textChannel.getHistory();
                 this.comments = new LinkedList<>();
 
@@ -173,13 +175,22 @@ public class ArchiveManager
 
             } catch (IOException e1)
             {
+                Logger.logMessage(e1.getMessage(), Logger.Severity.ERROR);
+
                 e1.printStackTrace();
             } catch (BaringoApiException e1)
             {
+                Logger.logMessage(e1.getMessage(), Logger.Severity.ERROR);
                 e1.printStackTrace();
             } catch (URISyntaxException e1)
             {
+                Logger.logMessage(e1.getMessage(), Logger.Severity.ERROR);
                 e1.printStackTrace();
+            }
+            catch (Exception ex)
+            {
+                Logger.logMessage(ex.getMessage(), Logger.Severity.ERROR);
+                ex.printStackTrace();
             }
         }
     }

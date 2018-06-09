@@ -131,7 +131,7 @@ public class UnsuballCommand implements ICommandFunc
 
 
         // get all comments that correspond to our parent comment.
-        List<Comment> subComments = ci.getParentComment().getChildren();
+        List<Comment> subComments = SubComHelper.getCommentsFromSameTier(comments, ci.getParentComment());
 
         if (subComments != null)
         {

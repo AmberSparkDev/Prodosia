@@ -6,7 +6,7 @@
 
     <groupId>com.Bluefix.Prodosia</groupId>
     <artifactId>Prodosia</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0.2</version>
     <build>
         <plugins>
             <plugin>

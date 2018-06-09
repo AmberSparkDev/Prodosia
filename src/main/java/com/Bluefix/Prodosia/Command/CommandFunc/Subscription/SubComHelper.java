@@ -134,15 +134,21 @@ public class SubComHelper
         // attempt to find the parent comment.
         List<Comment> tierItems = comments;
 
+        // if the root contains the target comment, return the root.
+        for (Comment c : tierItems)
+            if (c.getId() == commandComment.getId())
+                return tierItems;
+
         while (!tierItems.isEmpty())
         {
             LinkedList<Comment> newTier = new LinkedList<>();
-
 
             for (Comment c : tierItems)
             {
                 newTier.addAll(c.getChildren());
 
+                // if the parent of the command comment equals our own id, return
+                // our children.
                 if (c.getId() == commandComment.getParentId())
                 {
                     return c.getChildren();

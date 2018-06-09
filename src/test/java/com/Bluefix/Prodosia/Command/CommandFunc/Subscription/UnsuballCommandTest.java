@@ -101,6 +101,21 @@ public class UnsuballCommandTest
     @Mock
     Account selfAccount;
 
+    @Mock
+    Comment rootComment;
+
+    /*
+     * - Tag Comment (somewhere) (1)
+     * - Root comment (2)
+     *   - parentComment (3)
+     *   - subscription comment(s) (4+)
+     *
+     *   Authenticated accounts:
+     *   1 = Poster
+     *   2 = Tracker
+     *   TestImgurId = Subscription user
+     */
+
     @Rule
     public MockitoRule mockitoRule = MockitoJUnit.rule();
 
@@ -113,21 +128,27 @@ public class UnsuballCommandTest
         when(client.galleryService()).thenReturn(gallery);
         when(client.getAuthenticatedAccount()).thenReturn(selfAccount);
 
-        when(selfAccount.getId()).thenReturn(2);
+        when(selfAccount.getId()).thenReturn(1);
 
 
         when(tracker.getName()).thenReturn(TestImgurName);
-        when(tracker.getImgurId()).thenReturn(new Long(0));
+        when(tracker.getImgurId()).thenReturn(new Long(2));
 
         when(tagComment.getComment()).thenReturn("@Prefix tag test0");
-        when(parentComment.getComment()).thenReturn("Parent Comment");
-
-        when(parentComment.getId()).thenReturn(new Long(2));
         when(tagComment.getId()).thenReturn(new Long(1));
+        when(tagComment.getAuthorId()).thenReturn(2);
 
-        when(subComment.getId()).thenReturn(new Long(1));
+        when(parentComment.getComment()).thenReturn("Parent Comment");
+        when(parentComment.getId()).thenReturn(new Long(3));
+        when(parentComment.getAuthorId()).thenReturn(2);
+        when(parentComment.getParentId()).thenReturn(new Long(2));
 
+        when(subComment.getId()).thenReturn(new Long(4));
         when(subComment.getAuthorId()).thenReturn(TestImgurId);
+        when(subComment.getParentId()).thenReturn(new Long(2));
+
+        when(rootComment.getId()).thenReturn(new Long(2));
+        when(rootComment.getAuthorId()).thenReturn(2);
 
 
         tlTest0 = new Taglist("test0", "test0 taglist", false);
@@ -308,11 +329,14 @@ public class UnsuballCommandTest
         when(subComment.getAuthorName()).thenReturn(TestImgurName);
 
         childComments.add(subComment);
-        when(parentComment.getChildren()).thenReturn(childComments);
+        childComments.add(parentComment);
+
+        when(rootComment.getChildren()).thenReturn(childComments);
+        when(rootComment.getComment()).thenReturn("Reply to this comment to unsubscribe");
 
         LinkedList<Comment> coll = new LinkedList<>();
+        coll.add(rootComment);
         coll.add(tagComment);
-        coll.add(parentComment);
 
         return coll;
     }
