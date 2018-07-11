@@ -34,7 +34,7 @@ public class Filter
     public static String getPatternForFilters(Iterator<String> filters)
     {
         // if there are no filter items, return an empty pattern.
-        if (!filters.hasNext())
+        if (filters == null || !filters.hasNext())
             return "";
 
         StringBuilder sb = new StringBuilder();
@@ -50,14 +50,14 @@ public class Filter
         {
             String f = filters.next();
 
-            sb.append(f + "|");
+            sb.append(f + "($|\\s+)|");
         }
 
         // complete the last latch
         sb.setLength(sb.length()-1);
 
         // close the pattern and return
-        sb.append(")($|\\s+)");
+        sb.append(").*");
 
         return sb.toString();
     }
