@@ -187,7 +187,12 @@ public class ImportExportWindow
 
         File file = fileChooser.showSaveDialog(stage);
 
-        tf_export.setText(file == null ? "" : file.getPath());
+        String path = file.getPath();
+        if (!path.contains("."))
+            path = path + ".prod";
+
+
+        tf_export.setText(file == null ? "" : path);
     }
 
     public void doExport(ActionEvent actionEvent)
