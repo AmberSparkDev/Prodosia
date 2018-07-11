@@ -74,7 +74,7 @@ public class FilterTest
 
         String pattern = Filter.getPatternForFilters(filters.iterator());
 
-        Assert.assertEquals("(^|\\s+)(?i)(filter0($|\\s+)).*", pattern);
+        Assert.assertEquals("(^|\\s+)(?i)(filter0)($|\\s+).*", pattern);
 
         Assert.assertTrue(s0.matches(pattern));
         Assert.assertFalse(s1.matches(pattern));
@@ -91,7 +91,7 @@ public class FilterTest
 
         String pattern = Filter.getPatternForFilters(filters.iterator());
 
-        Assert.assertEquals("(^|\\s+)(?i)(filter0($|\\s+)|filter1($|\\s+)|filter2($|\\s+)).*", pattern);
+        Assert.assertEquals("(^|\\s+)(?i)(filter0|filter1|filter2)($|\\s+).*", pattern);
 
         Assert.assertTrue(s0.matches(pattern));
         Assert.assertTrue(s1.matches(pattern));

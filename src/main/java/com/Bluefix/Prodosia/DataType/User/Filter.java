@@ -50,14 +50,14 @@ public class Filter
         {
             String f = filters.next();
 
-            sb.append(f + "($|\\s+)|");
+            sb.append(f + "|");
         }
 
         // complete the last latch
         sb.setLength(sb.length()-1);
 
         // close the pattern and return
-        sb.append(").*");
+        sb.append(")($|\\s+).*");
 
         return sb.toString();
     }
