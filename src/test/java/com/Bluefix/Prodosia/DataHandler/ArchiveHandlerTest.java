@@ -22,8 +22,11 @@
 
 package com.Bluefix.Prodosia.DataHandler;
 
-import com.Bluefix.Prodosia.DataType.Archive.Archive;
-import com.Bluefix.Prodosia.DataType.Taglist.Taglist;
+import com.Bluefix.Prodosia.Data.DataHandler.ArchiveHandler;
+import com.Bluefix.Prodosia.Data.DataHandler.LocalStorageHandler;
+import com.Bluefix.Prodosia.Data.DataHandler.TaglistHandler;
+import com.Bluefix.Prodosia.Data.DataType.Archive.Archive;
+import com.Bluefix.Prodosia.Data.DataType.Taglist.Taglist;
 import com.github.kskelm.baringo.util.BaringoApiException;
 import org.junit.After;
 import org.junit.Assert;

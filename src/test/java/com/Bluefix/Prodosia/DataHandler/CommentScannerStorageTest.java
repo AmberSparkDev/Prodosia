@@ -22,9 +22,12 @@
 
 package com.Bluefix.Prodosia.DataHandler;
 
-import com.Bluefix.Prodosia.DataType.Tracker.Tracker;
-import com.Bluefix.Prodosia.DataType.Tracker.TrackerBookmark;
-import com.Bluefix.Prodosia.DataType.Tracker.TrackerPermissions;
+import com.Bluefix.Prodosia.Data.DataHandler.CommentScannerStorage;
+import com.Bluefix.Prodosia.Data.DataHandler.LocalStorageHandler;
+import com.Bluefix.Prodosia.Data.DataHandler.TrackerHandler;
+import com.Bluefix.Prodosia.Data.DataType.Tracker.Tracker;
+import com.Bluefix.Prodosia.Data.DataType.Tracker.TrackerBookmark;
+import com.Bluefix.Prodosia.Data.DataType.Tracker.TrackerPermissions;
 import com.github.kskelm.baringo.util.BaringoApiException;
 import org.junit.After;
 import org.junit.Assert;

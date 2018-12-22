@@ -22,6 +22,8 @@
 
 package com.Bluefix.Prodosia.DataHandler;
 
+import com.Bluefix.Prodosia.Data.DataHandler.CommentDeletionStorage;
+import com.Bluefix.Prodosia.Data.DataHandler.LocalStorageHandler;
 import org.junit.After;
 import org.junit.Before;
 

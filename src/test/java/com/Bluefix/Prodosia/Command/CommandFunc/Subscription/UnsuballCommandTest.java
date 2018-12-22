@@ -22,17 +22,18 @@
 
 package com.Bluefix.Prodosia.Command.CommandFunc.Subscription;
 
-import com.Bluefix.Prodosia.Command.CommandFunc.ICommandFunc;
-import com.Bluefix.Prodosia.DataHandler.TaglistHandler;
-import com.Bluefix.Prodosia.DataHandler.UserHandler;
-import com.Bluefix.Prodosia.DataType.Command.CommandInformation;
-import com.Bluefix.Prodosia.DataType.Command.ImgurCommandInformation;
-import com.Bluefix.Prodosia.DataType.Taglist.Rating;
-import com.Bluefix.Prodosia.DataType.Taglist.Taglist;
-import com.Bluefix.Prodosia.DataType.Tracker.Tracker;
-import com.Bluefix.Prodosia.DataType.User.User;
-import com.Bluefix.Prodosia.DataType.User.UserSubscription;
-import com.Bluefix.Prodosia.Imgur.ImgurApi.ImgurManager;
+import com.Bluefix.Prodosia.Business.Command.CommandFunc.ICommandFunc;
+import com.Bluefix.Prodosia.Business.Command.CommandFunc.Subscription.UnsuballCommand;
+import com.Bluefix.Prodosia.Data.DataHandler.TaglistHandler;
+import com.Bluefix.Prodosia.Data.DataHandler.UserHandler;
+import com.Bluefix.Prodosia.Data.DataType.Command.CommandInformation;
+import com.Bluefix.Prodosia.Data.DataType.Command.ImgurCommandInformation;
+import com.Bluefix.Prodosia.Data.DataType.Taglist.Rating;
+import com.Bluefix.Prodosia.Data.DataType.Taglist.Taglist;
+import com.Bluefix.Prodosia.Data.DataType.Tracker.Tracker;
+import com.Bluefix.Prodosia.Data.DataType.User.User;
+import com.Bluefix.Prodosia.Data.DataType.User.UserSubscription;
+import com.Bluefix.Prodosia.Business.Imgur.ImgurApi.ImgurManager;
 import com.github.kskelm.baringo.BaringoClient;
 import com.github.kskelm.baringo.GalleryService;
 import com.github.kskelm.baringo.model.Account;
@@ -48,7 +49,6 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 
-import static org.junit.Assert.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 

@@ -22,7 +22,9 @@
 
 package com.Bluefix.Prodosia.DataHandler;
 
-import com.Bluefix.Prodosia.Prefix.CommandPrefix;
+import com.Bluefix.Prodosia.Data.DataHandler.CommandPrefixStorage;
+import com.Bluefix.Prodosia.Data.DataHandler.LocalStorageHandler;
+import com.Bluefix.Prodosia.Business.Prefix.CommandPrefix;
 import com.github.kskelm.baringo.util.BaringoApiException;
 import org.junit.After;
 import org.junit.Assert;

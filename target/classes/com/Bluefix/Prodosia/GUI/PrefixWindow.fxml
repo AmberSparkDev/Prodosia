@@ -24,7 +24,7 @@
 
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.AnchorPane?>
-<AnchorPane minWidth="520.0" prefHeight="480.0" prefWidth="640.0" stylesheets="@stylesheet.css" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.Bluefix.Prodosia.GUI.Prefix.PrefixWindow">
+<AnchorPane minWidth="520.0" prefHeight="480.0" prefWidth="640.0" stylesheets="@stylesheet.css" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.Bluefix.Prodosia.Presentation.Prefix.PrefixWindow">
    <children>
       <Label layoutX="15.0" layoutY="14.0" text="Main Menu &gt; " />
       <Button layoutX="14.0" layoutY="42.0" mnemonicParsing="false" onAction="#accept" prefHeight="40.0" prefWidth="120.0" text="Accept" />

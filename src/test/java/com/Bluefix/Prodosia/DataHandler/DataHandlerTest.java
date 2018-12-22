@@ -23,6 +23,7 @@
 package com.Bluefix.Prodosia.DataHandler;
 
 
+import com.Bluefix.Prodosia.Data.DataHandler.LocalStorageHandler;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;

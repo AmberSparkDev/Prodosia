@@ -22,15 +22,16 @@
 
 package com.Bluefix.Prodosia.Command.CommandFunc.Subscription;
 
-import com.Bluefix.Prodosia.Command.CommandFunc.ICommandFunc;
-import com.Bluefix.Prodosia.DataHandler.TaglistHandler;
-import com.Bluefix.Prodosia.DataHandler.UserHandler;
-import com.Bluefix.Prodosia.DataType.Command.CommandInformation;
-import com.Bluefix.Prodosia.DataType.Taglist.Rating;
-import com.Bluefix.Prodosia.DataType.Taglist.Taglist;
-import com.Bluefix.Prodosia.DataType.Tracker.Tracker;
-import com.Bluefix.Prodosia.DataType.User.User;
-import com.Bluefix.Prodosia.DataType.User.UserSubscription;
+import com.Bluefix.Prodosia.Business.Command.CommandFunc.ICommandFunc;
+import com.Bluefix.Prodosia.Business.Command.CommandFunc.Subscription.UnsubCommand;
+import com.Bluefix.Prodosia.Data.DataHandler.TaglistHandler;
+import com.Bluefix.Prodosia.Data.DataHandler.UserHandler;
+import com.Bluefix.Prodosia.Data.DataType.Command.CommandInformation;
+import com.Bluefix.Prodosia.Data.DataType.Taglist.Rating;
+import com.Bluefix.Prodosia.Data.DataType.Taglist.Taglist;
+import com.Bluefix.Prodosia.Data.DataType.Tracker.Tracker;
+import com.Bluefix.Prodosia.Data.DataType.User.User;
+import com.Bluefix.Prodosia.Data.DataType.User.UserSubscription;
 import org.junit.*;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;

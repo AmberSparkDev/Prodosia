@@ -22,8 +22,9 @@
 
 package com.Bluefix.Prodosia.Command;
 
-import com.Bluefix.Prodosia.DataType.Command.CommandInformation;
-import com.Bluefix.Prodosia.DataType.Tracker.Tracker;
+import com.Bluefix.Prodosia.Business.Command.CommandHandler;
+import com.Bluefix.Prodosia.Data.DataType.Command.CommandInformation;
+import com.Bluefix.Prodosia.Data.DataType.Tracker.Tracker;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;

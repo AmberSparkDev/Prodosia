@@ -22,6 +22,7 @@
 
 package com.Bluefix.Prodosia.DataType.User;
 
+import com.Bluefix.Prodosia.Data.DataType.User.Filter;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -29,7 +30,6 @@ import org.junit.Test;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.regex.Pattern;
 
 public class FilterTest
 {

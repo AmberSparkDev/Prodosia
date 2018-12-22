@@ -22,9 +22,12 @@
 
 package com.Bluefix.Prodosia.DataHandler;
 
-import com.Bluefix.Prodosia.DataType.Comments.TagRequest.TagRequest;
-import com.Bluefix.Prodosia.DataType.Taglist.Rating;
-import com.Bluefix.Prodosia.DataType.Taglist.Taglist;
+import com.Bluefix.Prodosia.Data.DataHandler.LocalStorageHandler;
+import com.Bluefix.Prodosia.Data.DataHandler.TagRequestStorage;
+import com.Bluefix.Prodosia.Data.DataHandler.TaglistHandler;
+import com.Bluefix.Prodosia.Data.DataType.Comments.TagRequest.TagRequest;
+import com.Bluefix.Prodosia.Data.DataType.Taglist.Rating;
+import com.Bluefix.Prodosia.Data.DataType.Taglist.Taglist;
 import com.github.kskelm.baringo.util.BaringoApiException;
 import org.junit.After;
 import org.junit.Assert;
@@ -35,7 +38,6 @@ import javax.security.auth.login.LoginException;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.HashSet;
 
 public class TagRequestStorageTest extends DataHandlerTest<TagRequest>
