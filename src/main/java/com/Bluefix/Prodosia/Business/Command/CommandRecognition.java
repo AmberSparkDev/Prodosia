@@ -22,9 +22,9 @@
 
 package com.Bluefix.Prodosia.Business.Command;
 
+import com.Bluefix.Prodosia.Business.Logger.ApplicationWindowLogger;
 import com.Bluefix.Prodosia.Data.DataHandler.CommandPrefixStorage;
 import com.Bluefix.Prodosia.Data.DataType.Command.CommandInformation;
-import com.Bluefix.Prodosia.Business.Logger.Logger;
 import com.Bluefix.Prodosia.Business.Prefix.CommandPrefix;
 
 /**
@@ -57,13 +57,13 @@ public class CommandRecognition
             // if the command prefix wasn't set, simply ignore
             if (cPref == null)
             {
-                Logger.logMessage("### There was no prefix info for " + type.toString() + "!", Logger.Severity.WARNING);
+                ApplicationWindowLogger.logMessage("### There was no prefix info for " + type.toString() + "!", ApplicationWindowLogger.Severity.WARNING);
                 return;
             }
         } catch (Exception e)
         {
             e.printStackTrace();
-            Logger.logMessage("CommandRecognition::0parseComments -> " + e.getMessage(), Logger.Severity.ERROR);
+            ApplicationWindowLogger.logMessage("CommandRecognition::0parseComments -> " + e.getMessage(), ApplicationWindowLogger.Severity.ERROR);
             return;
         }
         // attempt to execute the entry
@@ -83,7 +83,7 @@ public class CommandRecognition
         catch (Exception e)
         {System.out.println("8");
             e.printStackTrace();
-            Logger.logMessage("CommandRecognition::1parseComments -> " + e.getMessage(), Logger.Severity.ERROR);
+            ApplicationWindowLogger.logMessage("CommandRecognition::1parseComments -> " + e.getMessage(), ApplicationWindowLogger.Severity.ERROR);
         }
     }
 }

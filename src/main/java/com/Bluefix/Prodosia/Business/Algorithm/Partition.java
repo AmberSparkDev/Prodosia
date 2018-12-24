@@ -44,13 +44,17 @@ public class Partition
         LengthStruct ls = new LengthStruct(entries);
 
         // spread the known lengths into partitions.
-        LinkedList<ArrayList<Integer>> partitionSplit = splitEntriesByLength(ls.length, maxLength);
+        LinkedList<ArrayList<Integer>> partitionSplit = splitEntriesByLength(ls.getLength(), maxLength);
 
         // reconstruct the string partitions and return.
-        return reconstructStringPartition(partitionSplit, ls.lengthMap);
+        return reconstructStringPartition(partitionSplit, ls.getLengthMap());
     }
 
-    
+
+    /**
+     * Maintain a collection with all the available lengths and the
+     * mapping for said length to a collection of strings.
+     */
     private static class LengthStruct
     {
         private ArrayList<Integer> length;

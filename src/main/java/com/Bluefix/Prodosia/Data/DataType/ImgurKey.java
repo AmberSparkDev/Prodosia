@@ -86,7 +86,6 @@ public class ImgurKey
     @Override
     public int hashCode()
     {
-
         return Objects.hash(clientId, clientSecret, callback);
     }
 }

@@ -24,6 +24,7 @@ package com.Bluefix.Prodosia.Business.Module;
 
 import com.Bluefix.Prodosia.Business.Imgur.CommentDeletion.CommentDeletionExecution;
 import com.Bluefix.Prodosia.Business.Imgur.CommentScanner.CommentScannerExecution;
+import com.Bluefix.Prodosia.Business.Imgur.ImgurApi.IImgurManager;
 import com.Bluefix.Prodosia.Business.Imgur.Tagging.CommentExecution;
 import com.Bluefix.Prodosia.Business.Imgur.UserSanitation.UserSanitationModule;
 
@@ -32,6 +33,18 @@ import com.Bluefix.Prodosia.Business.Imgur.UserSanitation.UserSanitationModule;
  */
 public class ModuleManager
 {
+    private IImgurManager _imgurManager;
+
+    public ModuleManager(IImgurManager imgurManager)
+    {
+        // store the dependencies
+        _imgurManager = imgurManager;
+
+        imgurDepen
+    }
+
+
+
     //region Variables, Constructor and Singleton
 
     private CommentDeletionExecution commentDeletionExecution;

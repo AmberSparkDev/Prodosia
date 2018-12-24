@@ -28,15 +28,26 @@ import java.util.ArrayList;
 /**
  * Storage class for an imgur account.
  */
-public abstract class CookieStorage
+public class CookieStorage implements ICookieStorage
 {
-    private static final String filename = "cookie.txt";
+    private String _cookieName;
+    private static final String fileExtension = ".txt";
     private static final String tokenName = "REFRESH";
 
 
-    private static String getFilePath()
+    public CookieStorage(String cookieName)
     {
-        return System.getProperty("user.dir") + "/" + filename;
+        _cookieName = cookieName;
+    }
+
+
+    /**
+     * Cookie storage uses the directory that the user runs the application from.
+     * @return The full path to the cookie file.
+     */
+    private String getFilePath()
+    {
+        return System.getProperty("user.dir") + "/" + _cookieName + fileExtension;
     }
 
 
@@ -44,7 +55,7 @@ public abstract class CookieStorage
      * Retrieves the refresh-token if it exists.
      * @return The refresh-token if it exists, or null otherwise
      */
-    public static String getRefreshToken() throws IOException
+    public String getRefreshToken()
     {
         ArrayList<DataStorage.Item> items = DataStorage.readItems(getFilePath());
 
@@ -66,7 +77,7 @@ public abstract class CookieStorage
     /**
      * Set the refresh token.
      */
-    public static void setRefreshToken(String token) throws IOException
+    public void setRefreshToken(String token) throws IOException
     {
         // if the refresh token was null, delete the cookie file.
         if (token == null)

@@ -23,22 +23,25 @@
 package com.Bluefix.Prodosia.Business.Imgur.ImgurApi;
 
 
+import com.Bluefix.Prodosia.Business.Authorization.IAuthorization;
 import com.Bluefix.Prodosia.Business.Authorization.ImgurAuthorization;
-import com.Bluefix.Prodosia.Data.DataType.ImgurKey;
 import com.Bluefix.Prodosia.Business.Exception.ExceptionHelper;
 import com.Bluefix.Prodosia.Business.Module.ModuleManager;
-import com.Bluefix.Prodosia.Data.Storage.KeyStorage;
+import com.Bluefix.Prodosia.Data.DataType.ImgurKey;
+import com.Bluefix.Prodosia.Data.Enum.AuthorizationResult;
+import com.Bluefix.Prodosia.Data.Logger.ILogger;
+import com.Bluefix.Prodosia.Data.Storage.ICookieStorage;
+import com.Bluefix.Prodosia.Data.Storage.IKeyStorage;
 import com.github.kskelm.baringo.BaringoClient;
-import com.github.kskelm.baringo.util.BaringoApiException;
+import com.microsoft.alm.oauth2.useragent.AuthorizationException;
 
-import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 
 /**
  * Manager for the imgur api.
  */
-public class ImgurManager
+public class ImgurManager implements IImgurManager
 {
     public static final String EnvVarImgurClientId = "ENV_IMGUR_CLIENT_ID";
     public static final String EnvVarImgurClientSecret = "ENV_IMGUR_CLIENT_SECRET";
@@ -46,130 +49,240 @@ public class ImgurManager
 
     public static final String DefaultImgurCallback = "https://imgur.com";
 
-    //region Singleton
+    private IKeyStorage _keyStorage;
+    private ICookieStorage _cookieStorage;
+    private ILogger _logger;
+    private ILogger _appLogger;
 
-    private static BaringoClient client;
+
+    private String _clientId;
+    private String _clientSecret;
+    private String _callback;
+
+    private BaringoClient _client;
+
 
     /**
-     * Retrieve the Imgur Api client that allows access to the underlying API.
-     * @return The Imgur API client.
-     * @throws IOException Exception reading/writing cookies. Non-essential, but good to know anyways.
-     * @throws BaringoApiException Baringo framework exception.
-     * @throws URISyntaxException Might pertain to an incompatibility with the imgur API.
+     * Initialize the Imgur Manager based on stored credentials.
+     * <p>
+     * At first this will check for the following environment variables:
+     * - ENV_IMGUR_CLIENT_ID
+     * - ENV_IMGUR_CLIENT_SECRET
+     * - ENV_IMGUR_CALLBACK
+     * <p>
+     * Afterwards this will check for a stored Imgur Key
+     *
+     * @throws IllegalArgumentException if no environment variables or stored imgur key credentials could be found.
      */
-    public static BaringoClient client() throws IOException, BaringoApiException, URISyntaxException
+    public ImgurManager(
+            IKeyStorage keystorage,
+            ICookieStorage cookieStorage,
+            ILogger logger,
+            ILogger appLogger) throws URISyntaxException, AuthorizationException
     {
-        if (client == null)
+        // store dependencies
+        _keyStorage = keystorage;
+        _cookieStorage = cookieStorage;
+        _logger = logger;
+        _appLogger = appLogger;
+
+        // first check if there are environment variables for this.
+        String envClientId = System.getenv(EnvVarImgurClientId);
+        String envClientSecret = System.getenv(EnvVarImgurClientSecret);
+        String envCallback = System.getenv(EnvVarImgurCallback);
+
+        if (envClientId != null && envClientSecret != null)
         {
-            // first check if there are environment variables for this.
-            String envClientId = System.getenv(EnvVarImgurClientId);
-            String envClientSecret = System.getenv(EnvVarImgurClientSecret);
-            String envCallback = System.getenv(EnvVarImgurCallback);
+            _clientId = envClientId;
+            _clientSecret = envClientSecret;
 
-            ImgurKey key;
-
-            if (envClientId != null && envClientSecret != null)
-            {
-                if (envCallback == null)
-                    envCallback = DefaultImgurCallback;
-
-                key = new ImgurKey(envClientId, envClientSecret, envCallback);
-                ImgurManager.client = createClient(key);
-                return ImgurManager.client;
-            }
-
-
-            key = KeyStorage.getImgurKey();
-
-            BaringoClient tmpClient = createClient(key);
-            initializeClient(tmpClient);
+            _callback = envCallback == null
+                    ? DefaultImgurCallback
+                    : envCallback;
         }
 
-        return client;
+        // if the credentials could not be found in the environment variables,
+        // check the keystorage.
+        if (_keyStorage != null && _clientId == null && _clientSecret == null && _callback == null)
+        {
+            try
+            {
+                ImgurKey ik = _keyStorage.getImgurKey();
+
+                _clientId = ik.getClientId();
+                _clientSecret = ik.getClientSecret();
+                _callback = ik.getCallback();
+
+                if (_callback == null || _callback.trim().isEmpty())
+                    _callback = DefaultImgurCallback;
+
+            } catch (Exception e)
+            {
+                if (_logger != null)
+                    _logger.warn("Exception while attempting to fetch the imgur key.\r\n" + e.getMessage());
+            }
+        }
+
+        // initialize the manager.
+        initialize();
     }
 
     /**
-     * Explicitly set the client.
-     * @param client
+     * Initialize the Imgur Manager with the supplied credentials.
+     *
+     * @param clientId     The client-id for the Imgur API
+     * @param clientSecret The client-secret for the Imgur API
+     * @param callback     The optional callback for the Imgur API
      */
-    public static void setClient(BaringoClient client)
+    public ImgurManager(String clientId,
+                        String clientSecret,
+                        String callback,
+                        IKeyStorage keystorage,
+                        ICookieStorage cookieStorage,
+                        ILogger logger,
+                        ILogger appLogger) throws URISyntaxException, AuthorizationException
     {
-        ImgurManager.client = client;
+        // store dependencies
+        _keyStorage = keystorage;
+        _cookieStorage = cookieStorage;
+        _logger = logger;
+        _appLogger = appLogger;
+
+        // set credentials
+        _clientId = clientId;
+        _clientSecret = clientSecret;
+        _callback = callback;
+
+        // initialize the manager.
+        initialize();
+    }
+
+
+    /**
+     * Set the credentials for the manager. This will invalidate the cookie and prompt user authorization.
+     * @param clientId     The client-id for the Imgur API
+     * @param clientSecret The client-secret for the Imgur API
+     * @param callback     The optional callback for the Imgur API
+     */
+    @Override
+    public void setCredentials(String clientId, String clientSecret, String callback) throws URISyntaxException, AuthorizationException
+    {
+        _clientId = clientId;
+        _clientSecret = clientSecret;
+        _callback = callback;
+
+        _client = null;
+
+        // attempt to remove the stored cookie.
+        try
+        {
+            _cookieStorage.setRefreshToken(null);
+        } catch (Exception e)
+        {
+            if (_logger != null)
+                _logger.warn("[ImgurManager] Exception while resetting the cookie.\r\n" + e.getMessage());
+        }
+
+        // initialize the new client
+        initialize();
     }
 
 
 
-
-    private static BaringoClient createClient(ImgurKey key) throws IOException, BaringoApiException, URISyntaxException
+    private void initialize() throws URISyntaxException, AuthorizationException
     {
-        // get the api key credentials.
-        if (key == null)
-            return null;
+        createClient();
+        initializeClient();
+    }
 
-        BaringoClient bClient = null;
+
+    private void createClient()
+    {
+        if (_clientId == null || _clientSecret == null)
+        {
+            if (_logger != null)
+                _logger.warn("Attempt to create Baringo client without proper credentials.\r\n" +
+                        "client id: " + _clientId + "\r\n" +
+                        "client secret: " + _clientSecret);
+
+            throw new IllegalArgumentException("Cannot instantiate the client without credentials.");
+        }
 
         try
         {
-            bClient = new BaringoClient.Builder()
-                    .clientAuth(key.getClientId(), key.getClientSecret())
+            _client = new BaringoClient.Builder()
+                    .clientAuth(_clientId, _clientSecret)
                     .build();
         } catch (Exception e)
         {
+            if (_logger != null)
+                _logger.error("[ImgurManager] Exception thrown while attempting to create the Baringo Client\r\n" + e.getMessage());
+
             ExceptionHelper.showWarning(e);
         }
-
-
-        return bClient;
     }
 
-    private static void initializeClient(BaringoClient client) throws IOException, URISyntaxException
+    private void initializeClient() throws URISyntaxException, AuthorizationException
     {
-        if (client == null)
-            return;
+        // create a new Authorization object
+        IAuthorization authorization = new ImgurAuthorization(
+                _client,
+                new URI(_callback),
+                _cookieStorage,
+                _logger,
+                _appLogger);
 
-        // immediately authorize the client if the key was stored locally.
-        // note: for anonymous usage it is not necessary to authorize. However,
-        // heavy use of authorized api access it expected and immediate authorization
-        // determines when the user is prompted, so it can be done on startup.
-        ImgurAuthorization.Result res = ImgurAuthorization.authorize(client, new URI(KeyStorage.getImgurKey().getCallback()));
+        // authorize the user.
+        AuthorizationResult res = authorization.authorize();
 
-        // if the authorization doesn't complete successfully, redirect
-        // the user to the Imgur API keys window and don't remove client
-        // initialization.
-        if (res == ImgurAuthorization.Result.SUCCESS)
+        // throw an AuthorizationException if the user could not be authorized properly.
+        if (res != AuthorizationResult.SUCCESS)
         {
-            ImgurManager.client = client;
-        }
-        else
-        {
-            ImgurManager.client = null;
+            _client = null;
+
+            if (_logger != null)
+                _logger.warn("[ImgurManager] Failed to authorize user.");
+
+            throw new AuthorizationException("User authorization failed.");
         }
     }
-
-    //endregion
-
-    //region Sanitation check
 
 
     /**
-     * Prompts the Client to re-init
+     * @return the Baringo Client maintained by the manager.
      */
-    public static void update() throws IOException, URISyntaxException, BaringoApiException
+    @Override
+    public BaringoClient getClient()
     {
-        boolean clientWasInitialized = client != null;
-
-        ImgurKey key = KeyStorage.getImgurKey();
-
-        BaringoClient tmpClient = createClient(key);
-
-        initializeClient(tmpClient);
-
-        // if the client itself wasn't initialized yet, start the imgur dependencies.
-        if (!clientWasInitialized && client != null)
-            ModuleManager.startImgurDependencies();
+        return _client;
     }
 
-    //endregion
+    /**
+     * @return the key storage used by the manager.
+     */
+    @Override
+    public IKeyStorage getKeyStorage()
+    {
+        return _keyStorage;
+    }
 
+
+        /**
+         * Prompts the Client to re-init
+         */
+        public void update() throws IOException, URISyntaxException, BaringoApiException
+        {
+            boolean clientWasInitialized = client != null;
+
+            ImgurKey key = KeyStorage.getImgurKey();
+
+            BaringoClient tmpClient = createClient(key);
+
+            initializeClient(tmpClient);
+
+            // if the client itself wasn't initialized yet, start the imgur dependencies.
+            if (!clientWasInitialized && client != null)
+                ModuleManager.startImgurDependencies();
+        }
 
 }

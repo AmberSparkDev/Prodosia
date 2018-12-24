@@ -22,9 +22,12 @@
 
 package com.Bluefix.Prodosia.Presentation.ApiKeys;
 
+import com.Bluefix.Prodosia.Business.ApiKeys.Imgur.ImgurApiKeys;
+import com.Bluefix.Prodosia.Business.Imgur.ImgurApi.IImgurManager;
 import com.Bluefix.Prodosia.Data.DataType.ImgurKey;
 import com.Bluefix.Prodosia.Business.Discord.DiscordManager;
 import com.Bluefix.Prodosia.Business.Exception.ExceptionHelper;
+import com.Bluefix.Prodosia.Data.Logger.ILogger;
 import com.Bluefix.Prodosia.Presentation.Navigation.VistaNavigator;
 import com.Bluefix.Prodosia.Business.Imgur.ImgurApi.ImgurManager;
 import com.Bluefix.Prodosia.Business.Module.ModuleManager;
@@ -50,6 +53,24 @@ public class ApiKeysWindow
     @FXML public TextField tf_discordToken;
     @FXML public CheckBox chk_callback;
 
+    private IImgurManager _imgurManager;
+    private ILogger _logger;
+    private ILogger _appLogger;
+
+
+    public ApiKeysWindow(IImgurManager imgurManager,
+                         ILogger logger,
+                         ILogger appLogger)
+    {
+        // store the dependencies.
+        _imgurManager = imgurManager;
+        _logger = logger;
+        _appLogger = appLogger;
+    }
+
+
+
+
     /**
      * Initialize the values of the UI window based on
      * what is available in the KeyStorage.
@@ -60,7 +81,7 @@ public class ApiKeysWindow
         // setup imgur credentials
         try
         {
-            ImgurKey ik = KeyStorage.getImgurKey();
+            ImgurKey ik = _imgurManager.getKeyStorage().getImgurKey();
 
             if (ik == null)
             {
@@ -88,8 +109,11 @@ public class ApiKeysWindow
                 }
             }
 
-        } catch (IOException e)
+        } catch (Exception e)
         {
+            if (_logger != null)
+                _logger.warn("[ApiKeysWindow] Exception while attempting to initialize the imgur key.\r\n" + e.getMessage());
+
             tf_imgClientId.setText("");
             tf_imgClientSecret.setText("");
             tf_imgCallback.setText("");
@@ -238,14 +262,10 @@ public class ApiKeysWindow
 
         if (!acceptImgurKey.equals(curKey))
         {
-            CookieStorage.setRefreshToken(null);
-
-            KeyStorage.setImgurKey(
+            ImgurApiKeys.update(
                     acceptImgurKey.getClientId(),
                     acceptImgurKey.getClientSecret(),
                     acceptImgurKey.getCallback());
-
-            ImgurManager.update();
         }
 
         // always make sure that the services that rely on imgur are started.

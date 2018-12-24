@@ -22,11 +22,11 @@
 
 package com.Bluefix.Prodosia.Business.Discord.Archive;
 
+import com.Bluefix.Prodosia.Business.Logger.ApplicationWindowLogger;
 import com.Bluefix.Prodosia.Data.DataHandler.ArchiveHandler;
 import com.Bluefix.Prodosia.Data.DataType.Archive.Archive;
 import com.Bluefix.Prodosia.Data.DataType.Comments.TagRequest.TagRequest;
 import com.Bluefix.Prodosia.Business.Discord.DiscordManager;
-import com.Bluefix.Prodosia.Business.Logger.Logger;
 import com.github.kskelm.baringo.util.BaringoApiException;
 import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.MessageHistory;
@@ -175,21 +175,21 @@ public class ArchiveManager
 
             } catch (IOException e1)
             {
-                Logger.logMessage(e1.getMessage(), Logger.Severity.ERROR);
+                ApplicationWindowLogger.logMessage(e1.getMessage(), ApplicationWindowLogger.Severity.ERROR);
 
                 e1.printStackTrace();
             } catch (BaringoApiException e1)
             {
-                Logger.logMessage(e1.getMessage(), Logger.Severity.ERROR);
+                ApplicationWindowLogger.logMessage(e1.getMessage(), ApplicationWindowLogger.Severity.ERROR);
                 e1.printStackTrace();
             } catch (URISyntaxException e1)
             {
-                Logger.logMessage(e1.getMessage(), Logger.Severity.ERROR);
+                ApplicationWindowLogger.logMessage(e1.getMessage(), ApplicationWindowLogger.Severity.ERROR);
                 e1.printStackTrace();
             }
             catch (Exception ex)
             {
-                Logger.logMessage(ex.getMessage(), Logger.Severity.ERROR);
+                ApplicationWindowLogger.logMessage(ex.getMessage(), ApplicationWindowLogger.Severity.ERROR);
                 ex.printStackTrace();
             }
         }

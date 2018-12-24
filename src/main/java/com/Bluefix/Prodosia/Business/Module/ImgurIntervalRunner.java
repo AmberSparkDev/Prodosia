@@ -22,27 +22,28 @@
 
 package com.Bluefix.Prodosia.Business.Module;
 
-import com.Bluefix.Prodosia.Business.Logger.Logger;
+import com.Bluefix.Prodosia.Business.Logger.ApplicationWindowLogger;
+import com.Bluefix.Prodosia.Data.Logger.ILogger;
 
 /**
  * This class allows for a subclass to be run in a periodic interval.
- *
+ * <p>
  * The class takes into account the maximum amount of GET requests that can
  * be executed and runs the underlying module according to these limitations.
- *
+ * <p>
  * Keep in mind that there is no perfect guarantee that the module will remain
  * within the maximum request limit. It is possible that some of the unused requests
  * during one hour are transferred to the next hour. This will have effect on the
  * hourly limit but not on the daily limit. The smaller the difference between the maximum
  * amount of requests and the average requests per cycle, the higher this fluctuation shall be.
  * As such, it is recommended to create more smaller cycles.
- *
+ * <p>
  * The disadvantage about more, smaller cycles means that if a user only keeps the application open
  * for a short amount of time, The Imgur API isn't optimally used.
- *
+ * <p>
  * Recommendation is to create cycles of about 1/6th of the GET requests, so that it runs every 10 minutes.
  */
-public abstract class ImgurIntervalRunner implements AutoCloseable
+public abstract class ImgurIntervalRunner implements IModule, AutoCloseable
 {
     //region Constructor
 
@@ -50,9 +51,20 @@ public abstract class ImgurIntervalRunner implements AutoCloseable
      * The maximum amount of GET requests allowed per reset.
      */
     private int maximumRequests;
+    private Worker worker;
+
+    //endregion
+
+    //region Runner Control
+    /**
+     * Indicates whether the runner is currently active.
+     */
+    private boolean isRunning;
+    private long expectedCycle;
 
     /**
      * Instantiate a new intervalrunner-like object.
+     *
      * @param maximumRequests The maximum amount of GET requests allowed per reset.
      */
     protected ImgurIntervalRunner(int maximumRequests)
@@ -63,22 +75,10 @@ public abstract class ImgurIntervalRunner implements AutoCloseable
         this.expectedCycle = -1;
     }
 
-    //endregion
-
-    //region Runner Control
-
-    private Worker worker;
-
-    /**
-     * Indicates whether the runner is currently active.
-     */
-    private boolean isRunning;
-
-    private long expectedCycle;
-
     /**
      * Start the runner. This will initiate periodic running of the module.
      */
+    @Override
     public synchronized void start()
     {
         isRunning = true;
@@ -94,6 +94,7 @@ public abstract class ImgurIntervalRunner implements AutoCloseable
     /**
      * Stop the runner. This will pause periodic running but will not interrupt a current cycle.
      */
+    @Override
     public synchronized void stop()
     {
         // store the expected cycle to start at.
@@ -116,6 +117,7 @@ public abstract class ImgurIntervalRunner implements AutoCloseable
 
     /**
      * Indicate the total amount of GET requests that were executed during the last cycle
+     *
      * @return The maximum amount of GET requests.
      */
     protected abstract int projectedRequests();
@@ -124,13 +126,26 @@ public abstract class ImgurIntervalRunner implements AutoCloseable
 
     //region Threaded runner logic
 
+    @Override
+    public void close()
+    {
+        this.stop();
+    }
+
+    //endregion
+
+    //region IntervalRunner Exception
+
     /**
      * The Worker class where the actual logic takes place.
-     *
+     * <p>
      * The functionality inside this class is multi-threaded.
      */
     private static class Worker extends Thread
     {
+        private ILogger _logger;
+        private ILogger _appLogger;
+
         //region Variables
 
         /**
@@ -161,14 +176,23 @@ public abstract class ImgurIntervalRunner implements AutoCloseable
 
         /**
          * Create a new Worker object based around the specified runner.
-         *
+         * <p>
          * The worker will start executing code when its expected cycle time has
          * been reached.
-         * @param runner The runner behind the worker.
+         *
+         * @param runner        The runner behind the worker.
          * @param expectedCycle The expected epoch-time in milliseconds when the thread should start.
          */
-        public Worker(ImgurIntervalRunner runner, long expectedCycle)
+        public Worker(
+                ImgurIntervalRunner runner,
+                long expectedCycle,
+                ILogger logger,
+                ILogger appLogger)
         {
+            // store the dependencies.
+            _logger = logger;
+            _appLogger = appLogger;
+
             this.runner = runner;
             this.expectedCycle = expectedCycle;
             this.previousProjection = -1;
@@ -176,7 +200,6 @@ public abstract class ImgurIntervalRunner implements AutoCloseable
         }
 
         //endregion
-
 
 
         /**
@@ -193,10 +216,9 @@ public abstract class ImgurIntervalRunner implements AutoCloseable
                 try
                 {
                     Thread.sleep(diff);
-                }
-                catch (InterruptedException e)
+                } catch (InterruptedException e)
                 {
-
+                    // any exception here is probably caused by the OS and not our concern. 
                 }
             }
 
@@ -206,13 +228,18 @@ public abstract class ImgurIntervalRunner implements AutoCloseable
                 try
                 {
                     runLogic();
-                }
-                catch (IntervalRunnerException e)
+                } catch (IntervalRunnerException e)
                 {
-                    Logger.logMessage(e.getMessage(), Logger.Severity.ERROR);
+                    if (_logger != null)
+                        _logger.error("[ImgurIntervalRunner::Worker] IntervalRunnerException thrown during execution.\r\n" + e.getMessage());
                 } catch (InterruptedException e)
                 {
-                    Logger.logMessage(e.getMessage(), Logger.Severity.ERROR);
+                    if (_logger != null)
+                        _logger.warn("[ImgurIntervalRunner::Worker] InterruptedException thrown during execution.\r\n" + e.getMessage());
+                } catch (Exception e)
+                {
+                    if (_logger != null)
+                        _logger.error("[ImgurIntervalRunner::Worker] Exception thrown during execution.\r\n" + e.getMessage());
                 }
             }
         }
@@ -246,7 +273,6 @@ public abstract class ImgurIntervalRunner implements AutoCloseable
             previousProjection = requests;
 
 
-
             // Execute the logic of the underlying module
             runner.run();
 
@@ -263,6 +289,7 @@ public abstract class ImgurIntervalRunner implements AutoCloseable
 
         /**
          * Retrieve the amount of time that should be waited before resuming
+         *
          * @param requests The amount of requests that are added.
          * @return The amount of milliseconds that should be padded between cycles.
          */
@@ -272,19 +299,7 @@ public abstract class ImgurIntervalRunner implements AutoCloseable
             long hourMillis = 60 * 60 * 1000;
 
             // use the requests as a portion of the hour to indicate how much sleep is necessary.
-            return (long)Math.ceil(hourMillis * (requests / (double)runner.maximumRequests));
-        }
-    }
-
-    //endregion
-
-    //region IntervalRunner Exception
-
-    public static class IntervalRunnerException extends Exception
-    {
-        public IntervalRunnerException(String exception)
-        {
-            super(exception);
+            return (long) Math.ceil(hourMillis * (requests / (double) runner.maximumRequests));
         }
     }
 
@@ -292,10 +307,12 @@ public abstract class ImgurIntervalRunner implements AutoCloseable
 
     //region Autocloseable implementation
 
-    @Override
-    public void close()
+    public static class IntervalRunnerException extends Exception
     {
-        this.stop();
+        public IntervalRunnerException(String exception)
+        {
+            super(exception);
+        }
     }
 
 

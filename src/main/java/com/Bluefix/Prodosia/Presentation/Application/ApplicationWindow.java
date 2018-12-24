@@ -23,6 +23,7 @@
 package com.Bluefix.Prodosia.Presentation.Application;
 
 import com.Bluefix.Prodosia.Business.Exception.ExceptionHelper;
+import com.Bluefix.Prodosia.Business.Logger.ApplicationWindowLogger;
 import com.Bluefix.Prodosia.Presentation.ApiKeys.ApiKeysWindow;
 import com.Bluefix.Prodosia.Presentation.Managers.ButtonListManager.TaglistListManager;
 import com.Bluefix.Prodosia.Presentation.Managers.ButtonListManager.TrackerListManager;
@@ -32,7 +33,6 @@ import com.Bluefix.Prodosia.Presentation.Prefix.PrefixWindow;
 import com.Bluefix.Prodosia.Presentation.Taglist.EditTaglistWindow;
 import com.Bluefix.Prodosia.Presentation.Tracker.EditTrackerWindow;
 import com.Bluefix.Prodosia.Presentation.User.EditUserWindow;
-import com.Bluefix.Prodosia.Business.Logger.Logger;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -103,7 +103,7 @@ public class ApplicationWindow
     private void initializeStatusWindow()
     {
         // set the output of the logger to the textarea
-        Logger.setupOutput(statusConsole);
+        ApplicationWindowLogger.setupOutput(statusConsole);
     }
 
     //endregion

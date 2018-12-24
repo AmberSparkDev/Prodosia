@@ -22,6 +22,7 @@
 
 package com.Bluefix.Prodosia.Data.DataType.Comments.TagRequest;
 
+import com.Bluefix.Prodosia.Business.Logger.ApplicationWindowLogger;
 import com.Bluefix.Prodosia.Data.DataHandler.CommentDeletionStorage;
 import com.Bluefix.Prodosia.Data.DataHandler.SimpleCommentRequestStorage;
 import com.Bluefix.Prodosia.Data.DataHandler.TagRequestStorage;
@@ -33,7 +34,6 @@ import com.Bluefix.Prodosia.Business.Exception.BaringoExceptionHelper;
 import com.Bluefix.Prodosia.Business.Imgur.CommentHelper;
 import com.Bluefix.Prodosia.Business.Imgur.ImgurApi.ImgurManager;
 import com.Bluefix.Prodosia.Business.Imgur.Tagging.TagRequestComments;
-import com.Bluefix.Prodosia.Business.Logger.Logger;
 import com.github.kskelm.baringo.model.Comment;
 import com.github.kskelm.baringo.util.BaringoApiException;
 
@@ -241,7 +241,7 @@ public class TagRequest extends BaseTagRequest implements ICommentRequest
                 delay = 0;
 
                 getParent();
-                Logger.logMessage("Starting tag on \"" + this.getImgurId() + "\"", Logger.Severity.INFORMATIONAL);
+                ApplicationWindowLogger.logMessage("Starting tag on \"" + this.getImgurId() + "\"");
             }
         }
         catch (BaringoApiException ex)
@@ -282,7 +282,7 @@ public class TagRequest extends BaseTagRequest implements ICommentRequest
                 }
 
                 // if the comments weren't empty, we will start the countdown. Notify the user.
-                Logger.logMessage("Postponing tag on \"" + getImgurId() + "\" for " + PostDelay + " minute" +
+                ApplicationWindowLogger.logMessage("Postponing tag on \"" + getImgurId() + "\" for " + PostDelay + " minute" +
                         (PostDelay == 1 ? "" : "s"));
             }
 
@@ -368,7 +368,7 @@ public class TagRequest extends BaseTagRequest implements ICommentRequest
             // if the parent has become invalid, delete this tag request.
             if (parentIsInvalid)
             {
-                Logger.logMessage("Parent-comment for post \"" + getImgurId() + "\" was deleted.", Logger.Severity.INFORMATIONAL);
+                ApplicationWindowLogger.logMessage("Parent-comment for post \"" + getImgurId() + "\" was deleted.");
                 TagRequestStorage.handler().remove(this);
                 isCompleted = true;
 
@@ -384,7 +384,7 @@ public class TagRequest extends BaseTagRequest implements ICommentRequest
             // if the post has become invalid or complete, delete this tag request.
             if (postIsInvalid)
             {
-                Logger.logMessage("Post \"" + getImgurId() + "\" was deleted.", Logger.Severity.INFORMATIONAL);
+                ApplicationWindowLogger.logMessage("Post \"" + getImgurId() + "\" was deleted.");
                 TagRequestStorage.handler().remove(this);
                 isCompleted = true;
                 return;
@@ -393,7 +393,7 @@ public class TagRequest extends BaseTagRequest implements ICommentRequest
             // if the post was complete, delete this tag request.
             if (postIsComplete)
             {
-                Logger.logMessage("Post \"" + getImgurId() + "\" successfully tagged.");
+                ApplicationWindowLogger.logMessage("Post \"" + getImgurId() + "\" successfully tagged.");
                 TagRequestStorage.handler().remove(this);
                 isCompleted = true;
 
@@ -435,7 +435,7 @@ public class TagRequest extends BaseTagRequest implements ICommentRequest
         {
             try
             {
-                Logger.logMessage("Post \"" + getImgurId() + "\" has timed out.", Logger.Severity.WARNING);
+                ApplicationWindowLogger.logMessage("Post \"" + getImgurId() + "\" has timed out.");
                 TagRequestStorage.handler().remove(this);
             } catch (IOException e)
             {

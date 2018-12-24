@@ -29,66 +29,151 @@ import java.util.ArrayList;
 
 /**
  * Manager for storing keys.
- *
+ * <p>
  * The keys are stored in plaintext.
  */
-public class KeyStorage
+public class KeyStorage implements IKeyStorage
 {
-    private static final String filename = "keys.txt";
+    /**
+     * Filepath for storage
+     */
+    private String _filepath;
 
     /**
      * The imgur key.
      */
-    private ImgurKey imgurKey;
+    private ImgurKey _imgurKey;
 
     /**
      * The discord bot token.
      */
-    private String discordToken;
+    private String _discordToken;
 
-    //region Singleton
-
-    private static KeyStorage me;
-
-    private static KeyStorage keyStorage() throws IOException
-    {
-        if (me == null)
-        {
-            me = readStorage();
-        }
-
-        return me;
-    }
-
-    //endregion
-
-    //region Constructor
 
     /**
-     * Empty constructor, meaning that no keys were provided yet.
+     * Create a new KeyStorage that will save into the specified file.
+     *
+     * @param filepath The path to the file that will hold the keys.
      */
-    private KeyStorage()
+    public KeyStorage(String filepath)
     {
-        this.imgurKey = null;
-        this.discordToken = null;
+        _filepath = filepath;
+
+        // todo: remove once no longer necessary.
+        _filepath = System.getProperty("user.dir") + "/keys.txt";
     }
 
-    private KeyStorage(ImgurKey imgurKey, String discordToken)
+    private static String storageMessage()
     {
-        this.imgurKey = imgurKey;
-        this.discordToken = discordToken;
+        return
+                "This document will contain any API keys known to the system.\n" +
+                        "Unless you know what you are doing, please don't tamper with this file.\n" +
+                        "When sharing the application with others, remove this file to keep the credentials secret.\n\n";
     }
 
-    //endregion
-
-
-    private static String getFilepath()
+    /**
+     * Set the imgur credentials.
+     *
+     * @param clientId     The client id.
+     * @param clientSecret The client secret.
+     * @param callback     The callback url.
+     * @throws IOException
+     */
+    @Override
+    public void setImgurKey(String clientId, String clientSecret, String callback) throws IOException
     {
-        return System.getProperty("user.dir") + "/" + filename;
+        _imgurKey = new ImgurKey(clientId, clientSecret, callback);
+        writeStorage();
     }
 
+    /**
+     * Retrieve the imgur key.
+     *
+     * @return the imgur key known by the system or null if it didn't exist.
+     * @throws IOException
+     */
+    @Override
 
+    public ImgurKey getImgurKey() throws IOException
+    {
+        readStorage();
+        return _imgurKey;
+    }
 
+    /**
+     * Retrieve the discord token.
+     *
+     * @return The discord token known by the system or null if it didn't exist.
+     * @throws IOException
+     */
+    @Override
+    public String getDiscordToken() throws IOException
+    {
+        readStorage();
+        return _discordToken;
+    }
+
+    /**
+     * Set the discord token.
+     *
+     * @param token The token to be used.
+     * @throws IOException
+     */
+    @Override
+    public void setDiscordToken(String token) throws IOException
+    {
+        _discordToken = token;
+        writeStorage();
+    }
+
+    private void readStorage()
+    {
+        String imgurClientId = null;
+        String imgurClientSecret = null;
+        String imgurCallback = null;
+
+        ArrayList<DataStorage.Item> items = DataStorage.readItems(_filepath);
+
+        // if the file did not exist, return
+        if (items == null)
+            return;
+
+        for (DataStorage.Item i : items)
+        {
+            if (Identifier.ImgurClientId.toString().equals(i.getName()))
+            {
+                imgurClientId = i.getData();
+            } else if (Identifier.ImgurClientSecret.toString().equals(i.getName()))
+            {
+                imgurClientSecret = i.getData();
+            } else if (Identifier.ImgurCallback.toString().equals(i.getName()))
+            {
+                imgurCallback = i.getData();
+            } else if (Identifier.DiscordToken.toString().equals(i.getName()))
+            {
+                _discordToken = i.getData();
+            }
+        }
+
+        _imgurKey = null;
+
+        if (imgurClientId != null && imgurClientSecret != null && imgurCallback != null)
+            _imgurKey = new ImgurKey(imgurClientId, imgurClientSecret, imgurCallback);
+    }
+
+    private void writeStorage() throws IOException
+    {
+        // add the items to be stored to the list.
+        ArrayList<DataStorage.Item> items = new ArrayList<>();
+        items.add(new DataStorage.Item(Identifier.ImgurClientId.toString(), _imgurKey.getClientId()));
+        items.add(new DataStorage.Item(Identifier.ImgurClientSecret.toString(), _imgurKey.getClientSecret()));
+        items.add(new DataStorage.Item(Identifier.ImgurCallback.toString(), _imgurKey.getCallback()));
+
+        if (_discordToken != null && !_discordToken.isEmpty())
+            items.add(new DataStorage.Item(Identifier.DiscordToken.toString(), _discordToken));
+
+        DataStorage.storeItems(_filepath, items, storageMessage());
+    }
 
     private enum Identifier
     {
@@ -110,142 +195,6 @@ public class KeyStorage
             return identifier;
         }
     }
-
-
-    //region Token handling
-
-    /**
-     * Set the imgur credentials.
-     * @param clientId The client id.
-     * @param clientSecret The client secret.
-     * @param callback The callback url.
-     * @throws IOException
-     */
-    public static void setImgurKey(String clientId, String clientSecret, String callback) throws IOException
-    {
-        keyStorage().imgurKey = new ImgurKey(clientId, clientSecret, callback);
-        writeStorage();
-    }
-
-    /**
-     * Retrieve the imgur key.
-     * @return the imgur key known by the system or null if it didn't exist.
-     * @throws IOException
-     */
-    public static ImgurKey getImgurKey() throws IOException
-    {
-        return keyStorage().imgurKey;
-    }
-
-
-    /**
-     * Set the discord token.
-     * @param token The token to be used.
-     * @throws IOException
-     */
-    public static void setDiscordToken(String token) throws IOException
-    {
-        keyStorage().discordToken = token;
-        writeStorage();
-    }
-
-    /**
-     * Retrieve the discord token.
-     * @return The discord token known by the system or null if it didn't exist.
-     * @throws IOException
-     */
-    public static String getDiscordToken() throws IOException
-    {
-        return keyStorage().discordToken;
-    }
-
-
-
-
-    //endregion
-
-
-
-
-
-
-
-    //region IO
-
-    private static KeyStorage readStorage() throws IOException
-    {
-        String imgurClientId = null;
-        String imgurClientSecret = null;
-        String imgurCallback = null;
-        String discordToken = null;
-
-        ArrayList<DataStorage.Item> items = DataStorage.readItems(getFilepath());
-
-        // if the file did not exist, return an empty KeyStorage.
-        if (items == null)
-            return new KeyStorage();
-
-        for (DataStorage.Item i : items)
-        {
-            if (Identifier.ImgurClientId.toString().equals(i.getName()))
-            {
-                imgurClientId = i.getData();
-            }
-            else if (Identifier.ImgurClientSecret.toString().equals(i.getName()))
-            {
-                imgurClientSecret = i.getData();
-            }
-            else if (Identifier.ImgurCallback.toString().equals(i.getName()))
-            {
-                imgurCallback = i.getData();
-            }
-            else if (Identifier.DiscordToken.toString().equals(i.getName()))
-            {
-                discordToken = i.getData();
-            }
-        }
-
-        ImgurKey iKey = null;
-
-        if (imgurClientId != null && imgurClientSecret != null && imgurCallback != null)
-            iKey = new ImgurKey(imgurClientId, imgurClientSecret, imgurCallback);
-
-        return new KeyStorage(iKey, discordToken);
-    }
-
-    private static void writeStorage() throws IOException
-    {
-        // retrieve the keystorage.
-        KeyStorage ks = keyStorage();
-
-        // add the items to be stored to the list.
-        ArrayList<DataStorage.Item> items = new ArrayList<>();
-        items.add(new DataStorage.Item(Identifier.ImgurClientId.toString(), ks.imgurKey.getClientId()));
-        items.add(new DataStorage.Item(Identifier.ImgurClientSecret.toString(), ks.imgurKey.getClientSecret()));
-        items.add(new DataStorage.Item(Identifier.ImgurCallback.toString(), ks.imgurKey.getCallback()));
-
-        if (ks.discordToken != null && !ks.discordToken.isEmpty())
-            items.add(new DataStorage.Item(Identifier.DiscordToken.toString(), ks.discordToken));
-
-        DataStorage.storeItems(getFilepath(), items, storageMessage());
-    }
-
-    private static String storageMessage()
-    {
-        return
-                "This document will contain any API keys known to the system.\n" +
-                "Unless you know what you are doing, please don't tamper with this file.\n" +
-                "When sharing the application with others, complete this file to keep the credentials secret.\n\n";
-    }
-
-    //endregion
-
-
-
-
-
-
-
 
 
 }
