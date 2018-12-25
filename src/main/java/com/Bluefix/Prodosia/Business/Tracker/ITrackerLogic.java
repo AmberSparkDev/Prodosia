@@ -20,23 +20,14 @@
  * SOFTWARE.
  */
 
-package com.Bluefix.Prodosia.Business.ApiKeys;
+package com.Bluefix.Prodosia.Business.Tracker;
 
-import com.Bluefix.Prodosia.Data.Storage.CookieStorage;
-import com.Bluefix.Prodosia.Data.Storage.ICookieStorage;
-
-/**
- * Stores cookie references in a singleton
- */
-public class CookieManager
+public interface ITrackerLogic
 {
-    private static ICookieStorage _cookieStorage;
 
-    public static ICookieStorage Cookie()
-    {
-        if (_cookieStorage == null)
-            _cookieStorage = new CookieStorage("cookie");
+    /**
+     * @return The metadata for the specified account-name, or null if it does not exist.
+     */
+    TrackerMetaInfo fetchTracker(String username);
 
-        return _cookieStorage;
-    }
 }

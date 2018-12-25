@@ -27,7 +27,13 @@ import com.Bluefix.Prodosia.Business.Command.CommandFunc.Subscription.SubCommand
 import com.Bluefix.Prodosia.Business.Command.CommandFunc.Subscription.SuballCommand;
 import com.Bluefix.Prodosia.Business.Command.CommandFunc.Subscription.UnsubCommand;
 import com.Bluefix.Prodosia.Business.Command.CommandFunc.Subscription.UnsuballCommand;
+import com.Bluefix.Prodosia.Business.Imgur.ImgurApi.IImgurManager;
+import com.Bluefix.Prodosia.Business.Imgur.Tagging.ICommentExecution;
+import com.Bluefix.Prodosia.Data.DataHandler.LocalStorageHandler;
 import com.Bluefix.Prodosia.Data.DataType.Command.CommandInformation;
+import com.Bluefix.Prodosia.Data.DataType.Comments.TagRequest.TagRequest;
+import com.Bluefix.Prodosia.Data.Logger.ILogger;
+import com.sun.istack.internal.NotNull;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -35,73 +41,98 @@ import java.util.HashMap;
 
 /**
  * This class parses and redirects commands fed to it.
- *
+ * <p>
  * The purpose of this class is to provide a generic
  * command interface that can be used by any user input
  * (Imgur / Discord / etc.)
  */
 public class CommandHandler
 {
-    //region CommandMap Functionality
-    private static HashMap<String, ICommandFunc> commandMap;
+    private ILogger _logger;
+    private ILogger _appLogger;
+
+    private HashMap<String, ICommandFunc> commandMap;
+    /**
+     * Commandlist stored String for optimization.
+     */
+    private String commandList = null;
+
+
+    public CommandHandler(@NotNull IImgurManager imgurManager,
+                          @NotNull ICommentExecution commentExecution,
+                          @NotNull LocalStorageHandler<TagRequest> tagRequestStorage,
+                          ILogger logger,
+                          ILogger appLogger)
+    {
+        // store the dependencies
+        _logger = logger;
+        _appLogger = appLogger;
+
+        // initialize the command mapping.
+        initializeCommandMap(imgurManager, commentExecution, tagRequestStorage);
+    }
+
+    private static void commandNotFound(CommandInformation ci, String lCom) throws Exception
+    {
+        String message = "Command \"" + lCom + "\" was not recognized!";
+
+        // output the message to the user.
+        ci.reply(message);
+    }
+
+    private static String listInformation()
+    {
+        return
+                "Will list all of the known commands.";
+    }
 
     /**
      * Retrieve the command function object for the command if it exists.
+     *
      * @param command The command that was issued.
      * @return The command function object for the specified command, or null if it doesn't exist.
      */
-    private static ICommandFunc getFunc(String command)
+    private ICommandFunc getFunc(String command)
     {
-        // intialize the commandMap if it did not exist.
-        if (commandMap == null)
-            initializeCommandMap();
-
         return commandMap.get(command.toLowerCase());
     }
 
     /**
      * Initialize all commands in the commandmap.
-     *
+     * <p>
      * `help` and `list` are reserved commands and cannot be added to the map.
-     *
+     * <p>
      * All commands added to the map should be lowercase and lowercase-unique.
      */
-    private static void initializeCommandMap()
+    private void initializeCommandMap(IImgurManager imgurManager,
+                                      ICommentExecution commentExecution,
+                                      LocalStorageHandler<TagRequest> tagRequestStorage)
     {
-        if (commandMap != null)
-            return;
-
         commandMap = new HashMap<>();
 
         // add all the different functionality classes.
         commandMap.put("test", new TestCommand());
-        commandMap.put("tag", new TagCommand());
+        commandMap.put("tag", new TagCommand(imgurManager, commentExecution, tagRequestStorage, _logger, _appLogger));
         commandMap.put("sub", new SubCommand());
         commandMap.put("unsub", new UnsubCommand());
         commandMap.put("getuser", new GetuserCommand());
         commandMap.put("getlist", new GetlistCommand());
-        commandMap.put("suball", new SuballCommand());
-        commandMap.put("unsuball", new UnsuballCommand());
+        commandMap.put("suball", new SuballCommand(imgurManager));
+        commandMap.put("unsuball", new UnsuballCommand(imgurManager));
     }
-
-    //endregion
-
-
-
-    //region Parse Command
-
 
     /**
      * Execute the command specified.
-     *
+     * <p>
      * The very first item in the command, separated by a space
      * from the rest of the data, will be considered the command.
      * The rest will be considered the arguments.
-     * @param ci The command information pertaining to the execution request.
+     *
+     * @param ci      The command information pertaining to the execution request.
      * @param command The command to be executed.
      * @return
      */
-    public static void execute(CommandInformation ci, String command)
+    public void execute(CommandInformation ci, String command)
     {
         String trimmed = command.trim();
 
@@ -121,11 +152,12 @@ public class CommandHandler
 
     /**
      * Execute the command specified.
-     * @param command The command to be executed.
+     *
+     * @param command   The command to be executed.
      * @param arguments The arguments, separated by a space
      * @return The command result after execution.
      */
-    public static void execute(CommandInformation ci, String command, String arguments)
+    public void execute(CommandInformation ci, String command, String arguments)
     {
         // keep parts between quotes together.
         String[] quoteSplit = arguments.trim().split("\"");
@@ -140,8 +172,7 @@ public class CommandHandler
             if (isQuote)
             {
                 splitItems.add("\"" + s + "\"");
-            }
-            else
+            } else
             {
                 // since it wasn't a quote, split by arguments.
                 String[] splitArguments = s.split("\\s+");
@@ -160,11 +191,12 @@ public class CommandHandler
 
     /**
      * Execute the command specified.
-     * @param command The command to be executed.
+     *
+     * @param command   The command to be executed.
      * @param arguments The arguments for the command.
      * @return The command result after execution.
      */
-    public static void execute(CommandInformation ci, String command, String[] arguments)
+    public void execute(CommandInformation ci, String command, String[] arguments)
     {
         String lCom = command.toLowerCase();
 
@@ -227,60 +259,15 @@ public class CommandHandler
         }
     }
 
-    //endregion
-
-    /**
-     * Helper class to execute methods asynchronous.
-     */
-    private static class ThreadedFuncCall extends Thread
-    {
-        private ICommandFunc icf;
-        private CommandInformation ci;
-        private String[] arguments;
-
-
-        /**
-         * Start a new Threaded Function Call.
-         * @param icf
-         * @param ci
-         * @param arguments
-         */
-        private ThreadedFuncCall(ICommandFunc icf, CommandInformation ci, String[] arguments)
-        {
-            this.icf = icf;
-            this.ci = ci;
-            this.arguments = arguments;
-        }
-
-        /**
-         * Execute the function.
-         */
-        @Override
-        public void run()
-        {
-            try
-            {
-                icf.execute(ci, arguments);
-            }
-            catch (Exception e)
-            {
-                e.printStackTrace();
-            }
-        }
-    }
-
-
-
-    //region Custom commands
-
     /**
      * Execute the `help` command. This command can provide the user with information
      * regarding the available commands in the system and acts as an entry point for an
      * unknown user.
+     *
      * @param arguments The arguments provided with the help command.
      * @return The result object which contains the provided information as its message.
      */
-    private static void executeHelp(CommandInformation ci, String[] arguments) throws Exception
+    private void executeHelp(CommandInformation ci, String[] arguments) throws Exception
     {
         // change the message depending on whether arguments were supplied.
         String message;
@@ -289,8 +276,7 @@ public class CommandHandler
         {
             message = "Use the `list` command to retrieve a list of possible commands.\n" +
                     "Use `help` with the specific command(s) as argument for information.";
-        }
-        else
+        } else
         {
             StringBuilder bMessage = new StringBuilder();
 
@@ -302,23 +288,20 @@ public class CommandHandler
                 if ("help".equals(arg))
                 {
                     // simply ignore
-                }
-                else if ("list".equals(arg))
+                } else if ("list".equals(arg))
                 {
                     bMessage.append("(" + arg + "): " + listInformation() + "\n");
-                }
-                else if (func == null)
+                } else if (func == null)
                 {
                     bMessage.append("(" + arg + "): The command does not exist.\n");
-                }
-                else
+                } else
                 {
                     // since the command exists, supply its information.
                     bMessage.append("(" + arg + "): " + func.info() + "\n");
                 }
             }
 
-            bMessage.setLength(bMessage.length()-1);
+            bMessage.setLength(bMessage.length() - 1);
 
 
             message = bMessage.toString();
@@ -328,25 +311,17 @@ public class CommandHandler
         ci.reply(message);
     }
 
-
-    /**
-     * Commandlist stored String for optimization.
-     */
-    private static String commandList = null;
-
     /**
      * Execute the `list` command. This command lists the available commands.
+     *
      * @param arguments Any arguments pertaining to this command.
      * @return The result object which contains the commands listed as its message.
      */
-    private static void executeList(CommandInformation ci, String[] arguments) throws Exception
+    private void executeList(CommandInformation ci, String[] arguments) throws Exception
     {
         // init the command list if it was null.
         if (commandList == null)
         {
-            // init the commands if this wasn't done yet.
-            initializeCommandMap();
-
             StringBuilder message = new StringBuilder();
 
             // list all the methods in the command-map
@@ -368,28 +343,43 @@ public class CommandHandler
         ci.reply(commandList);
     }
 
-    //endregion
-
-    //region Helper text
-
-    private static void commandNotFound(CommandInformation ci, String lCom) throws Exception
+    /**
+     * Helper class to execute methods asynchronous.
+     */
+    private static class ThreadedFuncCall extends Thread
     {
-        String message = "Command \"" + lCom + "\" was not recognized!";
+        private ICommandFunc icf;
+        private CommandInformation ci;
+        private String[] arguments;
 
-        // output the message to the user.
-        ci.reply(message);
+
+        /**
+         * Start a new Threaded Function Call.
+         *
+         * @param icf
+         * @param ci
+         * @param arguments
+         */
+        private ThreadedFuncCall(ICommandFunc icf, CommandInformation ci, String[] arguments)
+        {
+            this.icf = icf;
+            this.ci = ci;
+            this.arguments = arguments;
+        }
+
+        /**
+         * Execute the function.
+         */
+        @Override
+        public void run()
+        {
+            try
+            {
+                icf.execute(ci, arguments);
+            } catch (Exception e)
+            {
+                e.printStackTrace();
+            }
+        }
     }
-
-    private static String listInformation()
-    {
-        return
-                "Will list all of the known commands.";
-    }
-
-    //endregion
-
-
-
-
-
 }

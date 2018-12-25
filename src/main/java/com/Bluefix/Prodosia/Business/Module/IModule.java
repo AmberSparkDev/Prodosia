@@ -33,4 +33,9 @@ public interface IModule
      * Stop the module.
      */
     void stop();
+
+    /**
+     * @return the name of the module.
+     */
+    String getName();
 }

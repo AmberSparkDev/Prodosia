@@ -20,23 +20,20 @@
  * SOFTWARE.
  */
 
-package com.Bluefix.Prodosia.Business.ApiKeys;
+package com.Bluefix.Prodosia.Business.Discord;
 
-import com.Bluefix.Prodosia.Data.Storage.CookieStorage;
-import com.Bluefix.Prodosia.Data.Storage.ICookieStorage;
+import net.dv8tion.jda.core.JDA;
+import net.dv8tion.jda.core.entities.User;
 
-/**
- * Stores cookie references in a singleton
- */
-public class CookieManager
+public interface IDiscordManager
 {
-    private static ICookieStorage _cookieStorage;
+    /**
+     * Once the JDA has been initialized, this method will return the JDA object.
+     * @return The JDA object used to access the discord API.
+     */
+    JDA getJDA();
 
-    public static ICookieStorage Cookie()
-    {
-        if (_cookieStorage == null)
-            _cookieStorage = new CookieStorage("cookie");
+    void setupToken(String token);
 
-        return _cookieStorage;
-    }
+    void updateSelfPrefix();
 }

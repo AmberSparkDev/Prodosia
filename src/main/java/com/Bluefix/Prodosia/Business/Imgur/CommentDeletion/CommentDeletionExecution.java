@@ -22,11 +22,13 @@
 
 package com.Bluefix.Prodosia.Business.Imgur.CommentDeletion;
 
+import com.Bluefix.Prodosia.Business.Imgur.ImgurApi.IImgurManager;
 import com.Bluefix.Prodosia.Data.DataHandler.CommentDeletionStorage;
 import com.Bluefix.Prodosia.Business.Exception.BaringoExceptionHelper;
 import com.Bluefix.Prodosia.Business.Imgur.ImgurApi.ApiDistribution;
 import com.Bluefix.Prodosia.Business.Imgur.ImgurApi.ImgurManager;
 import com.Bluefix.Prodosia.Business.Module.ImgurIntervalRunner;
+import com.Bluefix.Prodosia.Data.Logger.ILogger;
 import com.github.kskelm.baringo.model.Comment;
 import com.github.kskelm.baringo.util.BaringoApiException;
 
@@ -39,7 +41,7 @@ import java.util.Iterator;
  */
 public class CommentDeletionExecution extends ImgurIntervalRunner
 {
-    //region variables
+    private IImgurManager _imgurManager;
 
     /**
      * If this option is enabled, the deletion of a comment is ensured, but
@@ -52,36 +54,26 @@ public class CommentDeletionExecution extends ImgurIntervalRunner
      */
     private static final int DeletionItemsPerCycle = ApiDistribution.DeletionModule / 6;
 
-    //endregion
 
-    //region Singleton and Constructor
-
-    private static CommentDeletionExecution me;
-
-    /**
-     * Retrieve the Comment Deletion Module object.
-     * @return The Comment Deletion Module object.
-     */
-    public static CommentDeletionExecution handler()
-    {
-        if (me == null)
-            me = new CommentDeletionExecution();
-
-        return me;
-    }
 
     /**
      * Create a new Module object for the Comment Deletion functionality.
      */
-    private CommentDeletionExecution()
+    public CommentDeletionExecution(
+            IImgurManager imgurManager,
+            ILogger logger,
+            ILogger appLogger
+
+    )
     {
-        super(ApiDistribution.DeletionModule);
+        super(ApiDistribution.DeletionModule, logger, appLogger);
+
+        // store the dependencies
+        _imgurManager = imgurManager;
 
         this.deletedComments = new HashSet<>();
         requestCounter = 0;
     }
-
-    //endregion
 
 
 
@@ -93,6 +85,10 @@ public class CommentDeletionExecution extends ImgurIntervalRunner
     @Override
     public void run()
     {
+        // if the imgur manager client wasn't initialized, skip the run.
+        if (_imgurManager.getClient() == null)
+            return;
+
         try
         {
             // check on the deletedComments if comment-deletion was ensured.
@@ -109,7 +105,7 @@ public class CommentDeletionExecution extends ImgurIntervalRunner
                     try
                     {
                         requestCounter++;
-                        Comment com = ImgurManager.client().commentService().getComment(value);
+                        Comment com = _imgurManager.getClient().commentService().getComment(value);
 
                         if (com == null)
                             deletionDeletion.add(value);
@@ -146,7 +142,7 @@ public class CommentDeletionExecution extends ImgurIntervalRunner
                 requestCounter++;
                 try
                 {
-                    ImgurManager.client().commentService().deleteComment(value);
+                    _imgurManager.getClient().commentService().deleteComment(value);
                 } catch (BaringoApiException ex)
                 {
                     if (    !BaringoExceptionHelper.isNotFound(ex) &&
@@ -184,10 +180,16 @@ public class CommentDeletionExecution extends ImgurIntervalRunner
      * @return The maximum amount of GET requests.
      */
     @Override
-    protected int projectedRequests()
+    public int projectedRequests()
     {
         int tmpReq = requestCounter;
         requestCounter = 0;
         return tmpReq;
+    }
+
+    @Override
+    public String getName()
+    {
+        return "CommentDeletion";
     }
 }

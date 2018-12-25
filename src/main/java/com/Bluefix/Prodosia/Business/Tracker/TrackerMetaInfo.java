@@ -20,23 +20,22 @@
  * SOFTWARE.
  */
 
-package com.Bluefix.Prodosia.Business.ApiKeys;
-
-import com.Bluefix.Prodosia.Data.Storage.CookieStorage;
-import com.Bluefix.Prodosia.Data.Storage.ICookieStorage;
+package com.Bluefix.Prodosia.Business.Tracker;
 
 /**
- * Stores cookie references in a singleton
+ * Immutable Data class for tracker metadata.
  */
-public class CookieManager
+public class TrackerMetaInfo
 {
-    private static ICookieStorage _cookieStorage;
+    private int _id;
 
-    public static ICookieStorage Cookie()
+    public TrackerMetaInfo(int id)
     {
-        if (_cookieStorage == null)
-            _cookieStorage = new CookieStorage("cookie");
+        _id = id;
+    }
 
-        return _cookieStorage;
+    public int getId()
+    {
+        return _id;
     }
 }

@@ -23,6 +23,7 @@
 package com.Bluefix.Prodosia.Business.Imgur.CommentScanner;
 
 import com.Bluefix.Prodosia.Business.Command.CommandRecognition;
+import com.Bluefix.Prodosia.Business.Imgur.ImgurApi.IImgurManager;
 import com.Bluefix.Prodosia.Data.DataHandler.CommentScannerStorage;
 import com.Bluefix.Prodosia.Data.DataHandler.TrackerHandler;
 import com.Bluefix.Prodosia.Data.DataType.Command.CommandInformation;
@@ -34,6 +35,7 @@ import com.Bluefix.Prodosia.Business.Imgur.ImgurApi.ApiDistribution;
 import com.Bluefix.Prodosia.Business.Imgur.ImgurApi.ImgurManager;
 import com.Bluefix.Prodosia.Business.Module.ImgurIntervalRunner;
 import com.Bluefix.Prodosia.Business.Prefix.CommandPrefix;
+import com.Bluefix.Prodosia.Data.Logger.ILogger;
 import com.github.kskelm.baringo.model.Account;
 import com.github.kskelm.baringo.model.Comment;
 import com.github.kskelm.baringo.util.BaringoApiException;
@@ -48,7 +50,7 @@ import java.util.*;
  */
 public class CommentScannerExecution extends ImgurIntervalRunner
 {
-    //region Tweaking data
+    private IImgurManager _imgurManager;
 
     /**
      * Indicate the maximum amount of requests that can be handled within a cycle.
@@ -56,36 +58,29 @@ public class CommentScannerExecution extends ImgurIntervalRunner
      */
     public static int MaximumGetRequestsPerCycle = 20;
 
-    //endregion
-
-    //region Singleton and Constructor
-
-    private static CommentScannerExecution me;
-
     /**
-     * Retrieve the Comment Scanner Module object.
-     * @return The Comment Scanner Module object.
+     * The minimum amount of time in milliseconds that this module should wait in between runs.
      */
-    public static CommentScannerExecution handler()
+    public static int MinimumWaitBetweenCyclesMillis = 20000;
+
+
+    public CommentScannerExecution(
+            IImgurManager imgurManager,
+            ILogger logger,
+            ILogger appLogger
+    )
     {
-        if (me == null)
-            me = new CommentScannerExecution();
+        super(ApiDistribution.CommentModule, logger, appLogger);
 
-        return me;
-    }
+        if (imgurManager == null)
+            throw new IllegalArgumentException("This module cannot function without the Imgur Manager.");
 
-
-    private CommentScannerExecution()
-    {
-        super(ApiDistribution.CommentModule);
+        // store the dependencies.
+        _imgurManager = imgurManager;
 
         trackerMap = new HashMap<>();
         requestCounter = 0;
     }
-
-    //endregion
-
-    //region Interval Runner logic
 
     /**
      * The request counter that keeps track of how many requests have been executed.
@@ -96,8 +91,12 @@ public class CommentScannerExecution extends ImgurIntervalRunner
      * Execute a single cycle.
      */
     @Override
-    protected void run()
+    public void run()
     {
+        // skip the run if the imgur client isn't available.
+        if (_imgurManager.getClient() == null)
+            return;
+
         try
         {
             // refresh the queue items.
@@ -115,7 +114,7 @@ public class CommentScannerExecution extends ImgurIntervalRunner
             try
             {
                 // force a short wait (20s)
-                Thread.sleep(20000);
+                Thread.sleep(MinimumWaitBetweenCyclesMillis);
             } catch (InterruptedException e)
             {
 
@@ -129,16 +128,12 @@ public class CommentScannerExecution extends ImgurIntervalRunner
      * @return The maximum amount of GET requests.
      */
     @Override
-    protected int projectedRequests()
+    public int projectedRequests()
     {
         int tmpReq = requestCounter;
         requestCounter = 0;
         return tmpReq;
     }
-
-    //endregion
-
-    //region Comment Scanner logic
 
     /**
      * Map the imgur-id of a tracker against its queue data.
@@ -321,7 +316,7 @@ public class CommentScannerExecution extends ImgurIntervalRunner
 
             try
             {
-                trackerComments = ImgurManager.client().accountService().listComments(
+                trackerComments = _imgurManager.getClient().accountService().listComments(
                         t.getImgurName(),
                         Comment.Sort.Newest,
                         curPage);
@@ -333,7 +328,7 @@ public class CommentScannerExecution extends ImgurIntervalRunner
                 {
                     try
                     {
-                        Account acc = ImgurManager.client().accountService().getAccount(t.getImgurId());
+                        Account acc = _imgurManager.getClient().accountService().getAccount(t.getImgurId());
 
                         Tracker newTracker = new Tracker(
                                 t.getId(),
@@ -389,7 +384,9 @@ public class CommentScannerExecution extends ImgurIntervalRunner
             {
                 CommandInformation ci = new ImgurCommandInformation(t, c);
 
-                CommandRecognition.executeEntry(CommandPrefix.Type.IMGUR, ci, c.getComment());
+                // create a new CommandRecognition object and execute the entry.
+                CommandRecognition cr = new CommandRecognition(_logger, _appLogger);
+                cr.executeEntry(CommandPrefix.Type.IMGUR, ci, c.getComment());
             }
 
             // if we have reached the maximum amount of allowed requests, return.
@@ -424,8 +421,11 @@ public class CommentScannerExecution extends ImgurIntervalRunner
         }
     }
 
-
-
+    @Override
+    public String getName()
+    {
+        return "CommentScanner";
+    }
 
 
     //endregion
@@ -530,22 +530,19 @@ public class CommentScannerExecution extends ImgurIntervalRunner
         }
     }
 
-    //endregion
-
-    //region Imgur API
 
     /**
      * Parse a bookmark for the specified user. Will consume 1 GET request.
      * @param tracker The specified tracker.
      * @return A bookmark with the latest comment
      */
-    private static TrackerBookmark getBookmarkForUser(Tracker tracker) throws BaringoApiException, IOException, URISyntaxException
+    private TrackerBookmark getBookmarkForUser(Tracker tracker) throws BaringoApiException, IOException, URISyntaxException
     {
         List<Comment> comments = null;
 
         try
         {
-            comments = ImgurManager.client().accountService().listComments(tracker.getImgurName(), Comment.Sort.Newest, 0);
+            comments = _imgurManager.getClient().accountService().listComments(tracker.getImgurName(), Comment.Sort.Newest, 0);
         }
         catch (Exception ex)
         {

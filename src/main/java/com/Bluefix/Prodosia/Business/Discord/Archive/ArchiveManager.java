@@ -22,11 +22,13 @@
 
 package com.Bluefix.Prodosia.Business.Discord.Archive;
 
+import com.Bluefix.Prodosia.Business.Discord.IDiscordManager;
 import com.Bluefix.Prodosia.Business.Logger.ApplicationWindowLogger;
 import com.Bluefix.Prodosia.Data.DataHandler.ArchiveHandler;
 import com.Bluefix.Prodosia.Data.DataType.Archive.Archive;
 import com.Bluefix.Prodosia.Data.DataType.Comments.TagRequest.TagRequest;
 import com.Bluefix.Prodosia.Business.Discord.DiscordManager;
+import com.Bluefix.Prodosia.Data.Logger.ILogger;
 import com.github.kskelm.baringo.util.BaringoApiException;
 import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.MessageHistory;
@@ -41,36 +43,29 @@ import java.util.*;
 /**
  * This class manages the archiving functionality
  */
-public class ArchiveManager
+public class ArchiveManager implements IArchiveManager
 {
+    private IDiscordManager _discordManager;
+    private ILogger _logger;
+    private ILogger _appLogger;
+
     /**
      * The maximum amount of comments that should be kept to check history for duplicates.
      */
     private static final int HistoryLimit = 50;
 
-    //region Singleton and constructor
-
-    private static ArchiveManager me;
-
-    private synchronized static ArchiveManager manager()
+    public ArchiveManager(IDiscordManager discordManager,
+            ILogger logger,
+            ILogger appLogger)
     {
-        if (me == null)
-        {
-            assert(HistoryLimit > 0);
-            me = new ArchiveManager();
-        }
+        // store the dependencies
+        _discordManager = discordManager;
+        _logger = logger;
+        _appLogger = appLogger;
 
-        return me;
-    }
-
-    private ArchiveManager()
-    {
         this.channels = new HashMap<>();
     }
 
-    //endregion
-
-    //region Channel list
 
     /**
      * Map
@@ -97,31 +92,20 @@ public class ArchiveManager
         /**
          * Create a new channel-info object.
          */
-        private ChannelInfo(String channelId)
+        private ChannelInfo(IDiscordManager discordManager,
+                String channelId)
         {
             // retrieve the message history from the comments.
-            try
+            this.textChannel = discordManager.getJDA().getTextChannelById(channelId);
+
+
+            MessageHistory mh = textChannel.getHistory();
+            this.comments = new LinkedList<>();
+
+            for (Message m : mh.getRetrievedHistory())
             {
-                this.textChannel = DiscordManager.manager().getTextChannelById(channelId);
-
-
-                MessageHistory mh = textChannel.getHistory();
-                this.comments = new LinkedList<>();
-
-                for (Message m : mh.getRetrievedHistory())
-                {
-                    comments.addLast(m.getContentRaw());
-                }
+                comments.addLast(m.getContentRaw());
             }
-            catch (LoginException e)
-            {
-                e.printStackTrace();
-            } catch (IOException e)
-            {
-                e.printStackTrace();
-            }
-
-            // TODO: Check if the message-history is stored in the right order.
         }
 
 
@@ -148,22 +132,21 @@ public class ArchiveManager
         }
     }
 
-    //endregion
 
-    //region Archiving logic
 
 
     /**
      * Posts a tag request item to the specified archive channels if applicable.
      * @param tagRequest
      */
-    public static void handleTagRequest(TagRequest tagRequest) throws SQLException
+    @Override
+    public void handleTagRequest(TagRequest tagRequest) throws SQLException
     {
         // update the channel-list according to the archives.
-        manager().update();
+        update();
 
         // find the channels that correspond with the tag request
-        for (Map.Entry<Archive, ChannelInfo> e : manager().channels.entrySet())
+        for (Map.Entry<Archive, ChannelInfo> e : channels.entrySet())
         {
             try
             {
@@ -173,24 +156,13 @@ public class ArchiveManager
                     e.getValue().postMessage(tagRequest.getArchiveMessage());
                 }
 
-            } catch (IOException e1)
+            }catch (Exception ex)
             {
-                ApplicationWindowLogger.logMessage(e1.getMessage(), ApplicationWindowLogger.Severity.ERROR);
+                if (_logger != null)
+                    _logger.error("[ArchiveManager] Exception while attempting to post archive message.\r\n" + ex.getMessage());
 
-                e1.printStackTrace();
-            } catch (BaringoApiException e1)
-            {
-                ApplicationWindowLogger.logMessage(e1.getMessage(), ApplicationWindowLogger.Severity.ERROR);
-                e1.printStackTrace();
-            } catch (URISyntaxException e1)
-            {
-                ApplicationWindowLogger.logMessage(e1.getMessage(), ApplicationWindowLogger.Severity.ERROR);
-                e1.printStackTrace();
-            }
-            catch (Exception ex)
-            {
-                ApplicationWindowLogger.logMessage(ex.getMessage(), ApplicationWindowLogger.Severity.ERROR);
-                ex.printStackTrace();
+                if (_appLogger != null)
+                    _appLogger.info("There was a problem posting to the archives.");
             }
         }
     }
@@ -219,10 +191,8 @@ public class ArchiveManager
             if (channels.containsKey(a))
                 continue;
 
-            channels.put(a, new ChannelInfo(a.getChannelId()));
+            channels.put(a, new ChannelInfo(_discordManager, a.getChannelId()));
         }
     }
 
-
-    //endregion
 }

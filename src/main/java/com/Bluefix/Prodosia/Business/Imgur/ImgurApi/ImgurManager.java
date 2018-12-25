@@ -26,7 +26,6 @@ package com.Bluefix.Prodosia.Business.Imgur.ImgurApi;
 import com.Bluefix.Prodosia.Business.Authorization.IAuthorization;
 import com.Bluefix.Prodosia.Business.Authorization.ImgurAuthorization;
 import com.Bluefix.Prodosia.Business.Exception.ExceptionHelper;
-import com.Bluefix.Prodosia.Business.Module.ModuleManager;
 import com.Bluefix.Prodosia.Data.DataType.ImgurKey;
 import com.Bluefix.Prodosia.Data.Enum.AuthorizationResult;
 import com.Bluefix.Prodosia.Data.Logger.ILogger;
@@ -70,9 +69,9 @@ public class ImgurManager implements IImgurManager
      * - ENV_IMGUR_CLIENT_SECRET
      * - ENV_IMGUR_CALLBACK
      * <p>
-     * Afterwards this will check for a stored Imgur Key
-     *
-     * @throws IllegalArgumentException if no environment variables or stored imgur key credentials could be found.
+     * Afterwards this will check for a stored Imgur Key.
+     * If neither can be found, the Manager does not initialize the Baringo Client and setCredentials()
+     * will have to be called manually
      */
     public ImgurManager(
             IKeyStorage keystorage,
@@ -103,7 +102,7 @@ public class ImgurManager implements IImgurManager
 
         // if the credentials could not be found in the environment variables,
         // check the keystorage.
-        if (_keyStorage != null && _clientId == null && _clientSecret == null && _callback == null)
+        if (_keyStorage != null && (_clientId == null || _clientSecret == null || _callback == null))
         {
             try
             {
@@ -123,8 +122,9 @@ public class ImgurManager implements IImgurManager
             }
         }
 
-        // initialize the manager.
-        initialize();
+        // initialize the manager if credentials could be found.
+        if (_clientId != null && _clientSecret != null)
+            initialize();
     }
 
     /**
@@ -160,6 +160,7 @@ public class ImgurManager implements IImgurManager
 
     /**
      * Set the credentials for the manager. This will invalidate the cookie and prompt user authorization.
+     *
      * @param clientId     The client-id for the Imgur API
      * @param clientSecret The client-secret for the Imgur API
      * @param callback     The optional callback for the Imgur API
@@ -185,8 +186,20 @@ public class ImgurManager implements IImgurManager
 
         // initialize the new client
         initialize();
-    }
 
+        // if the client was initialized without issue, store the keys in the key storage.
+        try
+        {
+            _keyStorage.setImgurKey(_clientId, _clientSecret, _callback);
+        } catch (Exception e)
+        {
+            if (_logger != null)
+                _logger.error("[ImgurManager] Exception while trying to store the Imgur Key.\r\n" + e.getMessage());
+
+            if (_appLogger != null)
+                _appLogger.info("There was a problem storing the Imgur keys.");
+        }
+    }
 
 
     private void initialize() throws URISyntaxException, AuthorizationException
@@ -265,24 +278,4 @@ public class ImgurManager implements IImgurManager
     {
         return _keyStorage;
     }
-
-
-        /**
-         * Prompts the Client to re-init
-         */
-        public void update() throws IOException, URISyntaxException, BaringoApiException
-        {
-            boolean clientWasInitialized = client != null;
-
-            ImgurKey key = KeyStorage.getImgurKey();
-
-            BaringoClient tmpClient = createClient(key);
-
-            initializeClient(tmpClient);
-
-            // if the client itself wasn't initialized yet, start the imgur dependencies.
-            if (!clientWasInitialized && client != null)
-                ModuleManager.startImgurDependencies();
-        }
-
 }

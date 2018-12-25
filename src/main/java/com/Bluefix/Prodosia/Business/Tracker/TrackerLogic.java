@@ -20,66 +20,59 @@
  * SOFTWARE.
  */
 
-package com.Bluefix.Prodosia.Business.ApiKeys.Imgur;
+package com.Bluefix.Prodosia.Business.Tracker;
 
+import com.Bluefix.Prodosia.Business.Exception.BaringoExceptionHelper;
 import com.Bluefix.Prodosia.Business.Imgur.ImgurApi.IImgurManager;
 import com.Bluefix.Prodosia.Data.Logger.ILogger;
-import com.Bluefix.Prodosia.Data.Storage.CookieStorage;
+import com.github.kskelm.baringo.model.Account;
+import com.github.kskelm.baringo.util.BaringoApiException;
 
-import java.io.IOException;
-
-/**
- * Business Logic for the Imgur Api Keys
- */
-public class ImgurApiKeys
+public class TrackerLogic implements ITrackerLogic
 {
     private IImgurManager _imgurManager;
-    private CookieStorage _cookieStorage;
     private ILogger _logger;
-    private ILogger _userLogger;
+    private ILogger _appLogger;
 
-    public ImgurApiKeys(
-            IImgurManager imgurmanager,
-            CookieStorage cookieStorage,
-            ILogger logger,
-            ILogger userLogger
-    )
+    public TrackerLogic(IImgurManager imgurManager,
+                        ILogger logger,
+                        ILogger appLogger)
     {
-        _imgurManager = imgurmanager;
-        _cookieStorage = cookieStorage;
+        // store the dependencies
+        _imgurManager = imgurManager;
         _logger = logger;
-        _userLogger = userLogger;
+        _appLogger = appLogger;
 
         if (_imgurManager == null)
             throw new IllegalArgumentException("The Imgur Manager cannot be null.");
     }
 
 
-    public void update(String clientId, String clientSecret, String callback)
+    @Override
+    public TrackerMetaInfo fetchTracker(String username)
     {
-        // remove the original cookie.
-        if (_cookieStorage != null)
+        try
         {
-            try
-            {
-                _cookieStorage.setRefreshToken(null);
-            } catch (IOException e)
+            Account acc = _imgurManager.getClient().accountService().getAccount(username);
+
+            if (acc != null)
+                return new TrackerMetaInfo(acc.getId());
+
+        } catch (BaringoApiException e)
+        {
+            if (BaringoExceptionHelper.isNotFound(e))
             {
                 if (_logger != null)
-                    _logger.warn("[ImgurApiKeys] IOException while trying to reset the cookie.\r\n" + e.getMessage());
+                    _logger.info("[TrackerLogic] The tracker with name \"" + username + "\" could not be found.");
+            }
+            else
+            {
+                if (_logger != null)
+                    _logger.warn("[TrackerLogic] BaringoApiException thrown while attempting to fetch the tracker " +
+                            "with name \"" + username + "\"\r\n" + e.getMessage());
             }
         }
 
-        // reset the credentials.
-        try
-        {
-            _imgurManager.setCredentials(clientId,
-                    clientSecret,
-                    callback);
-        } catch (Exception e)
-        {
-            if (_logger != null)
-                _logger.error("[ImgurApiKeys] Exception while attempting to reset the Imgur API credentials.\r\n" + e.getMessage());
-        }
+        return null;
     }
 }

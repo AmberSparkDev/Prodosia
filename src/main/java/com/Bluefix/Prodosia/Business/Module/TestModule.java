@@ -36,13 +36,13 @@ public class TestModule extends ImgurIntervalRunner
      */
     public TestModule(int maximumRequests)
     {
-        super(maximumRequests);
+        super(maximumRequests, null, null);
 
         counter = 1;
     }
 
     @Override
-    protected void run()
+    public void run()
     {
         System.out.println(ZonedDateTime.now().format(DateTimeFormatter.RFC_1123_DATE_TIME));
     }
@@ -50,8 +50,14 @@ public class TestModule extends ImgurIntervalRunner
     private int counter;
 
     @Override
-    protected int projectedRequests()
+    public int projectedRequests()
     {
         return counter++;
+    }
+
+    @Override
+    public String getName()
+    {
+        return "Test";
     }
 }

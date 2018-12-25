@@ -22,11 +22,15 @@
 
 package com.Bluefix.Prodosia.Data.DataType.Command;
 
+import com.Bluefix.Prodosia.Business.Imgur.ImgurApi.IImgurManager;
 import com.Bluefix.Prodosia.Data.DataType.Tracker.Tracker;
 import com.Bluefix.Prodosia.Business.Imgur.ImgurApi.ImgurManager;
+import com.Bluefix.Prodosia.Data.Logger.ILogger;
 import com.github.kskelm.baringo.model.Comment;
 import com.github.kskelm.baringo.util.BaringoApiException;
+import com.sun.istack.internal.NotNull;
 
+import javax.activation.CommandInfo;
 import java.io.IOException;
 import java.net.URISyntaxException;
 
@@ -35,6 +39,22 @@ import java.net.URISyntaxException;
  */
 public abstract class CommandInformation
 {
+    private IImgurManager _imgurManager;
+    private ILogger _logger;
+    private ILogger _appLogger;
+
+
+    public CommandInformation(@NotNull IImgurManager imgurManager,
+                              ILogger logger,
+                              ILogger appLogger)
+    {
+        // store the dependencies
+        _imgurManager = imgurManager;
+        _logger = logger;
+        _appLogger = appLogger;
+    }
+
+
     /**
      * The tracker that issued the command.
      */
@@ -89,7 +109,7 @@ public abstract class CommandInformation
         if (parentComment == null || parentComment.getId() != parentId)
         {
             this.parentComment =
-                    ImgurManager.client().commentService().getComment(parentId);
+                    _imgurManager.getClient().commentService().getComment(parentId);
         }
 
         return this;

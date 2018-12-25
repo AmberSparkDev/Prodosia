@@ -23,13 +23,16 @@
 package com.Bluefix.Prodosia.Business.Imgur.Tagging;
 
 import com.Bluefix.Prodosia.Business.Algorithm.Partition;
+import com.Bluefix.Prodosia.Business.Imgur.ImgurApi.IImgurManager;
 import com.Bluefix.Prodosia.Business.Imgur.ImgurApi.ImgurManager;
 import com.Bluefix.Prodosia.Data.DataHandler.UserHandler;
 import com.Bluefix.Prodosia.Data.DataType.Comments.StatComment;
 import com.Bluefix.Prodosia.Data.DataType.Comments.TagRequest.BaseTagRequest;
 import com.Bluefix.Prodosia.Data.DataType.User.User;
+import com.Bluefix.Prodosia.Data.Logger.ILogger;
 import com.github.kskelm.baringo.model.Comment;
 import com.github.kskelm.baringo.util.BaringoApiException;
+import com.sun.istack.internal.NotNull;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -45,6 +48,19 @@ import java.util.regex.Pattern;
  */
 public class TagRequestComments
 {
+    private IImgurManager _imgurManager;
+    private ILogger _logger;
+    private ILogger _appLogger;
+
+    public TagRequestComments(@NotNull IImgurManager imgurManager,
+                              ILogger logger,
+                              ILogger appLogger)
+    {
+        _imgurManager = imgurManager;
+        _logger = logger;
+        _appLogger = appLogger;
+    }
+
 
 
 
@@ -57,7 +73,7 @@ public class TagRequestComments
      * @return
      * @throws Exception
      */
-    public static LinkedList<String> parseCommentsForTagRequest(BaseTagRequest tr, List<Comment> postComments) throws Exception
+    public LinkedList<String> parseCommentsForTagRequest(BaseTagRequest tr, List<Comment> postComments) throws Exception
     {
         // find all the users necessary for the tag request.
         ArrayList<String> users = findUsernamesForTagRequest(tr);
@@ -110,7 +126,7 @@ public class TagRequestComments
         return output;
     }
 
-    private static ArrayList<String> findUsernamesForTagRequest(BaseTagRequest tr) throws Exception
+    private ArrayList<String> findUsernamesForTagRequest(BaseTagRequest tr) throws Exception
     {
         ArrayList<String> items = new ArrayList<>();
 
@@ -138,7 +154,7 @@ public class TagRequestComments
      * @param postComments
      * @return
      */
-    private static HashSet<String> findMentionedUsers(List<Comment> postComments)
+    private HashSet<String> findMentionedUsers(List<Comment> postComments)
     {
         HashSet<String> mentions = new HashSet<>();
 
@@ -183,7 +199,7 @@ public class TagRequestComments
      * @throws IOException
      * @throws URISyntaxException
      */
-    public static int findNumberOfMyMentions(List<Comment> comments) throws BaringoApiException, IOException, URISyntaxException
+    public int findNumberOfMyMentions(List<Comment> comments) throws BaringoApiException, IOException, URISyntaxException
     {
         if (comments == null || comments.isEmpty())
             return 0;
@@ -205,12 +221,12 @@ public class TagRequestComments
         return counter;
     }
 
-    public static List<Comment> findMyTagComments(List<Comment> comments) throws BaringoApiException, IOException, URISyntaxException
+    public List<Comment> findMyTagComments(List<Comment> comments) throws BaringoApiException, IOException, URISyntaxException
     {
         if (comments == null || comments.isEmpty())
             return null;
 
-        String posterName = ImgurManager.client().getAuthenticatedUserName();
+        String posterName = _imgurManager.getClient().getAuthenticatedUserName();
 
         if (posterName == null || posterName.trim().isEmpty())
             return null;

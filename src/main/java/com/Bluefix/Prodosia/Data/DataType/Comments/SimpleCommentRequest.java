@@ -22,10 +22,11 @@
 
 package com.Bluefix.Prodosia.Data.DataType.Comments;
 
-import com.Bluefix.Prodosia.Data.DataHandler.SimpleCommentRequestStorage;
-import com.Bluefix.Prodosia.Business.Imgur.ImgurApi.ImgurManager;
+import com.Bluefix.Prodosia.Business.Imgur.ImgurApi.IImgurManager;
+import com.Bluefix.Prodosia.Data.DataHandler.LocalStorageHandler;
 import com.github.kskelm.baringo.model.Comment;
 import com.github.kskelm.baringo.util.BaringoApiException;
+import com.sun.istack.internal.NotNull;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -35,23 +36,37 @@ import java.util.Objects;
 
 public class SimpleCommentRequest implements ICommentRequest
 {
+    private IImgurManager _imgurManager;
+    private LocalStorageHandler<SimpleCommentRequest> _simpleCommentRequestStorage;
+
     private long id;
     private String imgurId;
     private Comment parent;
     private long parentId;
     private LinkedList<String> comments;
+    private String dbString;
 
     /**
      * Create a simple comment request providing both the parent id and imgur Id
-     * @param imgurId The imgur id of the post
+     *
+     * @param imgurId  The imgur id of the post
      * @param parentId The parent id of the comment to reply to.
      * @param comments The comments to be posted.
      */
-    private SimpleCommentRequest(long id, String imgurId, long parentId, LinkedList<String> comments)
+    private SimpleCommentRequest(@NotNull IImgurManager imgurManager,
+                                 @NotNull LocalStorageHandler<SimpleCommentRequest> simpleCommentRequestStorage,
+                                 long id,
+                                 String imgurId,
+                                 long parentId,
+                                 LinkedList<String> comments)
     {
         // check if the request is valid.
         if ((imgurId == null || imgurId.trim().isEmpty()) && parentId < 0)
             throw new IllegalArgumentException("Must provide either the imgur id or the parent id");
+
+        // store the dependencies
+        _imgurManager = imgurManager;
+        _simpleCommentRequestStorage = simpleCommentRequestStorage;
 
         this.imgurId = imgurId;
         this.parentId = parentId;
@@ -61,36 +76,59 @@ public class SimpleCommentRequest implements ICommentRequest
 
     /**
      * Create a simple comment request providing both the parent id and imgur Id
-     * @param imgurId The imgur id of the post
+     *
+     * @param imgurId  The imgur id of the post
      * @param parentId The parent id of the comment to reply to.
      * @param comments The comments to be posted.
      */
-    public SimpleCommentRequest(String imgurId, long parentId, LinkedList<String> comments)
+    public SimpleCommentRequest(@NotNull IImgurManager imgurManager,
+                                @NotNull LocalStorageHandler<SimpleCommentRequest> simpleCommentRequestStorage,
+                                String imgurId,
+                                long parentId,
+                                LinkedList<String> comments)
     {
         // check if the request is valid.
         if ((imgurId == null || imgurId.trim().isEmpty()) && parentId < 0)
             throw new IllegalArgumentException("Must provide either the imgur id or the parent id");
 
+        // store the dependencies
+        _imgurManager = imgurManager;
+        _simpleCommentRequestStorage = simpleCommentRequestStorage;
+
         this.imgurId = imgurId;
         this.parentId = parentId;
         this.comments = comments;
         this.id = -1;
     }
 
-    public SimpleCommentRequest(String imgurId, LinkedList<String> comments)
+    public SimpleCommentRequest(@NotNull IImgurManager imgurManager,
+                                @NotNull LocalStorageHandler<SimpleCommentRequest> simpleCommentRequestStorage,
+                                String imgurId,
+                                LinkedList<String> comments)
     {
         if (imgurId == null || imgurId.trim().isEmpty())
             throw new IllegalArgumentException("Must provide a valid imgur id");
+
+        // store the dependencies
+        _imgurManager = imgurManager;
+        _simpleCommentRequestStorage = simpleCommentRequestStorage;
 
         this.imgurId = imgurId;
         this.comments = comments;
         this.id = -1;
     }
 
-    public SimpleCommentRequest(long parentId, LinkedList<String> comments)
+    public SimpleCommentRequest(@NotNull IImgurManager imgurManager,
+                                @NotNull LocalStorageHandler<SimpleCommentRequest> simpleCommentRequestStorage,
+                                long parentId,
+                                LinkedList<String> comments)
     {
         if (parentId < 0)
             throw new IllegalArgumentException("Must provide a valid parent id");
+
+        // store the dependencies
+        _imgurManager = imgurManager;
+        _simpleCommentRequestStorage = simpleCommentRequestStorage;
 
         this.imgurId = "";
         this.parentId = parentId;
@@ -98,10 +136,17 @@ public class SimpleCommentRequest implements ICommentRequest
         this.id = -1;
     }
 
-    public SimpleCommentRequest(String imgurId, String... comments)
+    public SimpleCommentRequest(@NotNull IImgurManager imgurManager,
+                                @NotNull LocalStorageHandler<SimpleCommentRequest> simpleCommentRequestStorage,
+                                String imgurId,
+                                String... comments)
     {
         if (imgurId == null || imgurId.trim().isEmpty())
             throw new IllegalArgumentException("Must provide a valid imgur id");
+
+        // store the dependencies
+        _imgurManager = imgurManager;
+        _simpleCommentRequestStorage = simpleCommentRequestStorage;
 
         this.imgurId = imgurId;
         this.comments = new LinkedList<>();
@@ -114,10 +159,17 @@ public class SimpleCommentRequest implements ICommentRequest
         this.id = -1;
     }
 
-    public SimpleCommentRequest(long parentId, String... comments)
+    public SimpleCommentRequest(@NotNull IImgurManager imgurManager,
+                                @NotNull LocalStorageHandler<SimpleCommentRequest> simpleCommentRequestStorage,
+                                long parentId,
+                                String... comments)
     {
         if (parentId < 0)
             throw new IllegalArgumentException("Must provide a valid parent id");
+
+        // store the dependencies
+        _imgurManager = imgurManager;
+        _simpleCommentRequestStorage = simpleCommentRequestStorage;
 
         this.imgurId = "";
         this.parentId = parentId;
@@ -129,6 +181,26 @@ public class SimpleCommentRequest implements ICommentRequest
         }
 
         this.id = -1;
+    }
+
+    public static SimpleCommentRequest parse(@NotNull IImgurManager imgurManager,
+                                             @NotNull LocalStorageHandler<SimpleCommentRequest> simpleCommentRequestStorage,
+                                             long id,
+                                             String imgurId,
+                                             long parentId,
+                                             String data)
+    {
+        // split the data lines.
+        String[] split = data.split(" ; ");
+
+        LinkedList<String> items = new LinkedList<>();
+
+        for (String s : split)
+        {
+            items.add(s.replace(";;", ";"));
+        }
+
+        return new SimpleCommentRequest(imgurManager, simpleCommentRequestStorage, id, imgurId, parentId, items);
     }
 
     /**
@@ -166,12 +238,11 @@ public class SimpleCommentRequest implements ICommentRequest
 
         if (this.parent == null)
         {
-            this.parent = ImgurManager.client().commentService().getComment(this.parentId);
+            this.parent = _imgurManager.getClient().commentService().getComment(this.parentId);
         }
 
         return this.parent;
     }
-
 
     public long getParentId()
     {
@@ -212,7 +283,7 @@ public class SimpleCommentRequest implements ICommentRequest
     {
         try
         {
-            SimpleCommentRequestStorage.handler().remove(this);
+            _simpleCommentRequestStorage.remove(this);
         } catch (SQLException e)
         {
             e.printStackTrace();
@@ -239,36 +310,16 @@ public class SimpleCommentRequest implements ICommentRequest
                 Objects.equals(comments, that.comments);
     }
 
-
-
     @Override
     public int hashCode()
     {
         return Objects.hash(imgurId, parentId, comments);
     }
 
-    //region Database helper
-
-    public static SimpleCommentRequest parse(long id, String imgurId, long parentId, String data)
-    {
-        // split the data lines.
-        String[] split = data.split(" ; ");
-
-        LinkedList<String> items = new LinkedList<>();
-
-        for (String s : split)
-        {
-            items.add(s.replace(";;", ";"));
-        }
-
-        return new SimpleCommentRequest(id, imgurId, parentId, items);
-    }
-
-    private String dbString;
-
     /**
      * Give a compact single-line string for storage in the database.
      * Use `SimpleCommentRequest.parse` to revert this.
+     *
      * @return
      */
     public String dbParseComments()
@@ -296,6 +347,4 @@ public class SimpleCommentRequest implements ICommentRequest
 
         return dbString;
     }
-
-    //endregion
 }

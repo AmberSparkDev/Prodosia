@@ -20,23 +20,27 @@
  * SOFTWARE.
  */
 
-package com.Bluefix.Prodosia.Business.ApiKeys;
+package com.Bluefix.Prodosia.Business.Module;
 
-import com.Bluefix.Prodosia.Data.Storage.CookieStorage;
-import com.Bluefix.Prodosia.Data.Storage.ICookieStorage;
-
-/**
- * Stores cookie references in a singleton
- */
-public class CookieManager
+public interface IModuleWorker
 {
-    private static ICookieStorage _cookieStorage;
+    /**
+     * @return whether the module is active at current.
+     */
+    boolean isAlive();
 
-    public static ICookieStorage Cookie()
-    {
-        if (_cookieStorage == null)
-            _cookieStorage = new CookieStorage("cookie");
+    /**
+     * Start the worker.
+     */
+    void start();
 
-        return _cookieStorage;
-    }
+    /**
+     * Stop the worker.
+     */
+    void stop();
+
+    /**
+     * @return the timestamp at which the next cycle should start.
+     */
+    long getExpectedCycle();
 }

@@ -26,12 +26,25 @@ import com.Bluefix.Prodosia.Business.Logger.ApplicationWindowLogger;
 import com.Bluefix.Prodosia.Data.DataHandler.CommandPrefixStorage;
 import com.Bluefix.Prodosia.Data.DataType.Command.CommandInformation;
 import com.Bluefix.Prodosia.Business.Prefix.CommandPrefix;
+import com.Bluefix.Prodosia.Data.Logger.ILogger;
 
 /**
  * Executes strings if they adhere to the prefix syntax.
  */
 public class CommandRecognition
 {
+    private ILogger _logger;
+    private ILogger _appLogger;
+
+
+
+    public CommandRecognition(ILogger logger, ILogger appLogger)
+    {
+        // store the dependencies
+        _logger = logger;
+        _appLogger = appLogger;
+    }
+
 
 
     /**
@@ -41,7 +54,7 @@ public class CommandRecognition
      * @param info The command information that is available.
      * @param entry The entry for execution
      */
-    public static void executeEntry(CommandPrefix.Type type, CommandInformation info, String entry)
+    public void executeEntry(CommandPrefix.Type type, CommandInformation info, String entry)
     {
         // if the entry is empty, return
         if (entry == null || entry.trim().isEmpty())
@@ -57,13 +70,18 @@ public class CommandRecognition
             // if the command prefix wasn't set, simply ignore
             if (cPref == null)
             {
-                ApplicationWindowLogger.logMessage("### There was no prefix info for " + type.toString() + "!", ApplicationWindowLogger.Severity.WARNING);
+                if (_logger != null)
+                    _logger.warn("[CommandRecognition] There was no prefix for the requested type (" + type.toString() + ")");
+
+                if (_appLogger != null)
+                    _appLogger.info("There was no prefix info for " + type.toString() + "!");
                 return;
             }
         } catch (Exception e)
         {
-            e.printStackTrace();
-            ApplicationWindowLogger.logMessage("CommandRecognition::0parseComments -> " + e.getMessage(), ApplicationWindowLogger.Severity.ERROR);
+            if (_logger != null)
+                _logger.error("[CommandRecognition] Exception while attempting to fetch prefix for type " + type.toString() + "\r\n" + e.getMessage());
+
             return;
         }
         // attempt to execute the entry
@@ -81,9 +99,9 @@ public class CommandRecognition
 
         }
         catch (Exception e)
-        {System.out.println("8");
-            e.printStackTrace();
-            ApplicationWindowLogger.logMessage("CommandRecognition::1parseComments -> " + e.getMessage(), ApplicationWindowLogger.Severity.ERROR);
+        {
+            if (_logger != null)
+                _logger.error("[CommandRecognition] Exception while attempting to execute command.\r\n" + e.getMessage());
         }
     }
 }

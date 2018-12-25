@@ -22,20 +22,22 @@
 
 package com.Bluefix.Prodosia.Presentation.Tracker;
 
+import com.Bluefix.Prodosia.Business.Discord.DiscordManager;
+import com.Bluefix.Prodosia.Business.Exception.ExceptionHelper;
+import com.Bluefix.Prodosia.Business.Imgur.ImgurApi.IImgurManager;
+import com.Bluefix.Prodosia.Business.Tracker.ITrackerLogic;
+import com.Bluefix.Prodosia.Business.Tracker.TrackerLogic;
+import com.Bluefix.Prodosia.Business.Tracker.TrackerMetaInfo;
 import com.Bluefix.Prodosia.Data.DataHandler.TaglistHandler;
 import com.Bluefix.Prodosia.Data.DataHandler.TrackerHandler;
 import com.Bluefix.Prodosia.Data.DataType.Taglist.Taglist;
 import com.Bluefix.Prodosia.Data.DataType.Tracker.Tracker;
 import com.Bluefix.Prodosia.Data.DataType.Tracker.TrackerPermissions;
-import com.Bluefix.Prodosia.Business.Discord.DiscordManager;
-import com.Bluefix.Prodosia.Business.Exception.ExceptionHelper;
+import com.Bluefix.Prodosia.Data.Logger.ILogger;
 import com.Bluefix.Prodosia.Presentation.Helpers.DataFieldStorage;
 import com.Bluefix.Prodosia.Presentation.Helpers.EditableWindowPane;
 import com.Bluefix.Prodosia.Presentation.Managers.CheckboxListManager.TaglistClManager;
 import com.Bluefix.Prodosia.Presentation.Navigation.GuiApplication;
-import com.Bluefix.Prodosia.Business.Imgur.ImgurApi.ImgurManager;
-import com.github.kskelm.baringo.model.Account;
-import com.github.kskelm.baringo.util.BaringoApiException;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
@@ -44,47 +46,84 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import net.dv8tion.jda.core.entities.User;
 
-import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashSet;
 
 public class EditTrackerWindow extends EditableWindowPane
 {
+    @FXML
+    public TextField txt_imgurName;
+    @FXML
+    public Label lbl_imgurId;
 
-    //region Constructor
-
-
-
-    //endregion
 
     //region Textfields and labels
-
-    @FXML public TextField txt_imgurName;
-    @FXML public Label lbl_imgurId;
-    @FXML public TextField txt_discordName;
-    @FXML public TextField txt_discordTag;
-    @FXML public TextField txt_discordId;
-    @FXML public Label lbl_navigation;
-    @FXML public Label lbl_deleteConfirmation;
-    @FXML public Button button_confirmDelete;
+    @FXML
+    public TextField txt_discordName;
+    @FXML
+    public TextField txt_discordTag;
+    @FXML
+    public TextField txt_discordId;
+    @FXML
+    public Label lbl_navigation;
+    @FXML
+    public Label lbl_deleteConfirmation;
+    @FXML
+    public Button button_confirmDelete;
+    @FXML
+    public Button button_back;
+    @FXML
+    public Button button_edit;
 
     //endregion
 
     //region Button actions
-
-    @FXML public Button button_back;
-    @FXML public Button button_edit;
-    @FXML public Button button_delete;
-    @FXML public Button button_checkImgurName;
-    @FXML public Button button_checkDiscordTag;
+    @FXML
+    public Button button_delete;
+    @FXML
+    public Button button_checkImgurName;
+    @FXML
+    public Button button_checkDiscordTag;
+    private ITrackerLogic _trackerLogic;
+    private Tracker curTracker;
 
 
     //endregion
 
     //region State handling
+    private String previousImgurName = null;
+
+    //endregion
+
+    //region initialization
+    private String previousDiscordId = null;
+    @FXML
+    private CheckBox perm_chkAdmin;
+    @FXML
+    private VBox perm_taglists;
+    @FXML
+    private TextField perm_filter;
+
+    //endregion
+
+    //region Datafield recovery
+    @FXML
+    private ScrollPane perm_scrollpane;
+    private TaglistClManager taglistClManager;
+
+    //endregion
+
+    //region inherited methods
+
+    public EditTrackerWindow(IImgurManager imgurManager,
+                             ILogger logger,
+                             ILogger appLogger)
+    {
+        // store the dependencies.
+        _trackerLogic = new TrackerLogic(imgurManager, logger, appLogger);
+    }
 
     @Override
     protected void applyState(WindowState state)
@@ -136,18 +175,15 @@ public class EditTrackerWindow extends EditableWindowPane
         }
     }
 
-    //endregion
-
-    //region initialization
-
-    @FXML private void initialize()
+    @FXML
+    private void initialize()
     {
         super.initialize(button_back, button_edit, button_delete, button_confirmDelete);
     }
 
+    //endregion
 
-
-    private Tracker curTracker;
+    //region Api update
 
     /**
      * Clear all the data from the textfields.
@@ -188,10 +224,9 @@ public class EditTrackerWindow extends EditableWindowPane
         }
     }
 
-
-
     /**
      * Initialize a window with the tracker-information.
+     *
      * @param tracker The tracker to initialize on. Can be null.
      */
     public void init(Tracker tracker)
@@ -206,14 +241,9 @@ public class EditTrackerWindow extends EditableWindowPane
             clearUpdate();
 
             setState(WindowState.VIEW);
-        }
-        else
+        } else
             setState(WindowState.EDIT);
     }
-
-    //endregion
-
-    //region Datafield recovery
 
     @Override
     protected DataFieldStorage storeFields()
@@ -239,10 +269,6 @@ public class EditTrackerWindow extends EditableWindowPane
         txt_discordTag.setText(fields.get(3));
         txt_discordId.setText(fields.get(4));
     }
-
-    //endregion
-
-    //region inherited methods
 
     /**
      * @return true iff we are still in the process of creating the tracker.
@@ -276,10 +302,6 @@ public class EditTrackerWindow extends EditableWindowPane
         return true;
     }
 
-    //endregion
-
-    //region Api update
-
     /**
      * Indicate to the system that an update of the data is not required. This is
      * the case when a user has just been loaded in.
@@ -311,9 +333,6 @@ public class EditTrackerWindow extends EditableWindowPane
         txt_discordTag.setText("");
     }
 
-    private String previousImgurName = null;
-    private String previousDiscordId = null;
-
     @FXML
     private synchronized void updateImgurData(ActionEvent event)
     {
@@ -327,35 +346,26 @@ public class EditTrackerWindow extends EditableWindowPane
             setImgurId();
     }
 
+
+    //endregion
+
+
+    //region Data extraction and validation
+
     /**
      * Check the imgur name and see if it existed.
      */
     public void setImgurId()
     {
-        try
-        {
+        TrackerMetaInfo tmi = _trackerLogic.fetchTracker(previousImgurName);
 
-            Account acc = ImgurManager.client().accountService().getAccount(previousImgurName);
-
-            if (acc == null)
-            {
-                invalidImgurName();
-            }
-            else
-            {
-                lbl_imgurId.setText(String.valueOf(acc.getId()));
-                txt_imgurName.setId("");
-            }
-
-        } catch (BaringoApiException e)
+        if (tmi == null)
         {
             invalidImgurName();
-        } catch (IOException e)
+        } else
         {
-            exceptionAlert(e);
-        } catch (URISyntaxException e)
-        {
-            exceptionAlert(e);
+            lbl_imgurId.setText(String.valueOf(tmi.getId()));
+            txt_imgurName.setId("");
         }
     }
 
@@ -367,7 +377,6 @@ public class EditTrackerWindow extends EditableWindowPane
         lbl_imgurId.setText("");
         txt_imgurName.setId("twInvalidImgurId");
     }
-
 
     /**
      * Update the discord data fields. Will only update if one of the fields was invalidated.
@@ -397,8 +406,7 @@ public class EditTrackerWindow extends EditableWindowPane
             if (u == null)
             {
                 invalidDiscordId();
-            }
-            else
+            } else
             {
                 txt_discordName.setText(u.getName());
                 txt_discordTag.setText(u.getDiscriminator());
@@ -418,14 +426,9 @@ public class EditTrackerWindow extends EditableWindowPane
         txt_discordId.setId("twInvalidDiscordId");
     }
 
-
-    //endregion
-
-
-    //region Data extraction and validation
-
     /**
      * Parse a tracker from the data in the fields. Will return null iff at least one field is invalid.
+     *
      * @return the tracker as indicated in the fields, or null otherwise.
      */
     private Tracker parseTracker()
@@ -449,8 +452,7 @@ public class EditTrackerWindow extends EditableWindowPane
         {
             alertUser("The imgur name was detected to be invalid. Check whether the name is correct or complete it to continue.");
             return null;
-        }
-        else if (valDis == DataValidation.ERRONEOUS)
+        } else if (valDis == DataValidation.ERRONEOUS)
         {
             alertUser("The discord id was detected to be invalid. Check whether the id is correct or complete it to continue.");
             return null;
@@ -488,6 +490,11 @@ public class EditTrackerWindow extends EditableWindowPane
                 perm);
     }
 
+    //endregion
+
+
+    //region Permission Handling
+
     private DataValidation validateImgurData()
     {
         if (lbl_imgurId.getText().isEmpty())
@@ -496,8 +503,7 @@ public class EditTrackerWindow extends EditableWindowPane
             if (txt_imgurName.getText().isEmpty())
             {
                 return DataValidation.MISSING;
-            }
-            else
+            } else
             {
                 // there was an imgur name, but no proper id.
                 return DataValidation.ERRONEOUS;
@@ -515,8 +521,7 @@ public class EditTrackerWindow extends EditableWindowPane
             if (txt_discordId.getText().trim().isEmpty())
             {
                 return DataValidation.MISSING;
-            }
-            else
+            } else
             {
                 // since there was a discord id but no associated name / tag, it is erroneous.
                 return DataValidation.ERRONEOUS;
@@ -525,35 +530,6 @@ public class EditTrackerWindow extends EditableWindowPane
 
         // TODO: determine whether the data is valid.
         return DataValidation.VALIDATED;
-    }
-
-
-
-
-
-
-
-
-
-    /**
-     * The validation of the specified data.
-     */
-    private enum DataValidation
-    {
-        /**
-         * The data was found to be correct.
-         */
-        VALIDATED,
-
-        /**
-         * The data was found to be at least partially incorrect.
-         */
-        ERRONEOUS,
-
-        /**
-         * The data was missing.
-         */
-        MISSING
     }
 
     private void alertUser(String message)
@@ -601,18 +577,6 @@ public class EditTrackerWindow extends EditableWindowPane
         alert.showAndWait();
     }
 
-    //endregion
-
-
-    //region Permission Handling
-
-    @FXML private CheckBox perm_chkAdmin;
-    @FXML private VBox perm_taglists;
-    @FXML private TextField perm_filter;
-    @FXML private ScrollPane perm_scrollpane;
-
-    private TaglistClManager taglistClManager;
-
     /**
      * Initialize the permissions with a clean array.
      */
@@ -634,7 +598,6 @@ public class EditTrackerWindow extends EditableWindowPane
         perm_chkAdmin.selectedProperty().addListener((observable, oldValue, newValue) ->
                 adminCheckboxSelection());
     }
-
 
     /**
      * Display the permissions that correspond to the currently selected tagger.
@@ -666,17 +629,16 @@ public class EditTrackerWindow extends EditableWindowPane
         {
             perm_filter.setDisable(true);
             perm_scrollpane.setDisable(true);
-        }
-        else
+        } else
         {
             perm_filter.setDisable(false);
             perm_scrollpane.setDisable(false);
         }
     }
 
-
     /**
      * Parse the permissions that have been selected by the user.
+     *
      * @return
      */
     private TrackerPermissions parsePermissions()
@@ -709,13 +671,29 @@ public class EditTrackerWindow extends EditableWindowPane
     }
 
 
+    /**
+     * The validation of the specified data.
+     */
+    private enum DataValidation
+    {
+        /**
+         * The data was found to be correct.
+         */
+        VALIDATED,
+
+        /**
+         * The data was found to be at least partially incorrect.
+         */
+        ERRONEOUS,
+
+        /**
+         * The data was missing.
+         */
+        MISSING
+    }
 
 
     //endregion
-
-
-
-
 
 
 }

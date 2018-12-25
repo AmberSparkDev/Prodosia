@@ -22,47 +22,50 @@
 
 package com.Bluefix.Prodosia.Business.Imgur.UserSanitation;
 
+import com.Bluefix.Prodosia.Business.Exception.BaringoExceptionHelper;
+import com.Bluefix.Prodosia.Business.Imgur.ImgurApi.IImgurManager;
 import com.Bluefix.Prodosia.Data.DataHandler.UserHandler;
 import com.Bluefix.Prodosia.Data.DataType.User.User;
 import com.Bluefix.Prodosia.Business.Imgur.ImgurApi.ApiDistribution;
 import com.Bluefix.Prodosia.Business.Imgur.ImgurApi.ImgurManager;
 import com.Bluefix.Prodosia.Business.Module.ImgurIntervalRunner;
+import com.Bluefix.Prodosia.Data.Logger.ILogger;
 import com.github.kskelm.baringo.model.Account;
+import com.github.kskelm.baringo.util.BaringoApiException;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashSet;
 
+/**
+ * Periodically check on users to see if they have to be deleted or if their Imgur username has changed.
+ */
 public class UserSanitationModule extends ImgurIntervalRunner
 {
-    //region Singleton and constructor
+    private IImgurManager _imgurManager;
 
-    private static UserSanitationModule me;
-
-    public static UserSanitationModule handler()
+    public UserSanitationModule(IImgurManager imgurManager, ILogger logger, ILogger appLogger)
     {
-        if (me == null)
-            me = new UserSanitationModule();
+        super(ApiDistribution.SanitationModule, logger, appLogger);
 
-        return me;
-    }
-
-    public UserSanitationModule()
-    {
-        super(ApiDistribution.SanitationModule);
+        // store the dependencies
+        _imgurManager = imgurManager;
 
         this.processedUser = false;
     }
 
-    //endregion
 
     private boolean processedUser;
+
+
 
     /**
      * Execute a single cycle.
      */
     @Override
-    protected void run()
+    public void run()
     {
         processedUser = false;
 
@@ -104,9 +107,33 @@ public class UserSanitationModule extends ImgurIntervalRunner
 
         try
         {
-            acc = ImgurManager.client().accountService().getAccount(u.getImgurId());
-        } catch (Exception e)
+            acc = _imgurManager.getClient().accountService().getAccount(u.getImgurId());
+        } catch (BaringoApiException ex)
         {
+            // if the user could not be found, delete it from the system.
+            if (BaringoExceptionHelper.isNotFound(ex))
+            {
+                try
+                {
+                    UserHandler.handler().remove(u);
+                } catch (Exception e)
+                {
+                    if (_logger != null)
+                        _logger.error("[UserSanitationModule] Exception while attempting to remove a deleted user.\r\n" + e.getMessage());
+                }
+            } else
+            {
+                if (_logger != null)
+                    _logger.warn("[UserSanitationModule] BaringoApiException while attempting to fetch user.\r\n" + ex.getMessage());
+            }
+
+            return;
+        }
+        catch (Exception e)
+        {
+            if (_logger != null)
+                _logger.warn("[UserSanitationModule] Exception while attempting to fetch user.\r\n" + e.getMessage());
+
             // an exception is annoying, but could indicate something simple (like
             // the Imgur servers being overloaded). As such, it shouldn't be considered
             // decisive (however, the API request should be considered used nonetheless).
@@ -149,9 +176,15 @@ public class UserSanitationModule extends ImgurIntervalRunner
      * @return The maximum amount of GET requests.
      */
     @Override
-    protected int projectedRequests()
+    public int projectedRequests()
     {
         // if a user was processed, return 1
         return (this.processedUser ? 1 : 0);
+    }
+
+    @Override
+    public String getName()
+    {
+        return "User Sanitation";
     }
 }

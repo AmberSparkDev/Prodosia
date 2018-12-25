@@ -22,19 +22,32 @@
 
 package com.Bluefix.Prodosia.Data.DataType.Command;
 
+import com.Bluefix.Prodosia.Business.Imgur.ImgurApi.IImgurManager;
+import com.Bluefix.Prodosia.Data.DataHandler.LocalStorageHandler;
 import com.Bluefix.Prodosia.Data.DataHandler.SimpleCommentRequestStorage;
 import com.Bluefix.Prodosia.Data.DataType.Comments.SimpleCommentRequest;
 import com.Bluefix.Prodosia.Data.DataType.Comments.StatComment;
 import com.Bluefix.Prodosia.Data.DataType.Tracker.Tracker;
+import com.Bluefix.Prodosia.Data.Logger.ILogger;
 import com.github.kskelm.baringo.model.Comment;
 
 import java.util.LinkedList;
 
 public class ImgurCommandInformation extends CommandInformation
 {
-    public ImgurCommandInformation(Tracker tracker, Comment comment)
+    private LocalStorageHandler<SimpleCommentRequest> _simpleCommentRequestStorage;
+
+    public ImgurCommandInformation(Tracker tracker,
+                                   Comment comment,
+                                   IImgurManager imgurManager,
+                                   LocalStorageHandler<SimpleCommentRequest> simpleCommentRequestStorage,
+                                   ILogger logger,
+                                   ILogger appLogger)
     {
-        super();
+        super(imgurManager, logger, appLogger);
+
+        // store the dependencies
+        _simpleCommentRequestStorage = simpleCommentRequestStorage;
 
         super.setTracker(tracker);
         super.setParentComment(comment);
@@ -57,6 +70,6 @@ public class ImgurCommandInformation extends CommandInformation
                         super.getParentComment().getId(),
                         mEn);
 
-        SimpleCommentRequestStorage.handler().set(scr);
+        _simpleCommentRequestStorage.set(scr);
     }
 }

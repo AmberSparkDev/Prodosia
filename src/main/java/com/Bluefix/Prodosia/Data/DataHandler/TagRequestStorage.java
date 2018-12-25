@@ -22,9 +22,10 @@
 
 package com.Bluefix.Prodosia.Data.DataHandler;
 
-import com.Bluefix.Prodosia.Data.DataType.Comments.TagRequest.TagRequest;
 import com.Bluefix.Prodosia.Business.Discord.Archive.ArchiveManager;
-import com.Bluefix.Prodosia.Business.Imgur.Tagging.CommentExecution;
+import com.Bluefix.Prodosia.Business.Discord.Archive.IArchiveManager;
+import com.Bluefix.Prodosia.Data.DataType.Comments.TagRequest.TagRequest;
+import com.Bluefix.Prodosia.Data.Logger.ILogger;
 import com.Bluefix.Prodosia.Data.SQLite.SqlDatabase;
 import com.github.kskelm.baringo.util.BaringoApiException;
 
@@ -39,40 +40,153 @@ import java.util.ArrayList;
 /**
  * Imgur helper class that handles Tag Requests.
  * It has a collection of all open tag requests that still need to be (partially) handled.
- *
+ * <p>
  * `CommentExecution` uses this class to tag the items in the queue. This class merely handles the storage.
  */
 public class TagRequestStorage extends LocalStorageHandler<TagRequest>
 {
-    //region Singleton and constructor
+    private IArchiveManager _archiveManager;
+    private ILogger _logger;
+    private ILogger _appLogger;
 
-    private static TagRequestStorage me;
-
-    public static TagRequestStorage handler()
-    {
-        if (me == null)
-        {
-            me = new TagRequestStorage();
-
-            // start an underlying thread that handles the tagrequests.
-            if (!CommentExecution.handler().isAlive())
-                CommentExecution.handler().start();
-        }
-
-        return me;
-    }
-
-    private TagRequestStorage()
+    public TagRequestStorage(IArchiveManager archiveManager,
+            ILogger logger,
+                             ILogger appLogger)
     {
         super(true);
+
+        // store the dependencies
+        _archiveManager = archiveManager;
+        _logger = logger;
+        _appLogger = appLogger;
     }
 
-    //endregion
+    private static TagRequest dbSetTagrequest(TagRequest t) throws SQLException, BaringoApiException, IOException, URISyntaxException
+    {
+        if (t == null)
+            return null;
 
-    //region Local Storage Handler implementation
+        // retrieve the old tag request
+        TagRequest oldRequest = dbGetTagrequest(t.getImgurId(), t.getParentId());
+
+        // complete the old tag request to replace it with the new one.
+        dbRemoveTagrequest(oldRequest);
+
+        String query =
+                "INSERT INTO TagQueue " +
+                        "(imgurId, parentComment, taglists, rating, filters, cleanComments) " +
+                        "VALUES (?,?,?,?,?,?);";
+
+        PreparedStatement prep = SqlDatabase.getStatement(query);
+        prep.setString(1, t.getImgurId());
+        prep.setLong(2, t.getParentId());
+        prep.setString(3, t.getDbTaglists());
+        prep.setInt(4, t.getRating().getValue());
+        prep.setString(5, t.getFilter());
+        prep.setBoolean(6, t.isCleanComments());
+
+        SqlDatabase.execute(prep);
+
+        assert (prep.isClosed());
+
+        return oldRequest;
+    }
+
+    private static void dbRemoveTagrequest(TagRequest t) throws SQLException, BaringoApiException, IOException, URISyntaxException
+    {
+        // if the tag request is null, skip
+        if (t == null)
+            return;
+
+        String query =
+                "DELETE FROM TagQueue " +
+                        "WHERE imgurId = ? AND parentComment = ?;";
+
+        PreparedStatement prep = SqlDatabase.getStatement(query);
+        prep.setString(1, t.getImgurId());
+        prep.setLong(2, t.getParentId());
+        SqlDatabase.execute(prep);
+
+        assert (prep.isClosed());
+    }
+
+    private static TagRequest dbGetTagrequest(String imgurId, long parentId) throws SQLException
+    {
+        String query =
+                "SELECT imgurId, parentComment, taglists, rating, filters, cleanComments " +
+                        "FROM TagQueue " +
+                        "WHERE imgurId = ? AND parentComment = ?;";
+
+        PreparedStatement prep = SqlDatabase.getStatement(query);
+        prep.setString(1, imgurId);
+        prep.setLong(2, parentId);
+        ArrayList<ResultSet> result = SqlDatabase.query(prep);
+
+        if (result.size() != 1)
+            throw new SQLException("SqlDatabase exception: Expected result size did not match (was " + result.size() + ")");
+
+        ResultSet rs = result.get(0);
+
+        // parse the result and return
+        ArrayList<TagRequest> parsedRequests = parseTagrequests(rs);
+
+        prep.close();
+        assert (prep.isClosed());
+
+        if (parsedRequests.isEmpty())
+            return null;
+
+        return parsedRequests.get(0);
+    }
+
+    private static ArrayList<TagRequest> dbGetTagrequests() throws SQLException
+    {
+        String query =
+                "SELECT imgurId, parentComment, taglists, rating, filters, cleanComments " +
+                        "FROM TagQueue;";
+
+        PreparedStatement prep = SqlDatabase.getStatement(query);
+        ArrayList<ResultSet> result = SqlDatabase.query(prep);
+
+        if (result.size() != 1)
+            throw new SQLException("SqlDatabase exception: Expected result size did not match (was " + result.size() + ")");
+
+        ResultSet rs = result.get(0);
+
+        // parse the result and return
+        ArrayList<TagRequest> parsedRequests = parseTagrequests(rs);
+
+        prep.close();
+        assert (prep.isClosed());
+
+        return parsedRequests;
+    }
+
+    private static ArrayList<TagRequest> parseTagrequests(ResultSet rs) throws SQLException
+    {
+        ArrayList<TagRequest> output = new ArrayList<>();
+
+        while (rs.next())
+        {
+            String imgurId = rs.getString(1);
+            long parentComment = rs.getLong(2);
+            String taglists = rs.getString(3);
+            int rating = rs.getInt(4);
+            String filters = rs.getString(5);
+            boolean cleanComments = rs.getBoolean(6);
+
+            output.add(new TagRequest(imgurId, parentComment, taglists, rating, filters, cleanComments));
+        }
+
+        // close the resultset
+        rs.close();
+
+        return output;
+    }
 
     /**
      * Add an item to the collection.
+     *
      * @param tagRequest The item to be added.
      */
     @Override
@@ -97,14 +211,20 @@ public class TagRequestStorage extends LocalStorageHandler<TagRequest>
             // complete the old item and add the new one.
             super.remove(oldT);
             super.set(merge);
-        }
-        else
+        } else
         {
             super.set(tagRequest);
         }
 
         // Let the archive manager handle the tagrequest as well.
-        ArchiveManager.handleTagRequest(tagRequest);
+        try
+        {
+            _archiveManager.handleTagRequest(tagRequest);
+        } catch (Exception e)
+        {
+            if (_logger != null)
+                _logger.error("[TagRequestStorage] Exception thrown while attempting to add a tag request to the archive manager.\r\n" + e.getMessage());
+        }
     }
 
     /**
@@ -139,137 +259,6 @@ public class TagRequestStorage extends LocalStorageHandler<TagRequest>
     {
         return dbGetTagrequests();
     }
-
-    //endregion
-
-    //region Database Management
-
-    private static TagRequest dbSetTagrequest(TagRequest t) throws SQLException, BaringoApiException, IOException, URISyntaxException
-    {
-        if (t == null)
-            return null;
-
-        // retrieve the old tag request
-        TagRequest oldRequest = dbGetTagrequest(t.getImgurId(), t.getParentId());
-
-        // complete the old tag request to replace it with the new one.
-        dbRemoveTagrequest(oldRequest);
-
-        String query =
-                "INSERT INTO TagQueue " +
-                "(imgurId, parentComment, taglists, rating, filters, cleanComments) " +
-                "VALUES (?,?,?,?,?,?);";
-
-        PreparedStatement prep = SqlDatabase.getStatement(query);
-        prep.setString(1, t.getImgurId());
-        prep.setLong(2, t.getParentId());
-        prep.setString(3, t.getDbTaglists());
-        prep.setInt(4, t.getRating().getValue());
-        prep.setString(5, t.getFilter());
-        prep.setBoolean(6, t.isCleanComments());
-
-        SqlDatabase.execute(prep);
-
-        assert(prep.isClosed());
-
-        return oldRequest;
-    }
-
-    private static void dbRemoveTagrequest(TagRequest t) throws SQLException, BaringoApiException, IOException, URISyntaxException
-    {
-        // if the tag request is null, skip
-        if (t == null)
-            return;
-
-        String query =
-                "DELETE FROM TagQueue " +
-                "WHERE imgurId = ? AND parentComment = ?;";
-
-        PreparedStatement prep = SqlDatabase.getStatement(query);
-        prep.setString(1, t.getImgurId());
-        prep.setLong(2, t.getParentId());
-        SqlDatabase.execute(prep);
-
-        assert(prep.isClosed());
-    }
-
-    private static TagRequest dbGetTagrequest(String imgurId, long parentId) throws SQLException
-    {
-        String query =
-                "SELECT imgurId, parentComment, taglists, rating, filters, cleanComments " +
-                "FROM TagQueue " +
-                "WHERE imgurId = ? AND parentComment = ?;";
-
-        PreparedStatement prep = SqlDatabase.getStatement(query);
-        prep.setString(1, imgurId);
-        prep.setLong(2, parentId);
-        ArrayList<ResultSet> result = SqlDatabase.query(prep);
-
-        if (result.size() != 1)
-            throw new SQLException("SqlDatabase exception: Expected result size did not match (was " + result.size() + ")");
-
-        ResultSet rs = result.get(0);
-
-        // parse the result and return
-        ArrayList<TagRequest> parsedRequests = parseTagrequests(rs);
-
-        prep.close();
-        assert(prep.isClosed());
-
-        if (parsedRequests.isEmpty())
-            return null;
-
-        return parsedRequests.get(0);
-    }
-
-    private static ArrayList<TagRequest> dbGetTagrequests() throws SQLException
-    {
-        String query =
-                "SELECT imgurId, parentComment, taglists, rating, filters, cleanComments " +
-                "FROM TagQueue;";
-
-        PreparedStatement prep = SqlDatabase.getStatement(query);
-        ArrayList<ResultSet> result = SqlDatabase.query(prep);
-
-        if (result.size() != 1)
-            throw new SQLException("SqlDatabase exception: Expected result size did not match (was " + result.size() + ")");
-
-        ResultSet rs = result.get(0);
-
-        // parse the result and return
-        ArrayList<TagRequest> parsedRequests = parseTagrequests(rs);
-
-        prep.close();
-        assert(prep.isClosed());
-
-        return parsedRequests;
-    }
-
-    private static ArrayList<TagRequest> parseTagrequests(ResultSet rs) throws SQLException
-    {
-        ArrayList<TagRequest> output = new ArrayList<>();
-
-        while (rs.next())
-        {
-            String imgurId = rs.getString(1);
-            long parentComment = rs.getLong(2);
-            String taglists = rs.getString(3);
-            int rating = rs.getInt(4);
-            String filters = rs.getString(5);
-            boolean cleanComments = rs.getBoolean(6);
-
-            output.add(new TagRequest(imgurId, parentComment, taglists, rating, filters, cleanComments));
-        }
-
-        // close the resultset
-        rs.close();
-
-        return output;
-    }
-
-    //endregion
-
-
 }
 
 

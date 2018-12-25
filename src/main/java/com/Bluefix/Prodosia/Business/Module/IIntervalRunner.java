@@ -20,23 +20,22 @@
  * SOFTWARE.
  */
 
-package com.Bluefix.Prodosia.Business.ApiKeys;
+package com.Bluefix.Prodosia.Business.Module;
 
-import com.Bluefix.Prodosia.Data.Storage.CookieStorage;
-import com.Bluefix.Prodosia.Data.Storage.ICookieStorage;
-
-/**
- * Stores cookie references in a singleton
- */
-public class CookieManager
+public interface IIntervalRunner extends IModule
 {
-    private static ICookieStorage _cookieStorage;
+    /**
+     * @return The amount of actual GET requests that have occurred since the last time this method was called.
+     */
+    int projectedRequests();
 
-    public static ICookieStorage Cookie()
-    {
-        if (_cookieStorage == null)
-            _cookieStorage = new CookieStorage("cookie");
+    /**
+     * @return The maximum amount of requests this module is allowed to run.
+     */
+    int getMaximumAllowedRequests();
 
-        return _cookieStorage;
-    }
+    /**
+     * Run the underlying module logic. This will happen once per interval.
+     */
+    void run();
 }

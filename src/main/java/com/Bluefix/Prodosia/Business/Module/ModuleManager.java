@@ -27,71 +27,31 @@ import com.Bluefix.Prodosia.Business.Imgur.CommentScanner.CommentScannerExecutio
 import com.Bluefix.Prodosia.Business.Imgur.ImgurApi.IImgurManager;
 import com.Bluefix.Prodosia.Business.Imgur.Tagging.CommentExecution;
 import com.Bluefix.Prodosia.Business.Imgur.UserSanitation.UserSanitationModule;
+import com.Bluefix.Prodosia.Data.Logger.ILogger;
 
 /**
- * Global module manager
+ * Module manager for all Imgur modules that are run in the background.
  */
 public class ModuleManager
 {
-    private IImgurManager _imgurManager;
+    private CommentDeletionExecution _commentDeletionExecution;
+    private CommentScannerExecution _commentScannerExecution;
+    private CommentExecution _commentExecution;
+    private UserSanitationModule _sanitationModule;
 
-    public ModuleManager(IImgurManager imgurManager)
+    public ModuleManager(
+            IImgurManager imgurManager,
+            ILogger logger,
+            ILogger appLogger)
     {
-        // store the dependencies
-        _imgurManager = imgurManager;
+        _commentScannerExecution = new CommentScannerExecution(imgurManager, logger, appLogger);
+        _commentDeletionExecution = new CommentDeletionExecution(imgurManager, logger, appLogger);
+        _commentExecution = new CommentExecution(imgurManager, logger, appLogger);
+        _sanitationModule = new UserSanitationModule(imgurManager, logger, appLogger);
 
-        imgurDepen
+        _commentScannerExecution.start();
+        _commentDeletionExecution.start();
+        _commentExecution.start();
+        _sanitationModule.start();
     }
-
-
-
-    //region Variables, Constructor and Singleton
-
-    private CommentDeletionExecution commentDeletionExecution;
-    private CommentScannerExecution commentScannerExecution;
-    private CommentExecution commentExecution;
-    private UserSanitationModule sanitationModule;
-
-    private static ModuleManager me;
-
-    private static ModuleManager handler()
-    {
-        if (me == null)
-            me = new ModuleManager();
-
-        return me;
-    }
-
-    private ModuleManager()
-    {
-        imgurDependenciesStarted = false;
-    }
-
-    //endregion
-
-
-    private boolean imgurDependenciesStarted;
-
-    public static synchronized void startImgurDependencies()
-    {
-        // if these entries were already started, skip this phase.
-        if (handler().imgurDependenciesStarted)
-            return;
-
-        handler().imgurDependenciesStarted = true;
-
-
-        // init all the module values
-        handler().commentScannerExecution = CommentScannerExecution.handler();
-        handler().commentDeletionExecution = CommentDeletionExecution.handler();
-        handler().commentExecution = CommentExecution.handler();
-        handler().sanitationModule = UserSanitationModule.handler();
-
-        // start the modules
-        handler().commentScannerExecution.start();
-        handler().commentDeletionExecution.start();
-        handler().commentExecution.start();
-        handler().sanitationModule.start();
-    }
-
 }

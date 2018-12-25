@@ -20,23 +20,11 @@
  * SOFTWARE.
  */
 
-package com.Bluefix.Prodosia.Business.ApiKeys;
+package com.Bluefix.Prodosia.Business.Discord.Archive;
 
-import com.Bluefix.Prodosia.Data.Storage.CookieStorage;
-import com.Bluefix.Prodosia.Data.Storage.ICookieStorage;
+import com.Bluefix.Prodosia.Data.DataType.Comments.TagRequest.TagRequest;
 
-/**
- * Stores cookie references in a singleton
- */
-public class CookieManager
+public interface IArchiveManager
 {
-    private static ICookieStorage _cookieStorage;
-
-    public static ICookieStorage Cookie()
-    {
-        if (_cookieStorage == null)
-            _cookieStorage = new CookieStorage("cookie");
-
-        return _cookieStorage;
-    }
+    void handleTagRequest(TagRequest tagRequest) throws Exception;
 }

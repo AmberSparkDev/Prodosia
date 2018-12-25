@@ -20,23 +20,12 @@
  * SOFTWARE.
  */
 
-package com.Bluefix.Prodosia.Business.ApiKeys;
+package com.Bluefix.Prodosia.Business.Module;
 
-import com.Bluefix.Prodosia.Data.Storage.CookieStorage;
-import com.Bluefix.Prodosia.Data.Storage.ICookieStorage;
-
-/**
- * Stores cookie references in a singleton
- */
-public class CookieManager
+public class MaxRequestsExceededException extends Exception
 {
-    private static ICookieStorage _cookieStorage;
-
-    public static ICookieStorage Cookie()
+    public MaxRequestsExceededException(String message)
     {
-        if (_cookieStorage == null)
-            _cookieStorage = new CookieStorage("cookie");
-
-        return _cookieStorage;
+        super(message);
     }
 }

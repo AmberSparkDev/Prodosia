@@ -20,23 +20,15 @@
  * SOFTWARE.
  */
 
-package com.Bluefix.Prodosia.Business.ApiKeys;
+package com.Bluefix.Prodosia.Business.Imgur.Tagging;
 
-import com.Bluefix.Prodosia.Data.Storage.CookieStorage;
-import com.Bluefix.Prodosia.Data.Storage.ICookieStorage;
+import com.Bluefix.Prodosia.Data.DataType.Comments.FeedbackRequest;
 
-/**
- * Stores cookie references in a singleton
- */
-public class CookieManager
+public interface ICommentExecution
 {
-    private static ICookieStorage _cookieStorage;
-
-    public static ICookieStorage Cookie()
-    {
-        if (_cookieStorage == null)
-            _cookieStorage = new CookieStorage("cookie");
-
-        return _cookieStorage;
-    }
+    /**
+     * Queue a new Feedback Request object.
+     * @param fr The feedback request metadata.
+     */
+    void executeFeedbackRequest(FeedbackRequest fr);
 }

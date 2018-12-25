@@ -23,6 +23,9 @@
 package com.Bluefix.Prodosia.Business.Command.CommandFunc;
 
 import com.Bluefix.Prodosia.Business.Command.CommandHelper.TagRequestParser;
+import com.Bluefix.Prodosia.Business.Imgur.ImgurApi.IImgurManager;
+import com.Bluefix.Prodosia.Business.Imgur.Tagging.ICommentExecution;
+import com.Bluefix.Prodosia.Data.DataHandler.LocalStorageHandler;
 import com.Bluefix.Prodosia.Data.DataHandler.TagRequestStorage;
 import com.Bluefix.Prodosia.Data.DataType.Command.CommandInformation;
 import com.Bluefix.Prodosia.Data.DataType.Comments.FeedbackRequest;
@@ -31,8 +34,10 @@ import com.Bluefix.Prodosia.Data.DataType.Comments.TagRequest.BaseTagRequest;
 import com.Bluefix.Prodosia.Data.DataType.Comments.TagRequest.TagRequest;
 import com.Bluefix.Prodosia.Business.Imgur.ImgurApi.ImgurManager;
 import com.Bluefix.Prodosia.Business.Imgur.Tagging.CommentExecution;
+import com.Bluefix.Prodosia.Data.Logger.ILogger;
 import com.github.kskelm.baringo.model.Comment;
 import com.github.kskelm.baringo.util.BaringoApiException;
+import com.sun.istack.internal.NotNull;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -41,6 +46,27 @@ import java.util.Objects;
 
 public class TagCommand implements ICommandFunc
 {
+    private IImgurManager _imgurManager;
+    private ICommentExecution _commentExecution;
+    private LocalStorageHandler<TagRequest> _tagRequestStorage;
+    private ILogger _logger;
+    private ILogger _appLogger;
+
+    public TagCommand(@NotNull IImgurManager imgurManager,
+                      @NotNull ICommentExecution commentExecution,
+                      @NotNull LocalStorageHandler<TagRequest> tagRequestStorage,
+                      ILogger logger,
+                      ILogger appLogger)
+    {
+        // store the dependencies.
+        _imgurManager = imgurManager;
+        _commentExecution = commentExecution;
+        _tagRequestStorage = tagRequestStorage;
+        _logger = logger;
+        _appLogger = appLogger;
+    }
+
+
     /**
      * Execute a tag command
      * @param ci Information pertaining to the command.
@@ -70,7 +96,7 @@ public class TagCommand implements ICommandFunc
      * @param arguments The arguments for the tag command.
      * @throws Exception
      */
-    private static void parseTagRequest(CommandInformation ci, String[] arguments) throws Exception
+    private void parseTagRequest(CommandInformation ci, String[] arguments) throws Exception
     {
         if (arguments == null || arguments.length == 0)
         {
@@ -146,16 +172,16 @@ public class TagCommand implements ICommandFunc
             // and handle the rest of the TagRequest there
 
             FeedbackRequest fr = new TagParentFeedbackRequest(
-                    parentComment, imgurId, trr.getTagRequest());
+                    _imgurManager, _tagRequestStorage, parentComment, imgurId, trr.getTagRequest());
 
-            CommentExecution.executeFeedbackRequest(fr);
+            _commentExecution.executeFeedbackRequest(fr);
         }
         else
         {
             // parse the tag request and add it to the queue.
             TagRequest tr = trr.getTagRequest().parseTagRequest(imgurId, ci.getParentComment());
 
-            TagRequestStorage.handler().set(tr);
+            _tagRequestStorage.set(tr);
         }
     }
 
@@ -168,12 +194,25 @@ public class TagCommand implements ICommandFunc
      */
     private static class TagParentFeedbackRequest extends FeedbackRequest
     {
+        private IImgurManager _imgurManager;
+        private LocalStorageHandler<TagRequest> _tagRequestStorage;
+
         private BaseTagRequest btr;
         private String imgurId;
 
-        public TagParentFeedbackRequest(String comment, String imgurId, BaseTagRequest btr)
+        public TagParentFeedbackRequest(
+                IImgurManager imgurManager,
+                LocalStorageHandler<TagRequest> tagRequestStorage,
+                String comment,
+                String imgurId,
+                BaseTagRequest btr)
         {
             super(comment);
+
+            // store the dependencies
+            _imgurManager = imgurManager;
+            _tagRequestStorage = tagRequestStorage;
+
             this.imgurId = imgurId;
 
             this.btr = btr;
@@ -189,7 +228,7 @@ public class TagCommand implements ICommandFunc
         {
             try
             {
-                Comment pComment = ImgurManager.client().commentService().getComment(commentId);
+                Comment pComment = _imgurManager.getClient().commentService().getComment(commentId);
 
                 // if the parent comment could not be posted, cancel the tag request for now.
                 if (pComment == null)
@@ -198,7 +237,7 @@ public class TagCommand implements ICommandFunc
                 // parse the tag request and add it to the queue.
                 TagRequest tr = btr.parseTagRequest(pComment);
 
-                TagRequestStorage.handler().set(tr);
+                _tagRequestStorage.set(tr);
             }
             catch (Exception e)
             {

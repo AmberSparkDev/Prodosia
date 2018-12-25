@@ -23,6 +23,7 @@
 package com.Bluefix.Prodosia.Business.Command.CommandFunc.Subscription;
 
 import com.Bluefix.Prodosia.Business.Command.CommandFunc.ICommandFunc;
+import com.Bluefix.Prodosia.Business.Imgur.ImgurApi.IImgurManager;
 import com.Bluefix.Prodosia.Data.DataHandler.UserHandler;
 import com.Bluefix.Prodosia.Data.DataType.Command.CommandInformation;
 import com.Bluefix.Prodosia.Data.DataType.Command.ImgurCommandInformation;
@@ -31,6 +32,7 @@ import com.Bluefix.Prodosia.Data.DataType.User.User;
 import com.Bluefix.Prodosia.Business.Imgur.ImgurApi.ImgurManager;
 import com.github.kskelm.baringo.model.Comment;
 import com.github.kskelm.baringo.util.BaringoApiException;
+import com.sun.istack.internal.NotNull;
 
 import java.util.HashSet;
 import java.util.List;
@@ -38,6 +40,14 @@ import java.util.regex.Pattern;
 
 public class UnsuballCommand implements ICommandFunc
 {
+    private IImgurManager _imgurManager;
+
+    public UnsuballCommand(@NotNull IImgurManager imgurManager)
+    {
+        _imgurManager = imgurManager;
+    }
+
+
     /**
      * Execute the command with the specified parameters.
      *
@@ -102,7 +112,7 @@ public class UnsuballCommand implements ICommandFunc
 
         try
         {
-            comments = ImgurManager.client().galleryService().getItemComments(imgurId, Comment.Sort.Best);
+            comments = _imgurManager.getClient().galleryService().getItemComments(imgurId, Comment.Sort.Best);
         }
         catch (BaringoApiException e)
         {
@@ -142,7 +152,7 @@ public class UnsuballCommand implements ICommandFunc
                 {
                     return (
                             c.getAuthorId() == ci.getTracker().getImgurId() ||
-                                    c.getAuthorId() == ImgurManager.client().getAuthenticatedAccount().getId());
+                                    c.getAuthorId() == _imgurManager.getClient().getAuthenticatedAccount().getId());
                 } catch (Exception ex)
                 {
                     // an exception here might be cause for concern, but it shouldn't impede functionality.
